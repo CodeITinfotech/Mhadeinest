@@ -7,13 +7,13 @@ import { Button } from "../ui/button";
 const logo = "/images/logo_transparent.png";
 
 const ADMIN_LINKS = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Booking Calendar", href: "/admin/calendar", icon: CalendarDays },
-  { name: "Packages", href: "/admin/packages", icon: Package },
-  { name: "Activities", href: "/admin/activities", icon: ActivityIcon },
-  { name: "Gallery", href: "/admin/gallery", icon: ImageIcon },
-  { name: "Blog Posts", href: "/admin/blog", icon: FileText },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Booking Calendar", href: "/calendar", icon: CalendarDays },
+  { name: "Packages", href: "/packages", icon: Package },
+  { name: "Activities", href: "/activities", icon: ActivityIcon },
+  { name: "Gallery", href: "/gallery", icon: ImageIcon },
+  { name: "Blog Posts", href: "/blog", icon: FileText },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -43,7 +43,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {ADMIN_LINKS.map((link) => {
             const Icon = link.icon;
-            const isActive = location === link.href || (link.href !== "/admin" && location.startsWith(link.href));
+            const isActive = location === link.href || (link.href !== "/" && location.startsWith(link.href));
             return (
               <Link
                 key={link.name}
@@ -78,7 +78,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 ml-64 flex flex-col">
         <header className="h-16 bg-card border-b border-border flex items-center px-8 sticky top-0 z-10">
           <h1 className="text-lg font-semibold text-foreground">
-            {ADMIN_LINKS.find(l => location === l.href || (l.href !== "/admin" && location.startsWith(l.href)))?.name || "Dashboard"}
+            {ADMIN_LINKS.find(l => location === l.href || (l.href !== "/" && location.startsWith(l.href)))?.name || "Dashboard"}
           </h1>
         </header>
         <div className="p-8 flex-1">
