@@ -3,7 +3,9 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon, FileText, Settings, LogOut, CalendarDays, Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { useState, useEffect } from "react";
 
+const API = import.meta.env.BASE_URL + "api";
 const logo = "/images/logo_transparent.png";
 
 const ADMIN_LINKS = [
@@ -20,6 +22,18 @@ const ADMIN_LINKS = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { isAuthenticated, isLoading, logout } = useAdminAuth();
+  const [siteName, setSiteName] = useState("Shubhangi The Boat House");
+  const [siteLogo, setSiteLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${API}/settings`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.siteName) setSiteName(d.siteName);
+        if (d.siteLogo) setSiteLogo(d.siteLogo);
+      })
+      .catch(() => {});
+  }, []);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center bg-muted/30">Loading...</div>;
@@ -34,11 +48,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex bg-muted/20 font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-card border-r border-border flex flex-col fixed h-full z-20">
-        <div className="p-6 border-b border-border">
-          <Link href="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-            <img src={logo} alt="Shubhangi The Boat House" className="h-10 w-auto object-contain" />
+        <div className="px-4 py-5 border-b border-border">
+          <Link href="/" className="flex flex-col items-center gap-2 text-primary hover:text-primary/80 transition-colors group">
+            <img
+              src={siteLogo || logo}
+              alt={siteName}
+              className="h-14 w-full object-contain object-center"
+            />
+            <span className="text-xs font-semibold text-center text-foreground/80 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+              {siteName}
+            </span>
           </Link>
-          <p className="text-xs text-muted-foreground mt-1">Admin Panel</p>
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,7 +11,8 @@ import { Lock } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetMeQueryKey } from "@workspace/api-client-react";
 
-const logo = "/images/logo.jpg";
+const API = import.meta.env.BASE_URL + "api";
+const defaultLogo = "/images/logo_transparent.png";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username required"),
@@ -23,6 +24,18 @@ export default function AdminLogin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const loginMutation = useAdminLogin();
+  const [siteName, setSiteName] = useState("Shubhangi The Boat House");
+  const [siteLogo, setSiteLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${API}/settings`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.siteName) setSiteName(d.siteName);
+        if (d.siteLogo) setSiteLogo(d.siteLogo);
+      })
+      .catch(() => {});
+  }, []);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema)
@@ -47,9 +60,9 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
         <div className="bg-primary p-8 text-center text-primary-foreground">
-          <img src={logo} alt="Shubhangi The Boat House" className="h-20 w-auto object-contain mx-auto mb-4 drop-shadow-lg" />
-          <h1 className="text-2xl font-display font-bold">Admin Portal</h1>
-          <p className="text-primary-foreground/70 text-sm mt-1">Sign in to manage the houseboat website</p>
+          <img src={siteLogo || defaultLogo} alt={siteName} className="h-20 w-auto object-contain mx-auto mb-4 drop-shadow-lg" />
+          <h1 className="text-xl font-display font-bold leading-snug">{siteName}</h1>
+          <p className="text-primary-foreground/70 text-sm mt-1">Sign in to manage the website</p>
         </div>
         
         <div className="p-8">
