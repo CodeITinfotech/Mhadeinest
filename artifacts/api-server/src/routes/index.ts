@@ -7,6 +7,7 @@ import blogRouter from "./blog";
 import settingsRouter from "./settings";
 import authRouter from "./auth";
 import inquiryRouter from "./inquiry";
+import bookingsRouter from "./bookings";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(blogRouter);
 router.use(settingsRouter);
 router.use(authRouter);
 router.use(inquiryRouter);
+router.use(bookingsRouter);
 
 export default router;
