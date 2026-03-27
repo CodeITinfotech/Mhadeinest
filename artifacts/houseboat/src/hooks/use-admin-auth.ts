@@ -17,7 +17,7 @@ export function useAdminAuth() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-        setLocation("/admin/login");
+        setLocation("/");
       },
     }
   });
