@@ -2,13 +2,14 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useGetSettings, useListPackages } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
 import { Anchor, Wind, Sun, Coffee } from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function Home() {
   const { data: settings } = useGetSettings();
   const { data: packages = [] } = useListPackages();
+  const { fmt } = useCurrency();
 
   const heroImage = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
 
@@ -179,7 +180,7 @@ export default function Home() {
                   <div className="flex items-end justify-between mt-auto pt-6 border-t border-muted">
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">From</p>
-                      <p className="text-2xl font-bold text-secondary">{formatPrice(pkg.pricePerNight)}<span className="text-sm text-muted-foreground font-normal">/night</span></p>
+                      <p className="text-2xl font-bold text-secondary">{fmt(pkg.pricePerNight)}<span className="text-sm text-muted-foreground font-normal">/night</span></p>
                     </div>
                     <Link href="/packages">
                       <Button variant="outline" className="rounded-full">Details</Button>

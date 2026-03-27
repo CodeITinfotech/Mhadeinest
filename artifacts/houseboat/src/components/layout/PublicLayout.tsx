@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { InquiryModal } from "@/components/InquiryModal";
 import { InquiryModalProvider, useInquiryModal } from "@/context/InquiryModalContext";
+import { CurrencyProvider, useCurrency, type Currency } from "@/context/CurrencyContext";
 const FALLBACK_LOGO = "/images/logo_transparent.png";
 
 const ALL_NAV_LINKS = [
@@ -20,9 +21,42 @@ const ALL_NAV_LINKS = [
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <InquiryModalProvider>
-      <PublicLayoutInner>{children}</PublicLayoutInner>
-    </InquiryModalProvider>
+    <CurrencyProvider>
+      <InquiryModalProvider>
+        <PublicLayoutInner>{children}</PublicLayoutInner>
+      </InquiryModalProvider>
+    </CurrencyProvider>
+  );
+}
+
+function CurrencySwitcher({ scrolled, onHome }: { scrolled: boolean; onHome: boolean }) {
+  const { currency, setCurrency } = useCurrency();
+  const currencies: Currency[] = ["INR", "GBP", "USD"];
+  const isLight = scrolled || !onHome;
+  return (
+    <div className={cn(
+      "flex items-center rounded-full p-0.5 gap-0.5",
+      isLight ? "bg-muted" : "bg-white/15 backdrop-blur-sm"
+    )}>
+      {currencies.map(c => (
+        <button
+          key={c}
+          onClick={() => setCurrency(c)}
+          className={cn(
+            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-all leading-none",
+            currency === c
+              ? isLight
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-white text-primary shadow-sm"
+              : isLight
+                ? "text-muted-foreground hover:text-foreground"
+                : "text-white/70 hover:text-white"
+          )}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -95,6 +129,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
+            <CurrencySwitcher scrolled={isScrolled} onHome={location === "/"} />
             <button
               onClick={() => openInquiry()}
               className={cn(
@@ -138,6 +173,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             className="fixed inset-0 z-40 bg-background pt-24 px-6 md:hidden"
           >
             <div className="flex flex-col gap-6 text-xl font-display">
+              {/* Currency switcher */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground font-sans font-medium">Currency:</span>
+                <CurrencySwitcher scrolled={true} onHome={false} />
+              </div>
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.name}
