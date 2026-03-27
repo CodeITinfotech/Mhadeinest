@@ -4,7 +4,7 @@ import { LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon,
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
-const logo = "/images/logo.jpg";
+const logo = "/images/logo_transparent.png";
 
 const ADMIN_LINKS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },

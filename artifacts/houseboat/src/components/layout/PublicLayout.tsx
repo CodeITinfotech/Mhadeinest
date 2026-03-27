@@ -4,7 +4,7 @@ import { Phone, Menu, X, Instagram, Facebook, Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-const logo = "/images/logo.jpg";
+const logo = "/images/logo_transparent.png";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
