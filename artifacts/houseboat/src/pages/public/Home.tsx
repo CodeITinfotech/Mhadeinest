@@ -14,59 +14,63 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* Hero Section — widget lives inside at 45% */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Background */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={heroImage} 
-            alt="Goa Houseboat Hero" 
+          <img
+            src={heroImage}
+            alt="Goa Houseboat Hero"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/75" />
         </div>
-        
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+
+        {/* Hero text — tight block in the upper 38% */}
+        <div className="absolute top-[7%] left-0 right-0 z-10 text-center px-4">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 leading-tight drop-shadow-lg"
+            className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-3 leading-tight drop-shadow-lg"
           >
             {settings?.heroTitle || "Escape to Luxury"}
           </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 30 }}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-2xl text-white/90 mb-10 font-light drop-shadow-md"
+            className="text-base md:text-lg text-white/85 mb-5 font-light drop-shadow-md max-w-xl mx-auto"
           >
             {settings?.heroSubtitle || "Experience the serene backwaters of Goa in our premium 3-bedroom wooden houseboat."}
           </motion.p>
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Link href="/packages">
-              <Button size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-full">
+              <Button size="default" className="w-full sm:w-auto px-7 py-2.5 rounded-full">
                 View Packages
               </Button>
             </Link>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="w-full sm:w-auto text-lg px-8 py-6 rounded-full text-white border-white hover:bg-white/20 hover:text-white backdrop-blur-sm"
+            <Button
+              size="default"
+              variant="outline"
+              className="w-full sm:w-auto px-7 py-2.5 rounded-full text-white border-white hover:bg-white/20 hover:text-white backdrop-blur-sm"
               onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Discover More
             </Button>
           </motion.div>
         </div>
-      </section>
 
-      {/* Availability Search Widget */}
-      <AvailabilitySearch />
+        {/* Availability Search — centred at 45% from top of hero */}
+        <div className="absolute top-[45%] -translate-y-1/2 left-0 right-0 z-20 px-4">
+          <AvailabilitySearch />
+        </div>
+      </section>
 
       {/* Features Banner */}
       <section className="bg-white py-12 border-b border-muted">

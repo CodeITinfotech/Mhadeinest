@@ -2,8 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useListPackages } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, CalendarDays, Users, Baby, ChevronDown, CheckCircle, AlertCircle, XCircle, Loader2, MessageSquareText } from "lucide-react";
+import {
+  Search, CalendarDays, Users, Baby, ChevronDown,
+  CheckCircle, AlertCircle, XCircle, Loader2, MessageSquareText
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useInquiryModal } from "@/hooks/use-inquiry-modal";
 
@@ -18,8 +20,8 @@ interface AvailabilityResult {
   status: "available" | "limited" | "full";
 }
 
-function Counter({ value, onChange, min = 0, max = 20, label }: {
-  value: number; onChange: (v: number) => void; min?: number; max?: number; label: string;
+function Counter({ value, onChange, min = 0, max = 20 }: {
+  value: number; onChange: (v: number) => void; min?: number; max?: number;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -27,18 +29,42 @@ function Counter({ value, onChange, min = 0, max = 20, label }: {
         type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
-        className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-lg font-bold text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-7 h-7 rounded-full border border-white/30 flex items-center justify-center text-base font-bold text-white hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >−</button>
-      <span className="w-8 text-center font-bold text-foreground text-lg">{value}</span>
+      <span className="w-7 text-center font-bold text-white text-base">{value}</span>
       <button
         type="button"
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
-        className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-lg font-bold text-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-7 h-7 rounded-full border border-white/30 flex items-center justify-center text-base font-bold text-white hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >+</button>
     </div>
   );
 }
+
+const statusConfig = {
+  available: {
+    icon: CheckCircle,
+    color: "text-green-400",
+    bg: "bg-green-900/40 border-green-400/30",
+    label: "Available!",
+    desc: "Great news — this date is open for bookings.",
+  },
+  limited: {
+    icon: AlertCircle,
+    color: "text-amber-400",
+    bg: "bg-amber-900/40 border-amber-400/30",
+    label: "Limited Availability",
+    desc: "Some slots are taken for this date. Contact us to confirm your spot.",
+  },
+  full: {
+    icon: XCircle,
+    color: "text-red-400",
+    bg: "bg-red-900/40 border-red-400/30",
+    label: "Fully Booked",
+    desc: "This date is fully booked. Try another date or contact us for alternatives.",
+  },
+};
 
 export function AvailabilitySearch() {
   const { data: packages = [] } = useListPackages();
@@ -51,6 +77,7 @@ export function AvailabilitySearch() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AvailabilityResult | null>(null);
   const [error, setError] = useState("");
+  const [focused, setFocused] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -61,7 +88,7 @@ export function AvailabilitySearch() {
     setLoading(true);
     try {
       const res = await fetch(`${API}/bookings/availability?date=${date}`);
-      if (!res.ok) throw new Error("Failed to check availability");
+      if (!res.ok) throw new Error();
       const data: AvailabilityResult = await res.json();
       setResult(data);
     } catch {
@@ -71,184 +98,167 @@ export function AvailabilitySearch() {
     }
   };
 
-  const statusConfig = {
-    available: {
-      icon: CheckCircle,
-      color: "text-green-600",
-      bg: "bg-green-50 border-green-200",
-      label: "Available!",
-      desc: "Great news — this date is open for bookings.",
-    },
-    limited: {
-      icon: AlertCircle,
-      color: "text-amber-600",
-      bg: "bg-amber-50 border-amber-200",
-      label: "Limited Availability",
-      desc: "Some slots are taken for this date. Contact us to confirm your spot.",
-    },
-    full: {
-      icon: XCircle,
-      color: "text-red-600",
-      bg: "bg-red-50 border-red-200",
-      label: "Fully Booked",
-      desc: "This date is fully booked. Try another date or contact us for alternatives.",
-    },
-  };
-
   return (
-    <section className="relative z-30 -mt-8 px-4 pb-12">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/60 overflow-hidden"
-        >
-          {/* Title strip */}
-          <div className="bg-primary px-6 py-3 flex items-center gap-2">
-            <Search className="w-4 h-4 text-primary-foreground/80" />
-            <span className="text-sm font-semibold text-primary-foreground tracking-wide uppercase">Check Availability</span>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: focused ? 1 : 0.72, y: 0 }}
+      whileHover={!focused ? { opacity: 0.9 } : undefined}
+      transition={{ duration: 0.55, delay: focused ? 0 : 0.6 }}
+      onClick={() => setFocused(true)}
+      className="w-full max-w-4xl mx-auto cursor-default"
+    >
+      <div className={cn(
+        "rounded-2xl overflow-hidden border transition-all duration-500",
+        focused
+          ? "bg-primary/90 backdrop-blur-xl border-white/25 shadow-[0_8px_40px_rgba(0,0,0,0.5)]"
+          : "bg-primary/65 backdrop-blur-md border-white/15 shadow-[0_4px_24px_rgba(0,0,0,0.4)]"
+      )}>
+        {/* Title row */}
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-white/10">
+          <Search className="w-3.5 h-3.5 text-white/60" />
+          <span className="text-[11px] font-bold text-white/70 uppercase tracking-widest">Check Availability</span>
+        </div>
 
-          {/* Search fields */}
-          <div className="p-5 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        {/* Fields */}
+        <div className="px-5 py-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
 
-              {/* Package / Service */}
-              <div className="md:col-span-1 space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                  Package / Service
-                  <span className="text-[10px] font-normal text-muted-foreground/60">(optional)</span>
-                </label>
-                <div className="relative">
-                  <select
-                    value={packageService}
-                    onChange={e => setPackageService(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-input bg-background pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 appearance-none text-foreground"
-                  >
-                    <option value="">Any Package</option>
-                    {packages.map(pkg => (
-                      <option key={pkg.id} value={pkg.name}>{pkg.name}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Date */}
-              <div className="md:col-span-1 space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                  <CalendarDays className="w-3.5 h-3.5" /> Check-in Date
-                </label>
-                <Input
-                  type="date"
-                  value={date}
-                  min={today}
-                  onChange={e => { setDate(e.target.value); setResult(null); setError(""); }}
-                  className="h-11 rounded-xl border-input focus:ring-2 focus:ring-primary/30 text-sm"
-                />
-              </div>
-
-              {/* Adults */}
-              <div className="md:col-span-1 space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" /> Adults
-                </label>
-                <div className="h-11 flex items-center px-3 rounded-xl border border-input bg-background">
-                  <Counter value={adults} onChange={setAdults} min={1} max={20} label="Adults" />
-                </div>
-              </div>
-
-              {/* Kids */}
-              <div className="md:col-span-1 space-y-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                  <Baby className="w-3.5 h-3.5" /> Kids
-                  <span className="text-[10px] font-normal text-muted-foreground/60">(under 12)</span>
-                </label>
-                <div className="h-11 flex items-center px-3 rounded-xl border border-input bg-background">
-                  <Counter value={kids} onChange={setKids} min={0} max={20} label="Kids" />
-                </div>
-              </div>
-
-              {/* Search button */}
-              <div className="md:col-span-1">
-                <Button
-                  onClick={handleSearch}
-                  disabled={loading}
-                  size="lg"
-                  className="w-full h-11 rounded-xl gap-2 text-sm font-semibold"
+            {/* Package / Service */}
+            <div className="col-span-2 md:col-span-1 space-y-1.5">
+              <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
+                Package / Service
+              </label>
+              <div className="relative">
+                <select
+                  value={packageService}
+                  onChange={e => setPackageService(e.target.value)}
+                  onClick={e => e.stopPropagation()}
+                  className="w-full h-10 rounded-xl border border-white/20 bg-white/10 pl-3 pr-7 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 appearance-none placeholder:text-white/40 [&>option]:bg-primary [&>option]:text-white"
                 >
-                  {loading
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking…</>
-                    : <><Search className="w-4 h-4" /> Check Now</>
-                  }
-                </Button>
+                  <option value="">Any Package</option>
+                  {packages.map(pkg => (
+                    <option key={pkg.id} value={pkg.name}>{pkg.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/50 pointer-events-none" />
               </div>
             </div>
 
-            {/* Error */}
-            {error && (
-              <p className="mt-3 text-sm text-destructive flex items-center gap-1.5">
-                <XCircle className="w-4 h-4 shrink-0" />{error}
-              </p>
-            )}
+            {/* Date */}
+            <div className="col-span-2 md:col-span-1 space-y-1.5">
+              <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
+                <CalendarDays className="w-3 h-3" /> Check-in Date
+              </label>
+              <input
+                type="date"
+                value={date}
+                min={today}
+                onClick={e => e.stopPropagation()}
+                onChange={e => { setDate(e.target.value); setResult(null); setError(""); }}
+                className="w-full h-10 rounded-xl border border-white/20 bg-white/10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Adults */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
+                <Users className="w-3 h-3" /> Adults
+              </label>
+              <div className="h-10 flex items-center px-2 rounded-xl border border-white/20 bg-white/10">
+                <Counter value={adults} onChange={setAdults} min={1} />
+              </div>
+            </div>
+
+            {/* Kids */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
+                <Baby className="w-3 h-3" /> Kids
+              </label>
+              <div className="h-10 flex items-center px-2 rounded-xl border border-white/20 bg-white/10">
+                <Counter value={kids} onChange={setKids} min={0} />
+              </div>
+            </div>
+
+            {/* Button */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-semibold text-transparent uppercase tracking-wide">·</label>
+              <button
+                onClick={e => { e.stopPropagation(); handleSearch(); }}
+                disabled={loading}
+                className="w-full h-10 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              >
+                {loading
+                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking…</>
+                  : <><Search className="w-4 h-4" /> Check</>
+                }
+              </button>
+            </div>
           </div>
 
-          {/* Result */}
-          <AnimatePresence>
-            {result && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {(() => {
-                  const cfg = statusConfig[result.status];
-                  const Icon = cfg.icon;
-                  return (
-                    <div className={cn("mx-5 mb-5 rounded-xl border p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4", cfg.bg)}>
-                      <div className="flex items-center gap-3 flex-1">
-                        <Icon className={cn("w-6 h-6 shrink-0", cfg.color)} />
-                        <div>
-                          <p className={cn("font-bold text-base", cfg.color)}>{cfg.label}</p>
-                          <p className="text-sm text-muted-foreground mt-0.5">{cfg.desc}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(result.date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-                            {packageService && <> · {packageService}</>}
-                            {" · "}{adults} adult{adults !== 1 ? "s" : ""}{kids > 0 ? `, ${kids} kid${kids !== 1 ? "s" : ""}` : ""}
-                          </p>
-                        </div>
+          {/* Error */}
+          {error && (
+            <p className="mt-2.5 text-xs text-red-300 flex items-center gap-1.5">
+              <XCircle className="w-3.5 h-3.5 shrink-0" />{error}
+            </p>
+          )}
+        </div>
+
+        {/* Result */}
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {(() => {
+                const cfg = statusConfig[result.status];
+                const Icon = cfg.icon;
+                return (
+                  <div className={cn(
+                    "mx-4 mb-4 rounded-xl border p-3.5 flex flex-col sm:flex-row items-start sm:items-center gap-3",
+                    cfg.bg
+                  )}>
+                    <div className="flex items-center gap-2.5 flex-1">
+                      <Icon className={cn("w-5 h-5 shrink-0", cfg.color)} />
+                      <div>
+                        <p className={cn("font-bold text-sm", cfg.color)}>{cfg.label}</p>
+                        <p className="text-xs text-white/60 mt-0.5">{cfg.desc}</p>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          {new Date(result.date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+                          {packageService && <> · {packageService}</>}
+                          {" · "}{adults} adult{adults !== 1 ? "s" : ""}{kids > 0 ? `, ${kids} kid${kids !== 1 ? "s" : ""}` : ""}
+                        </p>
                       </div>
-                      {result.status !== "full" && (
-                        <Button
-                          size="sm"
-                          className="shrink-0 gap-1.5 rounded-lg"
-                          onClick={() => openInquiry({ packageService, checkIn: date, adults: String(adults), kids: String(kids) })}
-                        >
-                          <MessageSquareText className="w-4 h-4" />
-                          Inquire Now
-                        </Button>
-                      )}
-                      {result.status === "full" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="shrink-0 gap-1.5 rounded-lg"
-                          onClick={() => openInquiry({ packageService, adults: String(adults), kids: String(kids) })}
-                        >
-                          <MessageSquareText className="w-4 h-4" />
-                          Ask Alternatives
-                        </Button>
-                      )}
                     </div>
-                  );
-                })()}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+                    {result.status !== "full" ? (
+                      <Button
+                        size="sm"
+                        className="shrink-0 gap-1.5 rounded-lg text-xs"
+                        onClick={e => { e.stopPropagation(); openInquiry({ packageService, checkIn: date, adults: String(adults), kids: String(kids) }); }}
+                      >
+                        <MessageSquareText className="w-3.5 h-3.5" />
+                        Inquire Now
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0 gap-1.5 rounded-lg text-xs border-white/30 text-white hover:bg-white/10"
+                        onClick={e => { e.stopPropagation(); openInquiry({ packageService, adults: String(adults), kids: String(kids) }); }}
+                      >
+                        <MessageSquareText className="w-3.5 h-3.5" />
+                        Ask Alternatives
+                      </Button>
+                    )}
+                  </div>
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </section>
+    </motion.div>
   );
 }
