@@ -12,6 +12,7 @@ export const inquiriesTable = pgTable("inquiries", {
   checkIn: text("check_in").default(""),
   checkOut: text("check_out").default(""),
   guests: integer("guests").default(2),
+  kids: integer("kids").notNull().default(0),
   paxDetails: text("pax_details").notNull().default(""),
   message: text("message").notNull().default(""),
   status: text("status").notNull().default("new"),

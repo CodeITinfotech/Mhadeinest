@@ -12,6 +12,7 @@ export const bookingsTable = pgTable("bookings", {
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
   guests: integer("guests").notNull().default(2),
+  kids: integer("kids").notNull().default(0),
   status: text("status").notNull().default("confirmed"),
   notes: text("notes").default(""),
   totalPrice: text("total_price").default(""),

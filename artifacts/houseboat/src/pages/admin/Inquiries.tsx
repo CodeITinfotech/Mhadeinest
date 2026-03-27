@@ -24,6 +24,7 @@ interface Inquiry {
   checkIn: string;
   checkOut: string;
   guests: number;
+  kids: number;
   paxDetails: string;
   message: string;
   status: Status;
@@ -258,8 +259,8 @@ export default function AdminInquiries() {
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Booking Details</p>
                   {selected.packageService && <DetailRow icon={Package} label="Package" value={selected.packageService} />}
                   {selected.checkIn && <DetailRow icon={Calendar} label="Date" value={selected.checkIn} />}
-                  {selected.guests && <DetailRow icon={Users} label="Guests" value={`${selected.guests} pax`} />}
-                  {selected.paxDetails && <DetailRow icon={User} label="Pax Details" value={selected.paxDetails} />}
+                  {selected.guests > 0 && <DetailRow icon={Users} label="Guests" value={`${selected.guests} adult${selected.guests !== 1 ? "s" : ""}${selected.kids > 0 ? `, ${selected.kids} kid${selected.kids !== 1 ? "s" : ""}` : ""}`} />}
+                  {selected.paxDetails && <DetailRow icon={User} label="Group Details" value={selected.paxDetails} />}
                 </div>
               )}
 
@@ -361,7 +362,7 @@ function InquiryCard({ inq, onView, onStatus, onDelete, updatingId, deletingId }
             {inq.email && <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{inq.email}</span>}
             {inq.packageService && <span className="flex items-center gap-1"><Package className="w-3.5 h-3.5" />{inq.packageService}</span>}
             {inq.checkIn && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{inq.checkIn}</span>}
-            {inq.guests && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{inq.guests} guests</span>}
+            {inq.guests > 0 && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{inq.guests} adult{inq.guests !== 1 ? "s" : ""}{inq.kids > 0 ? `, ${inq.kids} kid${inq.kids !== 1 ? "s" : ""}` : ""}</span>}
           </div>
           {inq.message && (
             <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{inq.message}</p>

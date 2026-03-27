@@ -72,6 +72,7 @@ const emptyForm = {
   checkIn: "",
   checkOut: "",
   guests: 2,
+  kids: 0,
   status: "confirmed" as BookingStatus,
   notes: "",
   totalPrice: "",
@@ -151,6 +152,7 @@ export default function AdminCalendar() {
       checkIn: b.checkIn,
       checkOut: b.checkOut,
       guests: b.guests,
+      kids: (b as any).kids ?? 0,
       status: b.status,
       notes: b.notes || "",
       totalPrice: b.totalPrice || "",
@@ -171,7 +173,7 @@ export default function AdminCalendar() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, guests: Number(form.guests) }),
+        body: JSON.stringify({ ...form, guests: Number(form.guests), kids: Number(form.kids) }),
       });
       if (!res.ok) throw new Error("Save failed");
       toast({ title: editingBooking ? "Booking updated" : "Booking created", description: `${form.guestName}'s booking saved successfully.` });
@@ -358,7 +360,7 @@ export default function AdminCalendar() {
                           {b.checkIn} → {b.checkOut}
                         </div>
                         <div className="flex items-center gap-1">
-                          <Users className="w-3 h-3" /> {b.guests} guest{b.guests > 1 ? "s" : ""}
+                          <Users className="w-3 h-3" /> {b.guests} adult{b.guests > 1 ? "s" : ""}{(b as any).kids > 0 ? `, ${(b as any).kids} kid${(b as any).kids > 1 ? "s" : ""}` : ""}
                         </div>
                         {b.guestEmail && (
                           <div className="flex items-center gap-1">
@@ -428,8 +430,12 @@ export default function AdminCalendar() {
                   <Input type="date" value={form.checkOut} onChange={e => setForm(f => ({ ...f, checkOut: e.target.value }))} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Guests</label>
+                  <label className="text-sm font-medium">Adults</label>
                   <Input type="number" min={1} max={20} value={form.guests} onChange={e => setForm(f => ({ ...f, guests: Number(e.target.value) }))} />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Kids (under 12)</label>
+                  <Input type="number" min={0} max={20} value={form.kids} onChange={e => setForm(f => ({ ...f, kids: Number(e.target.value) }))} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Total Price (₹)</label>

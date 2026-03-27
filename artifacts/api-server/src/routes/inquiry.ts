@@ -8,7 +8,7 @@ const router: IRouter = Router();
 
 // Public: submit inquiry
 router.post("/inquiry", async (req, res): Promise<void> => {
-  const { name, email, phone, whatsapp, packageService, checkIn, checkOut, guests, paxDetails, message } = req.body;
+  const { name, email, phone, whatsapp, packageService, checkIn, checkOut, guests, kids, paxDetails, message } = req.body;
   if (!name || !email) {
     res.status(400).json({ error: "Name and email are required" });
     return;
@@ -24,6 +24,7 @@ router.post("/inquiry", async (req, res): Promise<void> => {
       checkIn: checkIn || "",
       checkOut: checkOut || "",
       guests: guests || 1,
+      kids: kids || 0,
       paxDetails: paxDetails || "",
       message: message || "",
       status: "new",

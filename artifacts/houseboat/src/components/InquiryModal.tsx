@@ -31,14 +31,15 @@ interface FormData {
   email: string;
   packageService: string;
   checkIn: string;
-  guests: string;
+  adults: string;
+  kids: string;
   paxDetails: string;
   message: string;
 }
 
 const EMPTY: FormData = {
   name: "", phone: "", whatsapp: "", email: "",
-  packageService: "", checkIn: "", guests: "2",
+  packageService: "", checkIn: "", adults: "2", kids: "0",
   paxDetails: "", message: "",
 };
 
@@ -76,7 +77,7 @@ export function InquiryModal({ open, onClose }: Props) {
       const res = await fetch(`${API}/inquiry`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, guests: parseInt(form.guests) || 2 }),
+        body: JSON.stringify({ ...form, guests: parseInt(form.adults) || 2, kids: parseInt(form.kids) || 0 }),
       });
       if (!res.ok) throw new Error("Failed");
       setSuccess(true);
@@ -191,17 +192,23 @@ export function InquiryModal({ open, onClose }: Props) {
                         <Input type="date" value={form.checkIn} onChange={set("checkIn")} className="pl-9" min={new Date().toISOString().split("T")[0]} />
                       </div>
                     </FormField>
-                    <FormField label="Number of Guests">
+                    <FormField label="Adults">
                       <div className="relative">
                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input type="number" min={1} max={50} value={form.guests} onChange={set("guests")} placeholder="2" className="pl-9" />
+                        <Input type="number" min={1} max={50} value={form.adults} onChange={set("adults")} placeholder="2" className="pl-9" />
                       </div>
                     </FormField>
-                    <FormField label="Pax / Group Details" className="sm:col-span-2">
+                    <FormField label="Kids (under 12)">
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input type="number" min={0} max={20} value={form.kids} onChange={set("kids")} placeholder="0" className="pl-9" />
+                      </div>
+                    </FormField>
+                    <FormField label="Group Details / Special Notes" className="sm:col-span-2">
                       <Input
                         value={form.paxDetails}
                         onChange={set("paxDetails")}
-                        placeholder="e.g. 2 adults, 1 child (age 8), 1 infant — anniversary trip"
+                        placeholder="e.g. anniversary trip, dietary needs, ages of kids…"
                       />
                     </FormField>
                   </div>
