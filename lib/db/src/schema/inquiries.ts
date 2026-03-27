@@ -7,10 +7,14 @@ export const inquiriesTable = pgTable("inquiries", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull().default(""),
+  whatsapp: text("whatsapp").notNull().default(""),
+  packageService: text("package_service").notNull().default(""),
   checkIn: text("check_in").default(""),
   checkOut: text("check_out").default(""),
   guests: integer("guests").default(2),
+  paxDetails: text("pax_details").notNull().default(""),
   message: text("message").notNull().default(""),
+  status: text("status").notNull().default("new"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

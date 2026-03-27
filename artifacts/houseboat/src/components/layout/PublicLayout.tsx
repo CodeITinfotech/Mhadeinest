@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { useGetSettings } from "@workspace/api-client-react";
-import { Phone, Menu, X, Instagram, Facebook, Youtube } from "lucide-react";
+import { Phone, Menu, X, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { InquiryModal } from "@/components/InquiryModal";
 const FALLBACK_LOGO = "/images/logo_transparent.png";
 
 const ALL_NAV_LINKS = [
@@ -20,6 +21,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
   const { data: settings } = useGetSettings();
 
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
@@ -83,7 +85,19 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => setInquiryOpen(true)}
+              className={cn(
+                "px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 shadow-sm flex items-center gap-2 border",
+                isScrolled || location !== "/"
+                  ? "bg-background border-border text-foreground hover:bg-muted"
+                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+              )}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Inquire
+            </button>
             <a
               href={whatsappLink}
               target="_blank"
@@ -128,11 +142,18 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   {link.name}
                 </Link>
               ))}
+              <button
+                onClick={() => { setMobileMenuOpen(false); setInquiryOpen(true); }}
+                className="px-6 py-4 rounded-xl border border-border text-foreground font-bold text-center flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Send an Inquiry
+              </button>
               <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 px-6 py-4 rounded-xl bg-secondary text-secondary-foreground font-bold text-center flex items-center justify-center gap-2"
+                className="px-6 py-4 rounded-xl bg-secondary text-secondary-foreground font-bold text-center flex items-center justify-center gap-2"
               >
                 <Phone className="w-5 h-5" />
                 Book via WhatsApp
@@ -208,6 +229,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           © {new Date().getFullYear()} {settings?.siteName || "Goa Houseboat"}. All rights reserved.
         </div>
       </footer>
+
+      {/* Inquiry Modal */}
+      <InquiryModal open={inquiryOpen} onClose={() => setInquiryOpen(false)} />
 
       {/* Floating WhatsApp Button */}
       <a

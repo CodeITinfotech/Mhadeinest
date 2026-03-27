@@ -26,6 +26,7 @@ import AdminBlog from "@/pages/admin/Blog";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminCalendar from "@/pages/admin/Calendar";
 import AdminGallery from "@/pages/admin/Gallery";
+import AdminInquiries from "@/pages/admin/Inquiries";
 // Simple placeholders for missing admin routes to satisfy completeness requirement
 function AdminActivities() { return <div className="p-8"><h2 className="text-2xl font-bold mb-4">Manage Activities</h2><p className="text-muted-foreground">Activities CRUD interface is similar to Packages.</p></div>; }
 
@@ -55,6 +56,7 @@ function Router() {
             <Route path="/packages" component={AdminPackages} />
             <Route path="/activities" component={AdminActivities} />
             <Route path="/gallery" component={AdminGallery} />
+            <Route path="/inquiries" component={AdminInquiries} />
             <Route path="/blog" component={AdminBlog} />
             <Route path="/settings" component={AdminSettings} />
             <Route component={NotFound} />
