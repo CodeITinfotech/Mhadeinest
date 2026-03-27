@@ -1,9 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 import { useGetMe, getGetMeQueryKey, useAdminLogout } from "@workspace/api-client-react";
 
 export function useAdminAuth() {
-  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
   const { data: user, isLoading, error } = useGetMe({
@@ -17,7 +15,7 @@ export function useAdminAuth() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-        setLocation("/");
+        window.location.href = "/";
       },
     }
   });
