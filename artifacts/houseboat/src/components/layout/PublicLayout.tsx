@@ -144,7 +144,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <img
                 src={logo}
                 alt="Shubhangi The Boat House"
-                className="h-16 w-auto object-contain brightness-0 invert"
+                className="h-16 w-auto object-contain brightness-0 invert opacity-90"
               />
             </div>
             <p className="text-primary-foreground/70 mb-6">
