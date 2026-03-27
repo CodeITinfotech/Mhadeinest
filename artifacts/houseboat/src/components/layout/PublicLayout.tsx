@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { InquiryModal } from "@/components/InquiryModal";
+import { InquiryModalProvider, useInquiryModal } from "@/context/InquiryModalContext";
 const FALLBACK_LOGO = "/images/logo_transparent.png";
 
 const ALL_NAV_LINKS = [
@@ -18,10 +19,18 @@ const ALL_NAV_LINKS = [
 ];
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <InquiryModalProvider>
+      <PublicLayoutInner>{children}</PublicLayoutInner>
+    </InquiryModalProvider>
+  );
+}
+
+function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const { isOpen: inquiryOpen, prefill: inquiryPrefill, open: openInquiry, close: closeInquiry } = useInquiryModal();
   const { data: settings } = useGetSettings();
 
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
@@ -87,7 +96,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={() => setInquiryOpen(true)}
+              onClick={() => openInquiry()}
               className={cn(
                 "px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 shadow-sm flex items-center gap-2 border",
                 isScrolled || location !== "/"
@@ -143,7 +152,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
               <button
-                onClick={() => { setMobileMenuOpen(false); setInquiryOpen(true); }}
+                onClick={() => { setMobileMenuOpen(false); openInquiry(); }}
                 className="px-6 py-4 rounded-xl border border-border text-foreground font-bold text-center flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-5 h-5" />
@@ -231,7 +240,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       </footer>
 
       {/* Inquiry Modal */}
-      <InquiryModal open={inquiryOpen} onClose={() => setInquiryOpen(false)} />
+      <InquiryModal open={inquiryOpen} onClose={closeInquiry} initialData={inquiryPrefill ?? undefined} />
 
       {/* Floating WhatsApp Button */}
       <a

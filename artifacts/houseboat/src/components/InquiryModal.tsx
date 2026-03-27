@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, CheckCircle, ChevronDown, User, Phone, Mail, MessageSquare, Calendar, Users } from "lucide-react";
+import { X, Send, CheckCircle, ChevronDown, User, Phone, Mail, MessageSquare, Calendar, Users, Baby } from "lucide-react";
+import type { InquiryPrefill } from "@/context/InquiryModalContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +23,7 @@ const PACKAGES = [
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialData?: InquiryPrefill;
 }
 
 interface FormData {
@@ -43,7 +45,7 @@ const EMPTY: FormData = {
   paxDetails: "", message: "",
 };
 
-export function InquiryModal({ open, onClose }: Props) {
+export function InquiryModal({ open, onClose, initialData }: Props) {
   const [form, setForm] = useState<FormData>(EMPTY);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -55,6 +57,24 @@ export function InquiryModal({ open, onClose }: Props) {
     else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
+
+  // Pre-fill form when initialData changes (e.g. from availability search)
+  useEffect(() => {
+    if (open && initialData) {
+      setForm(prev => ({
+        ...prev,
+        ...(initialData.packageService !== undefined ? { packageService: initialData.packageService! } : {}),
+        ...(initialData.checkIn !== undefined ? { checkIn: initialData.checkIn! } : {}),
+        ...(initialData.adults !== undefined ? { adults: initialData.adults! } : {}),
+        ...(initialData.kids !== undefined ? { kids: initialData.kids! } : {}),
+      }));
+    } else if (!open) {
+      // Reset form on close
+      setForm(EMPTY);
+      setErrors({});
+      setSuccess(false);
+    }
+  }, [open, initialData]);
 
   const set = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [k]: e.target.value }));

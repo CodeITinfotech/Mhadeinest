@@ -4,6 +4,7 @@ import { useGetSettings, useListPackages } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { Anchor, Wind, Sun, Coffee } from "lucide-react";
+import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 
 export default function Home() {
   const { data: settings } = useGetSettings();
@@ -63,6 +64,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Availability Search Widget */}
+      <AvailabilitySearch />
 
       {/* Features Banner */}
       <section className="bg-white py-12 border-b border-muted">

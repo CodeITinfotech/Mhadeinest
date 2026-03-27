@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { bookingsTable, insertBookingSchema } from "@workspace/db/schema";
-import { eq, and, gte, lte, or } from "drizzle-orm";
+import { eq, and, gte, lte, gt, or } from "drizzle-orm";
 import { serializeDates, serializeArray } from "../lib/serialize";
 
 const router = Router();
@@ -81,6 +81,39 @@ router.delete("/bookings/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to delete booking" });
+  }
+});
+
+// Availability check — returns status for a single date
+router.get("/bookings/availability", async (req, res) => {
+  try {
+    const { date } = req.query as { date?: string };
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      res.status(400).json({ error: "Provide a valid date (YYYY-MM-DD)" });
+      return;
+    }
+    const MAX_GUESTS = 12; // max adults the houseboat can hold
+    const bookings = await db
+      .select()
+      .from(bookingsTable)
+      .where(
+        and(
+          lte(bookingsTable.checkIn, date),
+          gt(bookingsTable.checkOut, date),
+          or(
+            eq(bookingsTable.status, "confirmed"),
+            eq(bookingsTable.status, "pending")
+          )
+        )
+      );
+    const totalGuests = bookings.reduce((sum, b) => sum + b.guests, 0);
+    const bookingCount = bookings.length;
+    let status: "available" | "limited" | "full" = "available";
+    if (totalGuests >= MAX_GUESTS) status = "full";
+    else if (bookingCount > 0) status = "limited";
+    res.json({ date, available: status !== "full", bookingCount, totalGuests, maxGuests: MAX_GUESTS, status });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to check availability" });
   }
 });
 
