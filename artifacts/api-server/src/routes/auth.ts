@@ -69,10 +69,57 @@ router.get("/auth/me", async (req, res): Promise<void> => {
     return;
   }
   try {
-    const user = JSON.parse(cookie);
-    res.json(GetMeResponse.parse(user));
+    const session = JSON.parse(cookie);
+    const [user] = await db.select().from(adminUsersTable).where(eq(adminUsersTable.id, session.id));
+    if (!user) { res.status(401).json({ error: "User not found" }); return; }
+    res.json({ id: user.id, username: user.username, role: user.role, displayName: user.displayName, email: user.email, phone: user.phone, createdAt: user.createdAt });
   } catch {
     res.status(401).json({ error: "Invalid session" });
+  }
+});
+
+// Update admin profile
+router.put("/auth/profile", async (req, res): Promise<void> => {
+  const cookie = req.cookies?.admin_session;
+  if (!cookie) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const session = JSON.parse(cookie);
+    const { displayName, email, phone, currentPassword, newPassword, username } = req.body;
+
+    const [user] = await db.select().from(adminUsersTable).where(eq(adminUsersTable.id, session.id));
+    if (!user) { res.status(404).json({ error: "User not found" }); return; }
+
+    const updates: Partial<typeof user> = {};
+
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (email !== undefined) updates.email = email;
+    if (phone !== undefined) updates.phone = phone;
+
+    if (username && username !== user.username) {
+      const existing = await db.select().from(adminUsersTable).where(eq(adminUsersTable.username, username));
+      if (existing.length > 0) { res.status(400).json({ error: "Username already taken" }); return; }
+      updates.username = username;
+    }
+
+    if (newPassword) {
+      if (!currentPassword || user.passwordHash !== hashPassword(currentPassword)) {
+        res.status(400).json({ error: "Current password is incorrect" });
+        return;
+      }
+      updates.passwordHash = hashPassword(newPassword);
+    }
+
+    const [updated] = await db.update(adminUsersTable).set(updates).where(eq(adminUsersTable.id, session.id)).returning();
+
+    // Refresh cookie with new username if changed
+    const newSession = { id: updated.id, username: updated.username, role: updated.role };
+    res.cookie("admin_session", JSON.stringify(newSession), { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "lax" });
+
+    res.json({ success: true, user: { id: updated.id, username: updated.username, role: updated.role, displayName: updated.displayName, email: updated.email, phone: updated.phone } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update profile" });
   }
 });
 
