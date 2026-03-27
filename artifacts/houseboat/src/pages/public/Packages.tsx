@@ -2,7 +2,14 @@ import { motion } from "framer-motion";
 import { useListPackages, useGetSettings } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
-import { Check, Users } from "lucide-react";
+import { Check, Users, Tag } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+function fmt(val: string | null | undefined) {
+  const n = parseFloat(val ?? "");
+  if (isNaN(n)) return null;
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
+}
 
 export default function Packages() {
   const { data: packages = [], isLoading } = useListPackages();
@@ -20,7 +27,7 @@ export default function Packages() {
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h1 className="text-5xl font-display font-bold text-primary mb-6">Our Packages</h1>
           <p className="text-lg text-muted-foreground">
-            Whether you're planning a romantic getaway, a family vacation, or a private party, 
+            Whether you're planning a romantic getaway, a family vacation, or a private party,
             we have the perfect package to make your stay unforgettable.
           </p>
         </div>
@@ -29,12 +36,17 @@ export default function Packages() {
           {activePackages.map((pkg, idx) => {
             const isEven = idx % 2 === 0;
             const whatsappMsg = `Hi! I want to book the ${pkg.name} package for ${formatPrice(pkg.pricePerNight)}/night.`;
-            const waUrl = settings?.whatsappNumber 
+            const waUrl = settings?.whatsappNumber
               ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`
               : "#";
 
+            const price = parseFloat(pkg.pricePerNight);
+            const mrp = parseFloat((pkg as any).mrpPerNight ?? "");
+            const hasOffer = !isNaN(price) && !isNaN(mrp) && mrp > price;
+            const discountPct = hasOffer ? Math.round(((mrp - price) / mrp) * 100) : 0;
+
             return (
-              <motion.div 
+              <motion.div
                 key={pkg.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -42,28 +54,78 @@ export default function Packages() {
                 transition={{ duration: 0.6 }}
                 className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center`}
               >
+                {/* Image block */}
                 <div className="w-full lg:w-1/2 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative">
-                  <img 
-                    src={pkg.images?.[0] || `${import.meta.env.BASE_URL}images/bedroom.png`} 
+                  <img
+                    src={pkg.images?.[0] || `${import.meta.env.BASE_URL}images/bedroom.png`}
                     alt={pkg.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg flex items-center gap-2">
-                    <Users className="w-5 h-5 text-primary" />
-                    <span className="font-bold text-primary">Up to {pkg.capacity} Guests</span>
+
+                  {/* Capacity badge — top left */}
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="font-bold text-primary text-sm">Up to {pkg.capacity} Guests</span>
                   </div>
+
+                  {/* Pricing badge — top right */}
+                  {hasOffer ? (
+                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl px-4 py-3 min-w-[150px]">
+                      {/* Discount pill */}
+                      <div className="flex items-center gap-1 mb-1.5">
+                        <span className="inline-flex items-center gap-1 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          <Tag className="w-2.5 h-2.5" />
+                          {discountPct}% OFF
+                        </span>
+                      </div>
+                      {/* Package Price (MRP — struck) */}
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Package Price</p>
+                      <p className="text-sm text-muted-foreground line-through leading-tight">
+                        {fmt((pkg as any).mrpPerNight)}<span className="text-xs not-italic">/night</span>
+                      </p>
+                      {/* Offer Price */}
+                      <p className="text-[10px] text-green-600 font-semibold uppercase tracking-wide mt-1.5">Offer Price</p>
+                      <p className="text-lg font-bold text-green-700 leading-tight">
+                        {fmt(pkg.pricePerNight)}<span className="text-xs font-normal text-muted-foreground">/night</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg text-right">
+                      <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Price / Night</p>
+                      <p className="text-lg font-bold text-primary leading-tight">
+                        {fmt(pkg.pricePerNight) ?? formatPrice(pkg.pricePerNight)}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
+
+                {/* Content block */}
                 <div className="w-full lg:w-1/2">
                   <h2 className="text-4xl font-display font-bold text-primary mb-4">{pkg.name}</h2>
-                  <div className="mb-6 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-secondary">{formatPrice(pkg.pricePerNight)}</span>
+
+                  {/* Price display in text area */}
+                  <div className="mb-6 flex items-baseline gap-3 flex-wrap">
+                    <span className="text-4xl font-bold text-secondary">
+                      {fmt(pkg.pricePerNight) ?? formatPrice(pkg.pricePerNight)}
+                    </span>
                     <span className="text-lg text-muted-foreground">/ per night</span>
+                    {hasOffer && (
+                      <>
+                        <span className="text-xl text-muted-foreground line-through">
+                          {fmt((pkg as any).mrpPerNight)}
+                        </span>
+                        <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-sm font-bold px-2.5 py-1 rounded-full">
+                          <Tag className="w-3.5 h-3.5" />
+                          Save {discountPct}%
+                        </span>
+                      </>
+                    )}
                   </div>
+
                   <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                     {pkg.description}
                   </p>
-                  
+
                   <div className="bg-muted/30 rounded-xl p-6 mb-8 border border-border">
                     <h3 className="font-display font-bold text-lg mb-4 text-primary">What's Included</h3>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">

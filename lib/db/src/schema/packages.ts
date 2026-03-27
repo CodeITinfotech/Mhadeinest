@@ -7,6 +7,7 @@ export const packagesTable = pgTable("packages", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   pricePerNight: text("price_per_night").notNull(),
+  mrpPerNight: text("mrp_per_night"),
   capacity: integer("capacity").notNull().default(2),
   inclusions: text("inclusions").array().notNull().default([]),
   images: text("images").array().notNull().default([]),
