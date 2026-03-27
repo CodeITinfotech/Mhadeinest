@@ -428,6 +428,8 @@ export const GetSettingsResponse = zod.object({
   trailVideoUrl: zod.string().nullable(),
   aboutText: zod.string(),
   aboutImages: zod.array(zod.string()),
+  siteLogo: zod.string(),
+  navHiddenItems: zod.array(zod.string()),
   updatedAt: zod.string(),
 });
 
@@ -448,6 +450,8 @@ export const UpdateSettingsBody = zod.object({
   trailVideoUrl: zod.string().optional(),
   aboutText: zod.string().optional(),
   aboutImages: zod.array(zod.string()).optional(),
+  siteLogo: zod.string().optional(),
+  navHiddenItems: zod.array(zod.string()).optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -465,6 +469,8 @@ export const UpdateSettingsResponse = zod.object({
   trailVideoUrl: zod.string().nullable(),
   aboutText: zod.string(),
   aboutImages: zod.array(zod.string()),
+  siteLogo: zod.string(),
+  navHiddenItems: zod.array(zod.string()),
   updatedAt: zod.string(),
 });
 

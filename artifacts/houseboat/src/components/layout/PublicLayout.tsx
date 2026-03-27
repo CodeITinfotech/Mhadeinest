@@ -4,9 +4,9 @@ import { Phone, Menu, X, Instagram, Facebook, Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-const logo = "/images/logo_transparent.png";
+const FALLBACK_LOGO = "/images/logo_transparent.png";
 
-const NAV_LINKS = [
+const ALL_NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Packages", href: "/packages" },
   { name: "Dining", href: "/dining" },
@@ -21,6 +21,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: settings } = useGetSettings();
+
+  const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
+  const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
+  const NAV_LINKS = ALL_NAV_LINKS.filter(l => !hiddenItems.includes(l.name));
+
+  // Keep browser tab title in sync with site name
+  useEffect(() => {
+    if (settings?.siteName) {
+      document.title = `${settings.siteName} | Luxury Houseboat Experience in Goa`;
+    }
+  }, [settings?.siteName]);
 
   useEffect(() => {
     const handleScroll = () => {

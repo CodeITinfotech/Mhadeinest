@@ -17,6 +17,8 @@ export const settingsTable = pgTable("settings", {
   trailVideoUrl: text("trail_video_url"),
   aboutText: text("about_text").notNull().default("Welcome to our luxury houseboat experience in Goa. Nestled on the serene backwaters, our houseboat offers an unparalleled blend of comfort and adventure. With 3 beautifully appointed bedrooms, a rooftop restaurant with live cooking, and a range of exciting water activities, we promise memories that will last a lifetime."),
   aboutImages: text("about_images").array().notNull().default([]),
+  siteLogo: text("site_logo").notNull().default(""),
+  navHiddenItems: text("nav_hidden_items").array().notNull().default([]),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

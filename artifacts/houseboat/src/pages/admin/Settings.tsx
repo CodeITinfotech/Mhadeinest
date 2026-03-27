@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
-  KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff
+  KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
+  Upload, X, ImageIcon, Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +20,33 @@ const API = `${BASE}/api`;
 
 type Tab = "site" | "profile";
 
-// ─── Site settings schema ──────────────────────────────────────────────
+const ALL_NAV_ITEMS = [
+  { key: "Home",       href: "/" },
+  { key: "Packages",   href: "/packages" },
+  { key: "Dining",     href: "/dining" },
+  { key: "Activities", href: "/activities" },
+  { key: "Gallery",    href: "/gallery" },
+  { key: "Blog",       href: "/blog" },
+  { key: "About",      href: "/about" },
+];
+
+// ─── helpers ───────────────────────────────────────────────────────────────
+function scaleDown(dataUrl: string, maxPx = 800): Promise<string> {
+  return new Promise((res) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+      res(c.toDataURL("image/png"));
+    };
+    img.src = dataUrl;
+  });
+}
+
+// ─── schemas ───────────────────────────────────────────────────────────────
 const siteSchema = z.object({
   siteName: z.string().min(1),
   tagline: z.string(),
@@ -36,7 +63,6 @@ const siteSchema = z.object({
   aboutImages: z.string(),
 });
 
-// ─── Profile schema ────────────────────────────────────────────────────
 const profileSchema = z.object({
   displayName: z.string(),
   email: z.string().email("Must be a valid email").or(z.literal("")),
@@ -77,20 +103,35 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label:
   );
 }
 
+function Field({ label, children, error, className }: { label: string; children: React.ReactNode; error?: string; className?: string }) {
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  );
+}
+
+// ─── Main component ─────────────────────────────────────────────────────────
+
 export default function AdminSettings() {
   const { data: settings, isLoading } = useGetSettings();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<Tab>("site");
-  const [profile, setProfile] = useState<AdminProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
-  const [profileSaving, setProfileSaving] = useState(false);
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
-  // ─── Site settings form ──────────────────────────────────────────────
+  // ── Logo state ─────────────────────────────────────────────────────────
+  const [logoPreview, setLogoPreview] = useState<string>("");
+  const [logoChanged, setLogoChanged] = useState(false);
+  const [logoSaving, setLogoSaving] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Nav menu state ──────────────────────────────────────────────────────
+  const [hiddenItems, setHiddenItems] = useState<string[]>([]);
+  const [navSaving, setNavSaving] = useState(false);
+
+  // ── Site settings form ─────────────────────────────────────────────────
   const updateMutation = useUpdateSettings({
     mutation: {
       onSuccess: () => {
@@ -119,8 +160,10 @@ export default function AdminSettings() {
         aboutText: settings.aboutText,
         aboutImages: settings.aboutImages?.join(", ") || "",
       });
+      setLogoPreview((settings as any).siteLogo || "");
+      setHiddenItems((settings as any).navHiddenItems || []);
     }
-  }, [settings, siteForm]);
+  }, [settings]);
 
   const onSiteSubmit = (data: z.infer<typeof siteSchema>) => {
     updateMutation.mutate({
@@ -129,9 +172,83 @@ export default function AdminSettings() {
         aboutImages: data.aboutImages ? data.aboutImages.split(",").map(s => s.trim()) : [],
       }
     });
+    // Also update the page title immediately
+    document.title = `${data.siteName} | Luxury Houseboat Experience in Goa`;
   };
 
-  // ─── Profile form ────────────────────────────────────────────────────
+  // ── Logo handlers ───────────────────────────────────────────────────────
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const raw = ev.target?.result as string;
+      const scaled = await scaleDown(raw, 800);
+      setLogoPreview(scaled);
+      setLogoChanged(true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const removeLogo = () => {
+    setLogoPreview("");
+    setLogoChanged(true);
+  };
+
+  const saveLogo = async () => {
+    setLogoSaving(true);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteLogo: logoPreview }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      setLogoChanged(false);
+      toast({ title: "Logo saved", description: "Site logo updated across header and footer." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save logo.", variant: "destructive" });
+    } finally {
+      setLogoSaving(false);
+    }
+  };
+
+  // ── Nav menu handlers ────────────────────────────────────────────────────
+  const toggleNavItem = (key: string) => {
+    setHiddenItems(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+  };
+
+  const saveNavMenu = async () => {
+    setNavSaving(true);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ navHiddenItems: hiddenItems }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      toast({ title: "Menu saved", description: "Navigation menu configuration updated." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save menu config.", variant: "destructive" });
+    } finally {
+      setNavSaving(false);
+    }
+  };
+
+  // ── Profile ──────────────────────────────────────────────────────────────
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const profileForm = useForm<z.infer<typeof profileSchema>>({ resolver: zodResolver(profileSchema) });
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({ resolver: zodResolver(passwordSchema) });
 
@@ -217,7 +334,7 @@ export default function AdminSettings() {
         ))}
       </div>
 
-      {/* ── SITE SETTINGS TAB ─────────────────────────────────────── */}
+      {/* ── SITE SETTINGS TAB ─────────────────────────────────────────── */}
       {activeTab === "site" && (
         <>
           <div className="flex justify-between items-center">
@@ -232,41 +349,167 @@ export default function AdminSettings() {
           </div>
 
           {isLoading ? <div className="text-muted-foreground">Loading settings...</div> : (
-            <form className="space-y-6">
-              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
-                <h3 className="font-bold text-base border-b border-border pb-3">General & Hero</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Field label="Site Name"><Input {...siteForm.register("siteName")} /></Field>
-                  <Field label="Tagline (Footer)"><Input {...siteForm.register("tagline")} /></Field>
-                  <Field label="Hero Title"><Input {...siteForm.register("heroTitle")} /></Field>
-                  <Field label="Hero Subtitle"><Input {...siteForm.register("heroSubtitle")} /></Field>
-                  <Field label="Hero Image URL" className="md:col-span-2"><Input {...siteForm.register("heroImage")} /></Field>
+            <div className="space-y-6">
+
+              {/* ── LOGO SECTION ─────────────────────────────────────── */}
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 pb-3 border-b border-border">
+                  <ImageIcon className="w-4 h-4 text-primary" />
+                  <h3 className="font-bold text-base">Site Logo</h3>
+                  <p className="text-xs text-muted-foreground ml-auto">Displays in header (top-left) and footer (bottom-left)</p>
+                </div>
+
+                <div className="flex items-start gap-6 flex-wrap">
+                  {/* Preview */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-32 h-20 rounded-lg border border-border bg-muted flex items-center justify-center overflow-hidden">
+                      {logoPreview ? (
+                        <img src={logoPreview} alt="Logo preview" className="w-full h-full object-contain p-2" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                          <ImageIcon className="w-6 h-6" />
+                          <span className="text-xs">No logo</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground">Header preview</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-32 h-20 rounded-lg border border-border bg-primary flex items-center justify-center overflow-hidden">
+                      {logoPreview ? (
+                        <img src={logoPreview} alt="Logo footer preview" className="w-full h-full object-contain p-2 brightness-0 invert" />
+                      ) : (
+                        <div className="flex flex-col items-center gap-1 text-white/40">
+                          <ImageIcon className="w-6 h-6" />
+                          <span className="text-xs">No logo</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground">Footer preview</span>
+                  </div>
+
+                  {/* Upload actions */}
+                  <div className="flex flex-col gap-2 justify-center">
+                    <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    <Button variant="outline" size="sm" className="gap-2" onClick={() => logoInputRef.current?.click()}>
+                      <Upload className="w-4 h-4" /> Upload Logo
+                    </Button>
+                    {logoPreview && (
+                      <Button variant="ghost" size="sm" className="gap-2 text-destructive hover:text-destructive" onClick={removeLogo}>
+                        <X className="w-4 h-4" /> Remove Logo
+                      </Button>
+                    )}
+                    {logoChanged && (
+                      <Button size="sm" className="gap-2" onClick={saveLogo} disabled={logoSaving}>
+                        {logoSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {logoSaving ? "Saving…" : "Save Logo"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Recommended: PNG with transparent background. Max display height ~48px in header, ~64px in footer.
+                </p>
+              </div>
+
+              {/* ── GENERAL & HERO ───────────────────────────────────── */}
+              <form className="space-y-6">
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">General & Page Name</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field label="Page / Site Name" className="md:col-span-2">
+                      <Input {...siteForm.register("siteName")} placeholder="e.g. Shubhangi Floating House Boat" />
+                      <p className="text-xs text-muted-foreground mt-1">This sets the browser tab title and the site name shown in the footer.</p>
+                    </Field>
+                    <Field label="Tagline (Footer)"><Input {...siteForm.register("tagline")} /></Field>
+                    <Field label="Hero Title"><Input {...siteForm.register("heroTitle")} /></Field>
+                    <Field label="Hero Subtitle"><Input {...siteForm.register("heroSubtitle")} /></Field>
+                  </div>
+                </div>
+
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">Contact & Social</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field label="WhatsApp Number (e.g. +919876543210)"><Input {...siteForm.register("whatsappNumber")} /></Field>
+                    <Field label="Inquiry Email"><Input type="email" {...siteForm.register("inquiryEmail")} /></Field>
+                    <Field label="Instagram URL"><Input {...siteForm.register("socialInstagram")} /></Field>
+                    <Field label="Facebook URL"><Input {...siteForm.register("socialFacebook")} /></Field>
+                    <Field label="YouTube URL"><Input {...siteForm.register("socialYoutube")} /></Field>
+                  </div>
+                </div>
+
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">About & Trail Video</h3>
+                  <Field label="YouTube Trail Video URL"><Input {...siteForm.register("trailVideoUrl")} placeholder="https://youtube.com/watch?v=..." /></Field>
+                  <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
+                  <Field label="About Images (comma-separated URLs)"><Textarea {...siteForm.register("aboutImages")} className="min-h-[80px]" /></Field>
+                </div>
+              </form>
+
+              {/* ── NAV MENU CONFIG ──────────────────────────────────── */}
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <Menu className="w-4 h-4 text-primary" />
+                    <h3 className="font-bold text-base">Navigation Menu</h3>
+                  </div>
+                  <Button size="sm" className="gap-2" onClick={saveNavMenu} disabled={navSaving}>
+                    {navSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {navSaving ? "Saving…" : "Save Menu"}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">Toggle which pages appear in the public navigation bar. Hidden pages are still accessible via direct URL.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {ALL_NAV_ITEMS.map((item) => {
+                    const isVisible = !hiddenItems.includes(item.key);
+                    return (
+                      <label
+                        key={item.key}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors select-none",
+                          isVisible
+                            ? "bg-primary/5 border-primary/30 text-foreground"
+                            : "bg-muted/40 border-border text-muted-foreground"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 rounded flex items-center justify-center border-2 transition-colors shrink-0",
+                          isVisible ? "bg-primary border-primary" : "bg-background border-border"
+                        )}>
+                          {isVisible && (
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        <input
+                          type="checkbox"
+                          className="hidden"
+                          checked={isVisible}
+                          onChange={() => toggleNavItem(item.key)}
+                        />
+                        <div>
+                          <p className="text-sm font-medium">{item.key}</p>
+                          <p className="text-xs opacity-60">{item.href}</p>
+                        </div>
+                        <span className={cn(
+                          "ml-auto text-xs px-2 py-0.5 rounded-full font-medium",
+                          isVisible ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                        )}>
+                          {isVisible ? "Visible" : "Hidden"}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
-                <h3 className="font-bold text-base border-b border-border pb-3">Contact & Social</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Field label="WhatsApp Number (e.g. +919876543210)"><Input {...siteForm.register("whatsappNumber")} /></Field>
-                  <Field label="Inquiry Email"><Input type="email" {...siteForm.register("inquiryEmail")} /></Field>
-                  <Field label="Instagram URL"><Input {...siteForm.register("socialInstagram")} /></Field>
-                  <Field label="Facebook URL"><Input {...siteForm.register("socialFacebook")} /></Field>
-                  <Field label="YouTube URL"><Input {...siteForm.register("socialYoutube")} /></Field>
-                </div>
-              </div>
-
-              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
-                <h3 className="font-bold text-base border-b border-border pb-3">About & Trail Video</h3>
-                <Field label="YouTube Trail Video URL"><Input {...siteForm.register("trailVideoUrl")} placeholder="https://youtube.com/watch?v=..." /></Field>
-                <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
-                <Field label="About Images (comma-separated URLs)"><Textarea {...siteForm.register("aboutImages")} className="min-h-[80px]" /></Field>
-              </div>
-            </form>
+            </div>
           )}
         </>
       )}
 
-      {/* ── ADMIN PROFILE TAB ─────────────────────────────────────── */}
+      {/* ── ADMIN PROFILE TAB ─────────────────────────────────────────── */}
       {activeTab === "profile" && (
         <div className="space-y-6">
           <div>
@@ -280,10 +523,8 @@ export default function AdminSettings() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-              {/* LEFT — Admin Details (read-only) */}
+              {/* LEFT — read-only admin details */}
               <div className="space-y-4">
-                {/* Avatar card */}
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm text-center">
                   <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl font-bold text-primary">
@@ -296,29 +537,23 @@ export default function AdminSettings() {
                     {profile?.role?.charAt(0).toUpperCase()}{profile?.role?.slice(1)}
                   </span>
                 </div>
-
-                {/* Admin Details */}
                 <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
                   <h3 className="text-sm font-bold text-foreground mb-1">Admin Details</h3>
                   <p className="text-xs text-muted-foreground mb-4">Your account information</p>
-                  <div>
-                    <InfoRow icon={User} label="Username" value={`@${profile?.username}`} />
-                    <InfoRow icon={Shield} label="Role" value={profile?.role || ""} />
-                    <InfoRow icon={Mail} label="Email" value={profile?.email || "Not set"} />
-                    <InfoRow icon={Phone} label="Phone" value={profile?.phone || "Not set"} />
-                    <InfoRow icon={CalendarDays} label="Member Since" value={
-                      profile?.createdAt
-                        ? new Date(profile.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
-                        : ""
-                    } />
-                  </div>
+                  <InfoRow icon={User} label="Username" value={`@${profile?.username}`} />
+                  <InfoRow icon={Shield} label="Role" value={profile?.role || ""} />
+                  <InfoRow icon={Mail} label="Email" value={profile?.email || "Not set"} />
+                  <InfoRow icon={Phone} label="Phone" value={profile?.phone || "Not set"} />
+                  <InfoRow icon={CalendarDays} label="Member Since" value={
+                    profile?.createdAt
+                      ? new Date(profile.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+                      : ""
+                  } />
                 </div>
               </div>
 
-              {/* RIGHT — Edit forms */}
+              {/* RIGHT — editable forms */}
               <div className="lg:col-span-2 space-y-6">
-
-                {/* User Details (editable profile) */}
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border">
                     <User className="w-4 h-4 text-primary" />
@@ -351,7 +586,6 @@ export default function AdminSettings() {
                   </form>
                 </div>
 
-                {/* Admin Setting — Change Password */}
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                   <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border">
                     <KeyRound className="w-4 h-4 text-primary" />
@@ -418,16 +652,6 @@ export default function AdminSettings() {
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-function Field({ label, children, error, className }: { label: string; children: React.ReactNode; error?: string; className?: string }) {
-  return (
-    <div className={cn("space-y-1.5", className)}>
-      <label className="text-sm font-medium text-foreground">{label}</label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
