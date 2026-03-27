@@ -38,6 +38,24 @@ router.post("/gallery", async (req, res): Promise<void> => {
   res.status(201).json(serializeDates(image));
 });
 
+router.patch("/gallery/:id", async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+  const { caption, category, sortOrder, url } = req.body;
+  const updates: Record<string, unknown> = {};
+  if (caption !== undefined) updates.caption = caption;
+  if (category !== undefined) updates.category = category;
+  if (sortOrder !== undefined) updates.sortOrder = sortOrder;
+  if (url !== undefined) updates.url = url;
+  try {
+    const [image] = await db.update(galleryTable).set(updates).where(eq(galleryTable.id, id)).returning();
+    if (!image) { res.status(404).json({ error: "Image not found" }); return; }
+    res.json(serializeDates(image));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update gallery item" });
+  }
+});
+
 router.delete("/gallery/:id", async (req, res): Promise<void> => {
   const params = DeleteGalleryImageParams.safeParse(req.params);
   if (!params.success) {

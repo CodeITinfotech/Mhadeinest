@@ -25,9 +25,9 @@ import AdminPackages from "@/pages/admin/Packages";
 import AdminBlog from "@/pages/admin/Blog";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminCalendar from "@/pages/admin/Calendar";
+import AdminGallery from "@/pages/admin/Gallery";
 // Simple placeholders for missing admin routes to satisfy completeness requirement
 function AdminActivities() { return <div className="p-8"><h2 className="text-2xl font-bold mb-4">Manage Activities</h2><p className="text-muted-foreground">Activities CRUD interface is similar to Packages.</p></div>; }
-function AdminGallery() { return <div className="p-8"><h2 className="text-2xl font-bold mb-4">Manage Gallery</h2><p className="text-muted-foreground">Gallery upload interface.</p></div>; }
 
 import NotFound from "@/pages/not-found";
 
