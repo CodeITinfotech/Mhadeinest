@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   CheckCircle2, PhoneCall, XCircle, Clock, Search,
-  ChevronDown, Phone, Mail, Users, Calendar, Package,
-  MessageSquare, User, Trash2, X, RefreshCw, StickyNote
+  Phone, Mail, Users, Calendar, Package,
+  MessageSquare, User, X, RefreshCw, StickyNote, Baby
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,8 @@ const STATUS_CONFIG: Record<Status, { label: string; color: string; bg: string; 
   lost:           { label: "Lost",           color: "text-red-700",    bg: "bg-red-50 border-red-200",     icon: XCircle },
 };
 
-const STATUS_ORDER: Status[] = ["new", "details_shared", "converted", "lost"];
+const ACTIVE_STATUSES: Status[] = ["new", "details_shared", "converted"];
+const ALL_STATUSES: Status[] = ["new", "details_shared", "converted", "lost"];
 
 export default function AdminInquiries() {
   const { toast } = useToast();
@@ -48,7 +49,6 @@ export default function AdminInquiries() {
   const [filterStatus, setFilterStatus] = useState<Status | "all">("all");
   const [selected, setSelected] = useState<Inquiry | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [view, setView] = useState<"list" | "kanban">("list");
 
   const load = useCallback(async () => {
@@ -87,28 +87,21 @@ export default function AdminInquiries() {
     }
   };
 
-  const deleteInquiry = async (id: number) => {
-    setDeletingId(id);
-    try {
-      await fetch(`${API}/inquiries/${id}`, { method: "DELETE" });
-      setInquiries(prev => prev.filter(i => i.id !== id));
-      if (selected?.id === id) setSelected(null);
-      toast({ title: "Deleted", description: "Inquiry removed." });
-    } catch {
-      toast({ title: "Error", description: "Failed to delete.", variant: "destructive" });
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
+  // "All" tab excludes lost inquiries; "Lost" tab shows only lost
   const filtered = inquiries.filter(i => {
     const q = search.toLowerCase();
     const matchSearch = !q || i.name.toLowerCase().includes(q) || i.email.toLowerCase().includes(q) || i.phone.includes(q);
-    const matchStatus = filterStatus === "all" || i.status === filterStatus;
+    let matchStatus: boolean;
+    if (filterStatus === "all") {
+      matchStatus = i.status !== "lost";
+    } else {
+      matchStatus = i.status === filterStatus;
+    }
     return matchSearch && matchStatus;
   });
 
-  const counts = STATUS_ORDER.reduce((acc, s) => {
+  const activeCount = inquiries.filter(i => i.status !== "lost").length;
+  const counts = ALL_STATUSES.reduce((acc, s) => {
     acc[s] = inquiries.filter(i => i.status === s).length;
     return acc;
   }, {} as Record<Status, number>);
@@ -119,7 +112,10 @@ export default function AdminInquiries() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div>
           <h1 className="text-2xl font-bold">Inquiries</h1>
-          <p className="text-sm text-muted-foreground">{inquiries.length} total • {counts.new} new</p>
+          <p className="text-sm text-muted-foreground">
+            {activeCount} active • {counts.new} new
+            {counts.lost > 0 && <span className="text-red-500 ml-2">• {counts.lost} lost</span>}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={load} className="gap-2">
@@ -138,17 +134,22 @@ export default function AdminInquiries() {
         </div>
       </div>
 
-      {/* Status summary chips */}
+      {/* Status filter tabs */}
       <div className="flex gap-2 flex-wrap">
+        {/* All — excludes lost */}
         <button
           onClick={() => setFilterStatus("all")}
           className={cn("px-4 py-1.5 rounded-full text-sm font-medium border transition-colors",
-            filterStatus === "all" ? "bg-foreground text-background border-foreground" : "bg-card border-border text-muted-foreground hover:border-foreground/40"
+            filterStatus === "all"
+              ? "bg-foreground text-background border-foreground"
+              : "bg-card border-border text-muted-foreground hover:border-foreground/40"
           )}
         >
-          All <span className="ml-1 opacity-60">{inquiries.length}</span>
+          All <span className="ml-1 opacity-60">{activeCount}</span>
         </button>
-        {STATUS_ORDER.map(s => {
+
+        {/* Active status tabs */}
+        {ACTIVE_STATUSES.map(s => {
           const cfg = STATUS_CONFIG[s];
           const Icon = cfg.icon;
           return (
@@ -163,6 +164,22 @@ export default function AdminInquiries() {
             </button>
           );
         })}
+
+        {/* Lost tab — separated with a visual divider */}
+        <div className="flex items-center gap-2">
+          <div className="w-px h-6 bg-border" />
+          <button onClick={() => setFilterStatus("lost")}
+            className={cn("px-4 py-1.5 rounded-full text-sm font-medium border transition-colors flex items-center gap-1.5",
+              filterStatus === "lost"
+                ? "bg-red-50 text-red-700 border-red-300"
+                : "bg-card border-border text-muted-foreground hover:border-red-300 hover:text-red-600"
+            )}
+          >
+            <XCircle className="w-3.5 h-3.5" />
+            Lost
+            <span className="opacity-60">{counts.lost}</span>
+          </button>
+        </div>
       </div>
 
       {/* Search */}
@@ -171,11 +188,24 @@ export default function AdminInquiries() {
         <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, email, phone…" className="pl-9" />
       </div>
 
+      {/* Lost banner when viewing lost */}
+      {filterStatus === "lost" && (
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+          <XCircle className="w-4 h-4 shrink-0" />
+          <span>Lost inquiries are archived here for reference. They no longer appear under <strong>All</strong>.</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center py-16 text-muted-foreground">Loading inquiries…</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground">
-          {search || filterStatus !== "all" ? "No inquiries match your filters." : "No inquiries yet. They'll appear here once visitors submit the form."}
+          {filterStatus === "lost"
+            ? "No lost inquiries yet."
+            : search || filterStatus !== "all"
+              ? "No inquiries match your filters."
+              : "No inquiries yet. They'll appear here once visitors submit the form."
+          }
         </div>
       ) : view === "list" ? (
         /* ── LIST VIEW ──────────────────────────────────────────────── */
@@ -186,21 +216,23 @@ export default function AdminInquiries() {
               inq={inq}
               onView={() => setSelected(inq)}
               onStatus={updateStatus}
-              onDelete={deleteInquiry}
               updatingId={updatingId}
-              deletingId={deletingId}
             />
           ))}
         </div>
       ) : (
         /* ── KANBAN VIEW ────────────────────────────────────────────── */
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto">
-          {STATUS_ORDER.map(s => {
+          {ALL_STATUSES.map(s => {
             const cfg = STATUS_CONFIG[s];
             const Icon = cfg.icon;
-            const cards = filtered.filter(i => i.status === s);
+            const cards = inquiries.filter(i => {
+              const q = search.toLowerCase();
+              const matchSearch = !q || i.name.toLowerCase().includes(q) || i.email.toLowerCase().includes(q) || i.phone.includes(q);
+              return i.status === s && matchSearch;
+            });
             return (
-              <div key={s} className="min-w-[200px]">
+              <div key={s} className={cn("min-w-[200px]", s === "lost" ? "opacity-70" : "")}>
                 <div className={cn("flex items-center gap-2 px-3 py-2 rounded-lg border mb-3", cfg.bg)}>
                   <Icon className={cn("w-4 h-4", cfg.color)} />
                   <span className={cn("text-sm font-semibold", cfg.color)}>{cfg.label}</span>
@@ -259,7 +291,13 @@ export default function AdminInquiries() {
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Booking Details</p>
                   {selected.packageService && <DetailRow icon={Package} label="Package" value={selected.packageService} />}
                   {selected.checkIn && <DetailRow icon={Calendar} label="Date" value={selected.checkIn} />}
-                  {selected.guests > 0 && <DetailRow icon={Users} label="Guests" value={`${selected.guests} adult${selected.guests !== 1 ? "s" : ""}${selected.kids > 0 ? `, ${selected.kids} kid${selected.kids !== 1 ? "s" : ""}` : ""}`} />}
+                  {selected.guests > 0 && (
+                    <DetailRow
+                      icon={Users}
+                      label="Guests"
+                      value={`${selected.guests} adult${selected.guests !== 1 ? "s" : ""}${selected.kids > 0 ? `, ${selected.kids} kid${selected.kids !== 1 ? "s" : ""}` : ""}`}
+                    />
+                  )}
                   {selected.paxDetails && <DetailRow icon={User} label="Group Details" value={selected.paxDetails} />}
                 </div>
               )}
@@ -278,7 +316,7 @@ export default function AdminInquiries() {
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Change Status</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {STATUS_ORDER.map(s => {
+                  {ALL_STATUSES.map(s => {
                     const cfg = STATUS_CONFIG[s];
                     const Icon = cfg.icon;
                     const isActive = selected.status === s;
@@ -299,10 +337,15 @@ export default function AdminInquiries() {
                     );
                   })}
                 </div>
+                {selected.status !== "lost" && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Marking as <strong>Lost</strong> will move this inquiry out of the active list.
+                  </p>
+                )}
               </div>
 
               {/* WhatsApp quick reply */}
-              {selected.whatsapp || selected.phone ? (
+              {(selected.whatsapp || selected.phone) && (
                 <a
                   href={`https://wa.me/${(selected.whatsapp || selected.phone).replace(/\D/g, "")}?text=Hello%20${encodeURIComponent(selected.name)}%2C%20thank%20you%20for%20your%20inquiry%20about%20${encodeURIComponent(selected.packageService || "our houseboat")}!`}
                   target="_blank"
@@ -314,21 +357,7 @@ export default function AdminInquiries() {
                   </svg>
                   Reply on WhatsApp
                 </a>
-              ) : null}
-
-              {/* Delete */}
-              <div className="pt-2 border-t border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full gap-2"
-                  disabled={deletingId === selected.id}
-                  onClick={() => deleteInquiry(selected.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                  {deletingId === selected.id ? "Deleting…" : "Delete Inquiry"}
-                </Button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -339,17 +368,20 @@ export default function AdminInquiries() {
 
 // ── Sub-components ────────────────────────────────────────────────────────
 
-function InquiryCard({ inq, onView, onStatus, onDelete, updatingId, deletingId }: {
+function InquiryCard({ inq, onView, onStatus, updatingId }: {
   inq: Inquiry;
   onView: () => void;
   onStatus: (id: number, s: Status) => void;
-  onDelete: (id: number) => void;
   updatingId: number | null;
-  deletingId: number | null;
 }) {
   const cfg = STATUS_CONFIG[inq.status];
+  const isLost = inq.status === "lost";
+
   return (
-    <div className="bg-card border border-border rounded-xl p-4 hover:shadow-md transition-shadow">
+    <div className={cn(
+      "bg-card border rounded-xl p-4 hover:shadow-md transition-shadow",
+      isLost ? "border-red-200 opacity-75" : "border-border"
+    )}>
       <div className="flex items-start gap-4 flex-wrap">
         {/* Left info */}
         <div className="flex-1 min-w-0 cursor-pointer" onClick={onView}>
@@ -362,7 +394,13 @@ function InquiryCard({ inq, onView, onStatus, onDelete, updatingId, deletingId }
             {inq.email && <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" />{inq.email}</span>}
             {inq.packageService && <span className="flex items-center gap-1"><Package className="w-3.5 h-3.5" />{inq.packageService}</span>}
             {inq.checkIn && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{inq.checkIn}</span>}
-            {inq.guests > 0 && <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{inq.guests} adult{inq.guests !== 1 ? "s" : ""}{inq.kids > 0 ? `, ${inq.kids} kid${inq.kids !== 1 ? "s" : ""}` : ""}</span>}
+            {inq.guests > 0 && (
+              <span className="flex items-center gap-1">
+                <Users className="w-3.5 h-3.5" />
+                {inq.guests} adult{inq.guests !== 1 ? "s" : ""}
+                {inq.kids > 0 ? `, ${inq.kids} kid${inq.kids !== 1 ? "s" : ""}` : ""}
+              </span>
+            )}
           </div>
           {inq.message && (
             <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{inq.message}</p>
@@ -370,9 +408,9 @@ function InquiryCard({ inq, onView, onStatus, onDelete, updatingId, deletingId }
           <p className="text-xs text-muted-foreground/60 mt-2">{fmtDate(inq.createdAt)}</p>
         </div>
 
-        {/* Actions */}
+        {/* Quick status actions (only non-current statuses, no delete) */}
         <div className="flex flex-col gap-1.5 shrink-0">
-          {STATUS_ORDER.filter(s => s !== inq.status).map(s => {
+          {ALL_STATUSES.filter(s => s !== inq.status).map(s => {
             const c = STATUS_CONFIG[s];
             const Ic = c.icon;
             return (
@@ -388,14 +426,6 @@ function InquiryCard({ inq, onView, onStatus, onDelete, updatingId, deletingId }
               </button>
             );
           })}
-          <button
-            disabled={deletingId === inq.id}
-            onClick={() => onDelete(inq.id)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-40"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            Delete
-          </button>
         </div>
       </div>
     </div>
