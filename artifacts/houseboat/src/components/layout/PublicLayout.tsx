@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { InquiryModal } from "@/components/InquiryModal";
 import { InquiryModalProvider, useInquiryModal } from "@/context/InquiryModalContext";
 import { CurrencyProvider, useCurrency, type Currency } from "@/context/CurrencyContext";
+import { ChatWidget } from "@/components/ChatWidget";
 const FALLBACK_LOGO = "/images/logo_transparent.png";
 
 const ALL_NAV_LINKS = [
@@ -291,9 +292,12 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       >
         <Phone className="w-6 h-6" />
         <span className="absolute right-full mr-4 bg-white text-foreground px-3 py-1.5 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
-          Chat with us
+          WhatsApp us
         </span>
       </a>
+
+      {/* Live Chat Widget */}
+      <ChatWidget />
     </div>
   );
 }
