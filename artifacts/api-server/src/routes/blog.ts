@@ -241,6 +241,42 @@ router.post("/blog/:id/approve", async (req, res): Promise<void> => {
   res.json(ApproveBlogPostResponse.parse(serializeDates(post)));
 });
 
+// Admin: create and immediately publish a blog post (no OTP needed)
+router.post("/admin/blog", async (req, res): Promise<void> => {
+  const cookie = (req as any).cookies?.admin_session;
+  if (!cookie) { res.status(401).json({ error: "Not authenticated" }); return; }
+  try {
+    JSON.parse(cookie);
+  } catch { res.status(401).json({ error: "Invalid session" }); return; }
+
+  const { title, summary, content, authorName, images, hashtags, links } = req.body;
+  if (!title || !content || !authorName) {
+    res.status(400).json({ error: "title, content and authorName are required" });
+    return;
+  }
+
+  try {
+    const slug = generateSlug(title);
+    const [post] = await db.insert(blogPostsTable).values({
+      title,
+      slug,
+      content,
+      summary: summary || "",
+      authorName,
+      images: Array.isArray(images) ? images : [],
+      hashtags: Array.isArray(hashtags) ? hashtags : [],
+      links: Array.isArray(links) ? links : [],
+      status: "published",
+      isAdminPost: true,
+      publishedAt: new Date(),
+    }).returning();
+    res.status(201).json(serializeDates(post));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create blog post" });
+  }
+});
+
 router.delete("/blog/:id", async (req, res): Promise<void> => {
   const params = DeleteBlogPostParams.safeParse(req.params);
   if (!params.success) {
