@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { useGetSettings } from "@workspace/api-client-react";
-import { Phone, Menu, X, Ship, Instagram, Facebook, Youtube } from "lucide-react";
+import { Phone, Menu, X, Instagram, Facebook, Youtube } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+const logo = "/images/logo.jpg";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -46,10 +47,11 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <Ship className={cn("w-8 h-8 transition-colors", isScrolled || location !== "/" ? "text-primary" : "text-white group-hover:text-secondary")} />
-            <span className={cn("text-2xl font-display font-bold tracking-wide transition-colors", isScrolled || location !== "/" ? "text-primary" : "text-white")}>
-              {settings?.siteName || "Goa Houseboat"}
-            </span>
+            <img
+              src={logo}
+              alt="Shubhangi The Boat House"
+              className="h-12 w-auto object-contain transition-all duration-300 drop-shadow-md"
+            />
           </Link>
 
           {/* Desktop Nav */}
@@ -138,11 +140,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <footer className="bg-primary text-primary-foreground py-16 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
-            <div className="flex items-center gap-2 mb-6">
-              <Ship className="w-8 h-8 text-secondary" />
-              <span className="text-2xl font-display font-bold">
-                {settings?.siteName || "Goa Houseboat"}
-              </span>
+            <div className="flex items-center gap-3 mb-6">
+              <img
+                src={logo}
+                alt="Shubhangi The Boat House"
+                className="h-16 w-auto object-contain brightness-0 invert"
+              />
             </div>
             <p className="text-primary-foreground/70 mb-6">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}

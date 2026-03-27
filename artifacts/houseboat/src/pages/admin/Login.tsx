@@ -7,9 +7,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Ship, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetMeQueryKey } from "@workspace/api-client-react";
+
+const logo = "/images/logo.jpg";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username required"),
@@ -45,7 +47,7 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
         <div className="bg-primary p-8 text-center text-primary-foreground">
-          <Ship className="w-12 h-12 mx-auto mb-4 text-secondary" />
+          <img src={logo} alt="Shubhangi The Boat House" className="h-20 w-auto object-contain mx-auto mb-4 brightness-0 invert" />
           <h1 className="text-2xl font-display font-bold">Admin Portal</h1>
           <p className="text-primary-foreground/70 text-sm mt-1">Sign in to manage the houseboat website</p>
         </div>

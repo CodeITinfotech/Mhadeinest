@@ -1,8 +1,10 @@
 import { Link, useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
-import { Ship, LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon, FileText, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon, FileText, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+
+const logo = "/images/logo.jpg";
 
 const ADMIN_LINKS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -32,9 +34,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <aside className="w-64 bg-card border-r border-border flex flex-col fixed h-full z-20">
         <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
-            <Ship className="w-6 h-6" />
-            <span className="text-xl font-display font-bold">Admin Panel</span>
+            <img src={logo} alt="Shubhangi The Boat House" className="h-10 w-auto object-contain" />
           </Link>
+          <p className="text-xs text-muted-foreground mt-1">Admin Panel</p>
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
