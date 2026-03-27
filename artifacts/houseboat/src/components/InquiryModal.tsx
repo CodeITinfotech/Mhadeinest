@@ -107,10 +107,10 @@ export function InquiryModal({ open, onClose }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-card rounded-2xl shadow-2xl"
+            className="relative w-full max-w-2xl max-h-[90vh] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-primary text-primary-foreground px-6 py-5 flex items-start justify-between rounded-t-2xl">
+            {/* Header — always pinned, never scrolls */}
+            <div className="shrink-0 bg-primary text-primary-foreground px-6 py-5 flex items-start justify-between rounded-t-2xl">
               <div>
                 <h2 className="text-xl font-bold font-display">Send an Inquiry</h2>
                 <p className="text-primary-foreground/70 text-sm mt-0.5">
@@ -122,6 +122,8 @@ export function InquiryModal({ open, onClose }: Props) {
               </button>
             </div>
 
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto">
             {success ? (
               <div className="flex flex-col items-center justify-center gap-4 py-20 px-8 text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
@@ -242,6 +244,7 @@ export function InquiryModal({ open, onClose }: Props) {
                 </div>
               </form>
             )}
+            </div>{/* end scrollable body */}
           </motion.div>
         </div>
       )}
