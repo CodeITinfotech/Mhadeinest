@@ -11,14 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
-  Upload, X, ImageIcon, Menu
+  Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
 
-type Tab = "site" | "profile";
+type Tab = "site" | "email" | "profile";
 
 const ALL_NAV_ITEMS = [
   { key: "Home",       href: "/" },
@@ -240,6 +240,73 @@ export default function AdminSettings() {
     }
   };
 
+  // ── Email / SMTP state ───────────────────────────────────────────────────
+  const [smtpForm, setSmtpForm] = useState({
+    smtpHost: "", smtpPort: "587", smtpUser: "", smtpPass: "",
+    smtpFrom: "", smtpSecure: "false", notifyEmail: "",
+  });
+  const [smtpSaving, setSmtpSaving] = useState(false);
+  const [testingSend, setTestingSend] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
+
+  useEffect(() => {
+    if (settings) {
+      setSmtpForm({
+        smtpHost: (settings as any).smtpHost || "",
+        smtpPort: (settings as any).smtpPort || "587",
+        smtpUser: (settings as any).smtpUser || "",
+        smtpPass: (settings as any).smtpPass || "",
+        smtpFrom: (settings as any).smtpFrom || "",
+        smtpSecure: (settings as any).smtpSecure || "false",
+        notifyEmail: (settings as any).notifyEmail || "",
+      });
+    }
+  }, [settings]);
+
+  const saveSmtp = async () => {
+    setSmtpSaving(true);
+    setTestResult(null);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(smtpForm),
+      });
+      if (!res.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      toast({ title: "Email settings saved", description: "SMTP configuration updated successfully." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save SMTP settings.", variant: "destructive" });
+    } finally {
+      setSmtpSaving(false);
+    }
+  };
+
+  const sendTestEmail = async () => {
+    setTestingSend(true);
+    setTestResult(null);
+    // Save first, then test
+    try {
+      await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(smtpForm),
+      });
+      const res = await fetch(`${API}/email/test`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTestResult({ ok: true, msg: "Test email sent! Check your inbox." });
+      } else {
+        setTestResult({ ok: false, msg: data.error || "Failed to send test email." });
+      }
+    } catch {
+      setTestResult({ ok: false, msg: "Network error. Check server connection." });
+    } finally {
+      setTestingSend(false);
+    }
+  };
+
   // ── Profile ──────────────────────────────────────────────────────────────
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -310,6 +377,7 @@ export default function AdminSettings() {
 
   const tabs = [
     { key: "site" as Tab, label: "Site Settings", icon: Globe },
+    { key: "email" as Tab, label: "Email Settings", icon: Mail },
     { key: "profile" as Tab, label: "Admin Profile", icon: User },
   ];
 
@@ -507,6 +575,159 @@ export default function AdminSettings() {
             </div>
           )}
         </>
+      )}
+
+      {/* ── EMAIL SETTINGS TAB ────────────────────────────────────────── */}
+      {activeTab === "email" && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">Email Settings</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">Configure SMTP to receive inquiry notifications by email</p>
+            </div>
+            <Button onClick={saveSmtp} disabled={smtpSaving} className="gap-2">
+              {smtpSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Settings
+            </Button>
+          </div>
+
+          {/* Notification email */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Mail className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Notification Email</h3>
+            </div>
+            <Field label="Send Inquiry Notifications To">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  className="pl-9"
+                  placeholder="owner@example.com"
+                  value={smtpForm.notifyEmail}
+                  onChange={e => setSmtpForm(f => ({ ...f, notifyEmail: e.target.value }))}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">When a guest submits an inquiry, a notification email will be sent to this address.</p>
+            </Field>
+          </div>
+
+          {/* SMTP Configuration */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Server className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">SMTP Configuration</h3>
+              <p className="text-xs text-muted-foreground ml-auto">Works with Gmail, Outlook, Zoho, any SMTP server</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="SMTP Host" className="sm:col-span-2">
+                <Input
+                  placeholder="smtp.gmail.com"
+                  value={smtpForm.smtpHost}
+                  onChange={e => setSmtpForm(f => ({ ...f, smtpHost: e.target.value }))}
+                />
+              </Field>
+              <Field label="Port">
+                <Input
+                  placeholder="587"
+                  value={smtpForm.smtpPort}
+                  onChange={e => setSmtpForm(f => ({ ...f, smtpPort: e.target.value }))}
+                />
+              </Field>
+              <Field label="Security">
+                <select
+                  value={smtpForm.smtpSecure}
+                  onChange={e => setSmtpForm(f => ({ ...f, smtpSecure: e.target.value }))}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="false">STARTTLS (port 587)</option>
+                  <option value="true">SSL/TLS (port 465)</option>
+                </select>
+              </Field>
+              <Field label="Username / Email">
+                <Input
+                  placeholder="your@gmail.com"
+                  value={smtpForm.smtpUser}
+                  onChange={e => setSmtpForm(f => ({ ...f, smtpUser: e.target.value }))}
+                />
+              </Field>
+              <Field label="Password / App Password">
+                <div className="relative">
+                  <Input
+                    type={showSmtpPass ? "text" : "password"}
+                    placeholder="••••••••••••"
+                    value={smtpForm.smtpPass}
+                    onChange={e => setSmtpForm(f => ({ ...f, smtpPass: e.target.value }))}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSmtpPass(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showSmtpPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">For Gmail, use an <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="underline text-primary">App Password</a> (not your regular password).</p>
+              </Field>
+              <Field label="From Name / Email" className="sm:col-span-2">
+                <Input
+                  placeholder="Shubhangi The Boat House <noreply@yourdomain.com>"
+                  value={smtpForm.smtpFrom}
+                  onChange={e => setSmtpForm(f => ({ ...f, smtpFrom: e.target.value }))}
+                />
+              </Field>
+            </div>
+          </div>
+
+          {/* Quick reference */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 border-b border-border mb-4">
+              <Shield className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Common SMTP Providers</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              {[
+                { name: "Gmail", host: "smtp.gmail.com", port: "587", note: "Use App Password" },
+                { name: "Outlook / Hotmail", host: "smtp.office365.com", port: "587", note: "Use your password" },
+                { name: "Zoho Mail", host: "smtp.zoho.com", port: "587", note: "Use your password" },
+              ].map(p => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onClick={() => setSmtpForm(f => ({ ...f, smtpHost: p.host, smtpPort: p.port, smtpSecure: "false" }))}
+                  className="text-left p-3 rounded-lg border border-border hover:border-primary hover:bg-muted/50 transition-colors"
+                >
+                  <p className="font-semibold text-foreground">{p.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{p.host}:{p.port}</p>
+                  <p className="text-xs text-amber-600 mt-0.5">{p.note}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Test email */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Send className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Test Email</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Send a test inquiry email to verify your SMTP settings are working correctly. Settings will be saved before sending.</p>
+            <div className="flex items-center gap-4 flex-wrap">
+              <Button onClick={sendTestEmail} disabled={testingSend} variant="outline" className="gap-2">
+                {testingSend ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                Send Test Email
+              </Button>
+              {testResult && (
+                <div className={cn("flex items-center gap-2 text-sm font-medium", testResult.ok ? "text-green-600" : "text-destructive")}>
+                  {testResult.ok ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                  {testResult.msg}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── ADMIN PROFILE TAB ─────────────────────────────────────────── */}

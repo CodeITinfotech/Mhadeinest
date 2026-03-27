@@ -19,6 +19,13 @@ export const settingsTable = pgTable("settings", {
   aboutImages: text("about_images").array().notNull().default([]),
   siteLogo: text("site_logo").notNull().default(""),
   navHiddenItems: text("nav_hidden_items").array().notNull().default([]),
+  smtpHost: text("smtp_host").notNull().default(""),
+  smtpPort: text("smtp_port").notNull().default("587"),
+  smtpUser: text("smtp_user").notNull().default(""),
+  smtpPass: text("smtp_pass").notNull().default(""),
+  smtpFrom: text("smtp_from").notNull().default(""),
+  smtpSecure: text("smtp_secure").notNull().default("false"),
+  notifyEmail: text("notify_email").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

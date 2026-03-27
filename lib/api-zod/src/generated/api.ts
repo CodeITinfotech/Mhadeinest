@@ -430,6 +430,13 @@ export const GetSettingsResponse = zod.object({
   aboutImages: zod.array(zod.string()),
   siteLogo: zod.string(),
   navHiddenItems: zod.array(zod.string()),
+  smtpHost: zod.string(),
+  smtpPort: zod.string(),
+  smtpUser: zod.string(),
+  smtpPass: zod.string(),
+  smtpFrom: zod.string(),
+  smtpSecure: zod.string(),
+  notifyEmail: zod.string(),
   updatedAt: zod.string(),
 });
 
@@ -452,6 +459,13 @@ export const UpdateSettingsBody = zod.object({
   aboutImages: zod.array(zod.string()).optional(),
   siteLogo: zod.string().optional(),
   navHiddenItems: zod.array(zod.string()).optional(),
+  smtpHost: zod.string().optional(),
+  smtpPort: zod.string().optional(),
+  smtpUser: zod.string().optional(),
+  smtpPass: zod.string().optional(),
+  smtpFrom: zod.string().optional(),
+  smtpSecure: zod.string().optional(),
+  notifyEmail: zod.string().optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -471,6 +485,13 @@ export const UpdateSettingsResponse = zod.object({
   aboutImages: zod.array(zod.string()),
   siteLogo: zod.string(),
   navHiddenItems: zod.array(zod.string()),
+  smtpHost: zod.string(),
+  smtpPort: zod.string(),
+  smtpUser: zod.string(),
+  smtpPass: zod.string(),
+  smtpFrom: zod.string(),
+  smtpSecure: zod.string(),
+  notifyEmail: zod.string(),
   updatedAt: zod.string(),
 });
 

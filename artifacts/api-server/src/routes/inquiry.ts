@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@workspace/db";
 import { inquiriesTable } from "@workspace/db/schema";
 import { serializeArray, serializeDates } from "../lib/serialize";
+import { sendInquiryEmail } from "../lib/email";
 
 const router: IRouter = Router();
 
@@ -29,10 +30,43 @@ router.post("/inquiry", async (req, res): Promise<void> => {
       message: message || "",
       status: "new",
     }).returning();
+
+    // Fire email notification (non-blocking — don't fail if email fails)
+    sendInquiryEmail({
+      name, email, phone: phone || "", whatsapp: whatsapp || "",
+      packageService: packageService || "", checkIn: checkIn || "",
+      guests: guests || 1, kids: kids || 0,
+      paxDetails: paxDetails || "", message: message || "",
+    }).then(({ sent, error }) => {
+      if (sent) req.log.info({ inquiryId: inquiry.id }, "Inquiry email sent");
+      else req.log.warn({ error, inquiryId: inquiry.id }, "Inquiry email not sent");
+    });
+
     res.json({ message: "Your inquiry has been received. We will contact you shortly on WhatsApp or Email!", id: inquiry.id });
   } catch (err) {
     req.log.error(err, "Failed to save inquiry to DB");
     res.status(500).json({ error: "Failed to submit inquiry" });
+  }
+});
+
+// Admin: send a test email to verify SMTP settings
+router.post("/email/test", async (req, res): Promise<void> => {
+  const { sent, error } = await sendInquiryEmail({
+    name: "Test User",
+    email: "test@example.com",
+    phone: "+91 98765 43210",
+    whatsapp: "+91 98765 43210",
+    packageService: "Luxury Overnight Package",
+    checkIn: new Date().toISOString().split("T")[0],
+    guests: 2,
+    kids: 1,
+    paxDetails: "This is a test inquiry email",
+    message: "If you received this email, your SMTP settings are working correctly!",
+  });
+  if (sent) {
+    res.json({ success: true, message: "Test email sent successfully!" });
+  } else {
+    res.status(400).json({ success: false, error: error || "Failed to send test email" });
   }
 });
 
