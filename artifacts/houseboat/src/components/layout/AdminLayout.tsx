@@ -70,7 +70,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             alt={siteName}
             className="h-14 w-full object-contain object-center"
           />
-          <span className="text-xs font-semibold text-center text-foreground/80 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+          <span className="hidden lg:block text-xs font-semibold text-center text-foreground/80 leading-tight group-hover:text-primary transition-colors line-clamp-2">
             {siteName}
           </span>
         </Link>

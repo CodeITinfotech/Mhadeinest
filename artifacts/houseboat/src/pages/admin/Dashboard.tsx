@@ -152,7 +152,6 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Overview</h2>
-        <p className="text-muted-foreground mt-1">Welcome back. Here's a snapshot of your houseboat business.</p>
       </div>
 
       {/* Top 4 Booking Cards */}
