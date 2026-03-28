@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import {
   CheckCircle2, PhoneCall, XCircle, Clock, Search,
   Phone, Mail, Users, Calendar, Package,
-  MessageSquare, User, X, RefreshCw, StickyNote, Baby
+  MessageSquare, User, X, RefreshCw, StickyNote, Baby, Bell
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
 
-type Status = "new" | "details_shared" | "converted" | "lost";
+type Status = "new" | "details_shared" | "needs_followup" | "converted" | "lost";
 
 interface Inquiry {
   id: number;
@@ -32,14 +32,15 @@ interface Inquiry {
 }
 
 const STATUS_CONFIG: Record<Status, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  new:            { label: "New",            color: "text-blue-700",   bg: "bg-blue-50 border-blue-200",   icon: Clock },
-  details_shared: { label: "Details Shared", color: "text-amber-700",  bg: "bg-amber-50 border-amber-200", icon: PhoneCall },
-  converted:      { label: "Converted",      color: "text-green-700",  bg: "bg-green-50 border-green-200", icon: CheckCircle2 },
-  lost:           { label: "Lost",           color: "text-red-700",    bg: "bg-red-50 border-red-200",     icon: XCircle },
+  new:             { label: "New",             color: "text-blue-700",    bg: "bg-blue-50 border-blue-200",    icon: Clock },
+  details_shared:  { label: "Details Shared",  color: "text-amber-700",   bg: "bg-amber-50 border-amber-200",  icon: PhoneCall },
+  needs_followup:  { label: "Needs Follow Up", color: "text-orange-700",  bg: "bg-orange-50 border-orange-200", icon: Bell },
+  converted:       { label: "Converted",       color: "text-green-700",   bg: "bg-green-50 border-green-200",  icon: CheckCircle2 },
+  lost:            { label: "Lost",            color: "text-red-700",     bg: "bg-red-50 border-red-200",      icon: XCircle },
 };
 
-const ACTIVE_STATUSES: Status[] = ["new", "details_shared", "converted"];
-const ALL_STATUSES: Status[] = ["new", "details_shared", "converted", "lost"];
+const ACTIVE_STATUSES: Status[] = ["new", "details_shared", "needs_followup", "converted"];
+const ALL_STATUSES: Status[] = ["new", "details_shared", "needs_followup", "converted", "lost"];
 
 export default function AdminInquiries() {
   const { toast } = useToast();
