@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
-import { LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon, FileText, Settings, LogOut, CalendarDays, Inbox, MessageSquare, Trophy } from "lucide-react";
+import { LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon, FileText, Settings, LogOut, CalendarDays, Inbox, MessageSquare, Trophy, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
@@ -17,6 +17,7 @@ const ADMIN_LINKS = [
   { name: "Inquiries", href: "/inquiries", icon: Inbox },
   { name: "Live Chat", href: "/chat", icon: MessageSquare },
   { name: "Awards & Recognition", href: "/awards", icon: Trophy },
+  { name: "FAQ", href: "/faqs", icon: HelpCircle },
   { name: "Blog Posts", href: "/blog", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
 ];

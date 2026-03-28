@@ -10,6 +10,7 @@ import inquiryRouter from "./inquiry";
 import bookingsRouter from "./bookings";
 import chatRouter from "./chat";
 import awardsRouter from "./awards";
+import faqsRouter from "./faqs";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(inquiryRouter);
 router.use(bookingsRouter);
 router.use(chatRouter);
 router.use(awardsRouter);
+router.use(faqsRouter);
 
 export default router;

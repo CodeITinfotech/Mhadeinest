@@ -1,12 +1,18 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useGetSettings, useListPackages, useListActivities } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Anchor, Wind, Sun, Coffee } from "lucide-react";
+import { Anchor, Wind, Sun, Coffee, ChevronDown } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useInquiryModal } from "@/context/InquiryModalContext";
+import { useState } from "react";
+
+const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+interface Faq { id: number; question: string; answer: string; isActive: boolean; sortOrder: number; }
 
 const FALLBACK_FEATURES = [
   { icon: Anchor, title: "Premium Stay", desc: "3 Luxurious Bedrooms" },
@@ -21,6 +27,17 @@ export default function Home() {
   const { data: activities = [] } = useListActivities();
   const { fmt } = useCurrency();
   const { open: openInquiry } = useInquiryModal();
+  const [openFaqId, setOpenFaqId] = useState<number | null>(null);
+
+  const { data: allFaqs = [] } = useQuery<Faq[]>({
+    queryKey: ["faqs-public"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/faqs`);
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const activeFaqs = allFaqs.filter(f => f.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
   const activeActivities = activities
     .filter((a) => a.isActive)
@@ -235,6 +252,67 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      {activeFaqs.length > 0 && (
+        <section className="py-20 bg-muted/30">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-14"
+            >
+              <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Got Questions?</p>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-primary leading-tight">
+                Frequently Asked Questions About the Overnight<br className="hidden sm:block" /> Goan Houseboat Trip
+              </h2>
+            </motion.div>
+
+            <div className="divide-y divide-border border border-border rounded-2xl bg-card overflow-hidden shadow-sm">
+              {activeFaqs.map((faq, idx) => {
+                const isOpen = openFaqId === faq.id;
+                return (
+                  <motion.div
+                    key={faq.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.06, duration: 0.4 }}
+                  >
+                    <button
+                      onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
+                      className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="font-medium text-foreground leading-snug pr-2">{faq.question}</span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          key="answer"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-6 pb-6 pt-0">
+                            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{faq.answer}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

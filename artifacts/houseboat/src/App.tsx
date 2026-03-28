@@ -30,6 +30,7 @@ import AdminInquiries from "@/pages/admin/Inquiries";
 import AdminChat from "@/pages/admin/Chat";
 import AdminActivities from "@/pages/admin/Activities";
 import AdminAwards from "@/pages/admin/Awards";
+import AdminFaqs from "@/pages/admin/Faqs";
 
 import NotFound from "@/pages/not-found";
 
@@ -60,6 +61,7 @@ function Router() {
             <Route path="/inquiries" component={AdminInquiries} />
             <Route path="/chat" component={AdminChat} />
             <Route path="/awards" component={AdminAwards} />
+            <Route path="/faqs" component={AdminFaqs} />
             <Route path="/blog" component={AdminBlog} />
             <Route path="/settings" component={AdminSettings} />
             <Route component={NotFound} />

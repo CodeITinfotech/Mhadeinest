@@ -7,3 +7,4 @@ export * from "./bookings";
 export * from "./inquiries";
 export * from "./chat";
 export * from "./awards";
+export * from "./faqs";
