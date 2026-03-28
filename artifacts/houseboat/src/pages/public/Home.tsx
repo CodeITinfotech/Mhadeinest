@@ -100,8 +100,8 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Availability Search — bottom on mobile, centred at 45% on desktop */}
-        <div className="absolute bottom-6 md:bottom-auto md:top-[45%] md:-translate-y-1/2 left-0 right-0 z-20 px-4">
+        {/* Availability Search — pinned to bottom on all screen sizes */}
+        <div className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 px-4">
           <AvailabilitySearch />
         </div>
       </section>
