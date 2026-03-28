@@ -16,7 +16,7 @@ const ADMIN_LINKS = [
   { name: "Gallery", href: "/gallery", icon: ImageIcon },
   { name: "Inquiries", href: "/inquiries", icon: Inbox },
   { name: "Live Chat", href: "/chat", icon: MessageSquare },
-  { name: "Awards & Recognition", href: "/awards", icon: Trophy },
+  { name: "Awards", href: "/awards", icon: Trophy },
   { name: "FAQ", href: "/faqs", icon: HelpCircle },
   { name: "Blog Posts", href: "/blog", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
