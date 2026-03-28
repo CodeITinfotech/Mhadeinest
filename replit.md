@@ -91,6 +91,7 @@ All routes under `/api`:
 - `GET/PATCH /settings`
 - `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`
 - `POST /inquiry`
+- `GET/POST /awards`, `PATCH/DELETE /awards/:id`
 
 ## TypeScript & Composite Projects
 

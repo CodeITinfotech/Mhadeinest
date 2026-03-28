@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useGetSettings } from "@workspace/api-client-react";
-import { Phone, Menu, X, Instagram, Facebook, Youtube, MessageCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Phone, Menu, X, Instagram, Facebook, Youtube, MessageCircle, Trophy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -61,12 +62,34 @@ function CurrencySwitcher({ scrolled, onHome }: { scrolled: boolean; onHome: boo
   );
 }
 
+const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+interface Award {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string | null;
+  link: string | null;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isOpen: inquiryOpen, prefill: inquiryPrefill, open: openInquiry, close: closeInquiry } = useInquiryModal();
   const { data: settings } = useGetSettings();
+
+  const { data: allAwards = [] } = useQuery<Award[]>({
+    queryKey: ["awards-public"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/awards`);
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const activeAwards = allAwards.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
   const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
@@ -277,7 +300,63 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
+        {/* Awards Recognition Strip */}
+        {activeAwards.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-primary-foreground/10">
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex items-center gap-2 text-primary-foreground/60">
+                <Trophy className="w-4 h-4" />
+                <span className="text-xs font-semibold uppercase tracking-widest">Awards & Recognition</span>
+                <Trophy className="w-4 h-4" />
+              </div>
+              <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+                {activeAwards.map(award => (
+                  <div key={award.id} className="flex flex-col items-center gap-2 group">
+                    {award.link ? (
+                      <a href={award.link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2">
+                        {award.image ? (
+                          <img
+                            src={award.image}
+                            alt={award.title}
+                            className="h-14 w-auto max-w-[100px] object-contain opacity-80 group-hover:opacity-100 transition-opacity filter brightness-0 invert"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center group-hover:bg-primary-foreground/20 transition-colors">
+                            <Trophy className="w-6 h-6 text-secondary" />
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <p className="text-xs font-semibold text-primary-foreground/80 group-hover:text-white transition-colors leading-tight max-w-[110px]">{award.title}</p>
+                          {award.subtitle && <p className="text-[10px] text-primary-foreground/50 mt-0.5 leading-tight max-w-[110px]">{award.subtitle}</p>}
+                        </div>
+                      </a>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        {award.image ? (
+                          <img
+                            src={award.image}
+                            alt={award.title}
+                            className="h-14 w-auto max-w-[100px] object-contain opacity-80 filter brightness-0 invert"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center">
+                            <Trophy className="w-6 h-6 text-secondary" />
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <p className="text-xs font-semibold text-primary-foreground/80 leading-tight max-w-[110px]">{award.title}</p>
+                          {award.subtitle && <p className="text-[10px] text-primary-foreground/50 mt-0.5 leading-tight max-w-[110px]">{award.subtitle}</p>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
           © {new Date().getFullYear()} {settings?.siteName || "Goa Houseboat"}. All rights reserved.
         </div>
       </footer>
