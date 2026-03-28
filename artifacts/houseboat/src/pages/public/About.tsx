@@ -1,9 +1,32 @@
 import { useGetSettings } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
-import { MapPin, Navigation, Play } from "lucide-react";
+import { Navigation, Play, Trophy } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+interface Award {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string | null;
+  link: string | null;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 export default function About() {
   const { data: settings } = useGetSettings();
+
+  const { data: allAwards = [] } = useQuery<Award[]>({
+    queryKey: ["awards-public"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/awards`);
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  const activeAwards = allAwards.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
   const mapUrl = (settings as any)?.locationMapUrl || "";
   const trailVideoUrl = settings?.trailVideoUrl || "";
@@ -95,6 +118,66 @@ export default function About() {
             )}
           </div>
         </div>
+
+        {/* Awards & Recognition — only shown when admin has added awards */}
+        {activeAwards.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-24"
+          >
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center gap-2 text-secondary mb-3">
+                <Trophy className="w-5 h-5" />
+                <p className="font-semibold text-sm uppercase tracking-widest">Awards & Recognition</p>
+                <Trophy className="w-5 h-5" />
+              </div>
+              <h2 className="text-3xl font-display font-bold text-primary">Honoured by the Best</h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8 md:gap-14">
+              {activeAwards.map(award => (
+                <motion.div
+                  key={award.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="flex flex-col items-center gap-3 group"
+                >
+                  {award.link ? (
+                    <a href={award.link} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-3">
+                      {award.image ? (
+                        <img src={award.image} alt={award.title} className="h-16 w-auto max-w-[120px] object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-secondary/10 border-2 border-secondary/20 flex items-center justify-center group-hover:border-secondary/50 transition-colors">
+                          <Trophy className="w-7 h-7 text-secondary" />
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-primary group-hover:text-secondary transition-colors leading-tight max-w-[130px]">{award.title}</p>
+                        {award.subtitle && <p className="text-xs text-muted-foreground mt-1 leading-tight max-w-[130px]">{award.subtitle}</p>}
+                      </div>
+                    </a>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      {award.image ? (
+                        <img src={award.image} alt={award.title} className="h-16 w-auto max-w-[120px] object-contain opacity-80" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-secondary/10 border-2 border-secondary/20 flex items-center justify-center">
+                          <Trophy className="w-7 h-7 text-secondary" />
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-primary leading-tight max-w-[130px]">{award.title}</p>
+                        {award.subtitle && <p className="text-xs text-muted-foreground mt-1 leading-tight max-w-[130px]">{award.subtitle}</p>}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
