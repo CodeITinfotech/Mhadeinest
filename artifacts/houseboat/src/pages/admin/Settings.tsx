@@ -59,6 +59,8 @@ const siteSchema = z.object({
   socialFacebook: z.string().optional(),
   socialYoutube: z.string().optional(),
   trailVideoUrl: z.string().optional(),
+  trailTitle: z.string(),
+  trailDescription: z.string(),
   locationMapUrl: z.string().optional(),
   aboutText: z.string(),
   aboutImages: z.string(),
@@ -163,6 +165,8 @@ export default function AdminSettings() {
         socialFacebook: settings.socialFacebook || "",
         socialYoutube: settings.socialYoutube || "",
         trailVideoUrl: settings.trailVideoUrl || "",
+        trailTitle: (settings as any).trailTitle || "Our Trail",
+        trailDescription: (settings as any).trailDescription || "Take a virtual tour of our regular cruise route. Watch as we navigate through mangroves, local fishing villages, and open waters.",
         locationMapUrl: (settings as any).locationMapUrl || "",
         aboutText: settings.aboutText,
         aboutImages: settings.aboutImages?.join(", ") || "",
@@ -546,6 +550,8 @@ export default function AdminSettings() {
                     />
                     <p className="text-xs text-muted-foreground mt-1.5">In Google Maps, click Share → Embed a map → copy the <strong>src</strong> URL from the iframe code</p>
                   </Field>
+                  <Field label="Trail Section Title"><Input {...siteForm.register("trailTitle")} placeholder="Our Trail" /></Field>
+                  <Field label="Trail Section Description"><Textarea {...siteForm.register("trailDescription")} className="min-h-[80px]" placeholder="Describe the trail video section..." /></Field>
                   <Field label="YouTube Trail Video URL"><Input {...siteForm.register("trailVideoUrl")} placeholder="https://youtube.com/watch?v=..." /></Field>
                   <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
                 </div>

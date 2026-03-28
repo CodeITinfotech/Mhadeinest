@@ -198,6 +198,8 @@ export interface Settings {
   socialYoutube: string | null;
   /** @nullable */
   trailVideoUrl: string | null;
+  trailTitle: string;
+  trailDescription: string;
   aboutText: string;
   aboutImages: string[];
   /** @nullable */
@@ -217,6 +219,8 @@ export interface UpdateSettingsBody {
   socialFacebook?: string;
   socialYoutube?: string;
   trailVideoUrl?: string;
+  trailTitle?: string;
+  trailDescription?: string;
   aboutText?: string;
   aboutImages?: string[];
   locationMapUrl?: string;

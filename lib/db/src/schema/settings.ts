@@ -15,6 +15,8 @@ export const settingsTable = pgTable("settings", {
   socialFacebook: text("social_facebook"),
   socialYoutube: text("social_youtube"),
   trailVideoUrl: text("trail_video_url"),
+  trailTitle: text("trail_title").notNull().default("Our Trail"),
+  trailDescription: text("trail_description").notNull().default("Take a virtual tour of our regular cruise route. Watch as we navigate through mangroves, local fishing villages, and open waters."),
   aboutText: text("about_text").notNull().default("Welcome to our luxury houseboat experience in Goa. Nestled on the serene backwaters, our houseboat offers an unparalleled blend of comfort and adventure. With 3 beautifully appointed bedrooms, a rooftop restaurant with live cooking, and a range of exciting water activities, we promise memories that will last a lifetime."),
   aboutImages: text("about_images").array().notNull().default([]),
   siteLogo: text("site_logo").notNull().default(""),

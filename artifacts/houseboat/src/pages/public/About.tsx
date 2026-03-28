@@ -64,9 +64,11 @@ export default function About() {
 
         {/* Trail Video Section */}
         <div className="bg-muted/30 rounded-3xl p-8 md:p-16 border border-border text-center">
-          <h2 className="text-3xl font-display font-bold text-primary mb-4">Our Trail</h2>
+          <h2 className="text-3xl font-display font-bold text-primary mb-4">
+            {settings?.trailTitle || "Our Trail"}
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-10">
-            Take a virtual tour of our regular cruise route. Watch as we navigate through mangroves, local fishing villages, and open waters.
+            {settings?.trailDescription || "Take a virtual tour of our regular cruise route. Watch as we navigate through mangroves, local fishing villages, and open waters."}
           </p>
 
           <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-2xl overflow-hidden shadow-2xl relative">
