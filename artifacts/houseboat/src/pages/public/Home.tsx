@@ -256,13 +256,13 @@ export default function Home() {
       {/* FAQ Section */}
       {activeFaqs.length > 0 && (
         <section className="py-20 bg-muted/30">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-14"
+              className="text-center mb-14 max-w-3xl mx-auto"
             >
               <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Got Questions?</p>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-primary leading-tight">
