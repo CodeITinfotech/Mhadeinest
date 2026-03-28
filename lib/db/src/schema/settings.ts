@@ -29,6 +29,8 @@ export const settingsTable = pgTable("settings", {
   smtpSecure: text("smtp_secure").notNull().default("false"),
   notifyEmail: text("notify_email").notNull().default(""),
   showChatWidget: text("show_chat_widget").notNull().default("true"),
+  chatWidgetColor: text("chat_widget_color").notNull().default("#10b981"),
+  chatWidgetAlignment: text("chat_widget_alignment").notNull().default("right"),
   showWhatsappButton: text("show_whatsapp_button").notNull().default("true"),
   locationMapUrl: text("location_map_url"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

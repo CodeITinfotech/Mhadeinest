@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, ChevronDown, Bot, User, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const API = import.meta.env.BASE_URL + "api";
@@ -28,7 +28,12 @@ function formatTime(iso: string) {
   } catch { return ""; }
 }
 
-export function ChatWidget() {
+interface ChatWidgetProps {
+  color?: string;
+  alignment?: "left" | "right";
+}
+
+export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidgetProps) {
   const [open, setOpen] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [visitorName, setVisitorName] = useState("");
@@ -42,6 +47,9 @@ export function ChatWidget() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const esRef = useRef<EventSource | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isLeft = alignment === "left";
+  const posClass = isLeft ? "left-6" : "right-6";
 
   // Load existing session token
   useEffect(() => {
@@ -113,7 +121,6 @@ export function ChatWidget() {
       setNameSubmitted(true);
       setSessionClosed(false);
     } catch {
-      // ignore
     } finally {
       setStarting(false);
     }
@@ -151,7 +158,11 @@ export function ChatWidget() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-2xl flex items-center justify-center hover:bg-primary/90 hover:scale-110 transition-all group"
+        className={cn(
+          "fixed bottom-24 z-50 w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-all group",
+          posClass
+        )}
+        style={{ backgroundColor: color }}
         aria-label="Open chat"
       >
         <AnimatePresence mode="wait">
@@ -167,12 +178,17 @@ export function ChatWidget() {
         </AnimatePresence>
         {/* Unread badge */}
         {unreadCount > 0 && !open && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-secondary text-secondary-foreground text-[11px] font-bold flex items-center justify-center shadow">
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-yellow-400 text-yellow-900 text-[11px] font-bold flex items-center justify-center shadow">
             {unreadCount}
           </span>
         )}
         {/* Tooltip */}
-        <span className="absolute right-full mr-3 bg-primary text-primary-foreground text-sm font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow pointer-events-none">
+        <span
+          className={cn(
+            "absolute bg-gray-800 text-white text-sm font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow pointer-events-none",
+            isLeft ? "left-full ml-3" : "right-full mr-3"
+          )}
+        >
           Chat with us
         </span>
       </button>
@@ -185,22 +201,25 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.22 }}
-            className="fixed bottom-44 right-6 z-50 w-[360px] max-w-[calc(100vw-24px)] rounded-2xl overflow-hidden shadow-2xl border border-border flex flex-col"
+            className={cn(
+              "fixed bottom-44 z-50 w-[360px] max-w-[calc(100vw-24px)] rounded-2xl overflow-hidden shadow-2xl border border-border flex flex-col",
+              posClass
+            )}
             style={{ height: 480 }}
           >
             {/* Header */}
-            <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3 shrink-0">
-              <div className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center">
+            <div className="text-white px-4 py-3 flex items-center gap-3 shrink-0" style={{ backgroundColor: color }}>
+              <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-sm leading-tight">Shubhangi The Boat House</p>
-                <p className="text-[11px] text-primary-foreground/70 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span>
+                <p className="text-[11px] text-white/70 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-300 inline-block"></span>
                   Online · Usually replies quickly
                 </p>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1 hover:bg-primary-foreground/10 rounded-lg transition-colors">
+              <button onClick={() => setOpen(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -209,8 +228,8 @@ export function ChatWidget() {
             <div className="flex-1 overflow-y-auto bg-background p-4 space-y-3">
               {/* Welcome message */}
               <div className="flex gap-2">
-                <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
-                  <Bot className="w-4 h-4 text-primary-foreground" />
+                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: color }}>
+                  <Bot className="w-4 h-4 text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2 text-sm text-foreground inline-block max-w-[85%]">
@@ -227,10 +246,13 @@ export function ChatWidget() {
                   className={cn("flex gap-2", msg.sender === "visitor" ? "flex-row-reverse" : "flex-row")}
                 >
                   {msg.sender !== "visitor" && (
-                    <div className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5", msg.sender === "admin" ? "bg-secondary" : "bg-primary")}>
+                    <div
+                      className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5")}
+                      style={{ backgroundColor: msg.sender === "admin" ? "#6366f1" : color }}
+                    >
                       {msg.sender === "admin"
-                        ? <User className="w-4 h-4 text-secondary-foreground" />
-                        : <Bot className="w-4 h-4 text-primary-foreground" />
+                        ? <User className="w-4 h-4 text-white" />
+                        : <Bot className="w-4 h-4 text-white" />
                       }
                     </div>
                   )}
@@ -238,12 +260,10 @@ export function ChatWidget() {
                     {msg.sender !== "visitor" && (
                       <span className="text-[10px] text-muted-foreground mb-0.5 ml-1 capitalize">{msg.sender}</span>
                     )}
-                    <div className={cn(
-                      "px-3 py-2 rounded-2xl text-sm",
-                      msg.sender === "visitor"
-                        ? "bg-primary text-primary-foreground rounded-tr-sm"
-                        : "bg-muted text-foreground rounded-tl-sm"
-                    )}>
+                    <div
+                      className={cn("px-3 py-2 rounded-2xl text-sm", msg.sender === "visitor" ? "rounded-tr-sm text-white" : "bg-muted text-foreground rounded-tl-sm")}
+                      style={msg.sender === "visitor" ? { backgroundColor: color } : undefined}
+                    >
                       {msg.message}
                     </div>
                     <span className="text-[10px] text-muted-foreground mt-0.5 mx-1">{formatTime(msg.createdAt)}</span>
@@ -253,7 +273,20 @@ export function ChatWidget() {
 
               {sessionClosed && (
                 <div className="text-center text-xs text-muted-foreground py-2 border-t border-border">
-                  This chat session has ended. <button onClick={() => { localStorage.removeItem(STORAGE_KEY); setSessionToken(null); setNameSubmitted(false); setMessages([]); setSessionClosed(false); }} className="text-primary underline">Start new chat</button>
+                  This chat session has ended.{" "}
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem(STORAGE_KEY);
+                      setSessionToken(null);
+                      setNameSubmitted(false);
+                      setMessages([]);
+                      setSessionClosed(false);
+                    }}
+                    className="underline"
+                    style={{ color }}
+                  >
+                    Start new chat
+                  </button>
                 </div>
               )}
 
@@ -263,7 +296,6 @@ export function ChatWidget() {
             {/* Quick questions or name form or input */}
             <div className="bg-background border-t border-border shrink-0">
               {!nameSubmitted ? (
-                /* Name form */
                 <form onSubmit={handleNameSubmit} className="p-3 space-y-2">
                   <p className="text-xs text-muted-foreground font-medium">Your name (optional)</p>
                   <div className="flex gap-2">
@@ -271,18 +303,19 @@ export function ChatWidget() {
                       value={visitorName}
                       onChange={e => setVisitorName(e.target.value)}
                       placeholder="e.g. John"
-                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 bg-background"
+                      style={{ focusRingColor: color } as React.CSSProperties}
                     />
                     <button
                       type="submit"
                       disabled={starting}
-                      className="px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium flex items-center gap-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      className="px-4 h-9 rounded-xl text-white text-sm font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                      style={{ backgroundColor: color }}
                     >
                       {starting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                       Start
                     </button>
                   </div>
-                  {/* Quick questions before session */}
                   <p className="text-xs text-muted-foreground font-medium pt-1">Or pick a quick question:</p>
                   <div className="flex flex-wrap gap-1.5">
                     {QUICK_QUESTIONS.slice(0, 3).map(q => (
@@ -291,7 +324,7 @@ export function ChatWidget() {
                         type="button"
                         onClick={() => handleQuickQuestion(q)}
                         disabled={starting}
-                        className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-primary hover:text-primary transition-colors text-foreground bg-muted/50"
+                        className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-current transition-colors text-foreground bg-muted/50"
                       >
                         {q}
                       </button>
@@ -299,16 +332,14 @@ export function ChatWidget() {
                   </div>
                 </form>
               ) : messages.length > 0 && !sessionClosed ? (
-                /* Message input */
                 <div className="p-3">
-                  {/* Quick questions shown above input */}
                   {messages.length < 3 && (
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {QUICK_QUESTIONS.filter(q => !messages.some(m => m.message === q)).slice(0, 4).map(q => (
                         <button
                           key={q}
                           onClick={() => sendMessage(q)}
-                          className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-primary hover:text-primary transition-colors text-foreground bg-muted/50"
+                          className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-current transition-colors text-foreground bg-muted/50"
                         >
                           {q}
                         </button>
@@ -323,19 +354,19 @@ export function ChatWidget() {
                       onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(input); } }}
                       placeholder="Type a message…"
                       disabled={sending}
-                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background disabled:opacity-50"
+                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 bg-background disabled:opacity-50"
                     />
                     <button
                       onClick={() => sendMessage(input)}
                       disabled={!input.trim() || sending}
-                      className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-40"
+                      className="w-9 h-9 rounded-xl text-white flex items-center justify-center transition-colors disabled:opacity-40"
+                      style={{ backgroundColor: color }}
                     >
                       {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
               ) : nameSubmitted && messages.length === 0 ? (
-                /* Quick questions after session created but no messages yet */
                 <div className="p-3 space-y-2">
                   <p className="text-xs text-muted-foreground font-medium">Pick a question or type below:</p>
                   <div className="flex flex-wrap gap-1.5 mb-2">
@@ -343,7 +374,7 @@ export function ChatWidget() {
                       <button
                         key={q}
                         onClick={() => sendMessage(q)}
-                        className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-primary hover:text-primary transition-colors text-foreground bg-muted/50"
+                        className="text-[11px] px-2.5 py-1 rounded-full border border-border hover:border-current transition-colors text-foreground bg-muted/50"
                       >
                         {q}
                       </button>
@@ -356,12 +387,13 @@ export function ChatWidget() {
                       onChange={e => setInput(e.target.value)}
                       onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMessage(input); } }}
                       placeholder="Or type your question…"
-                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+                      className="flex-1 h-9 px-3 rounded-xl border border-input text-sm focus:outline-none focus:ring-2 bg-background"
                     />
                     <button
                       onClick={() => sendMessage(input)}
                       disabled={!input.trim()}
-                      className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-40"
+                      className="w-9 h-9 rounded-xl text-white flex items-center justify-center transition-colors disabled:opacity-40"
+                      style={{ backgroundColor: color }}
                     >
                       <Send className="w-4 h-4" />
                     </button>

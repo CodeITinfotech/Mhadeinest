@@ -94,6 +94,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
   const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
   const showChat = (settings as any)?.showChatWidget !== "false";
+  const chatWidgetColor: string = (settings as any)?.chatWidgetColor || "#10b981";
+  const chatWidgetAlignment: "left" | "right" = (settings as any)?.chatWidgetAlignment === "left" ? "left" : "right";
   const showWhatsapp = (settings as any)?.showWhatsappButton !== "false";
   const NAV_LINKS = ALL_NAV_LINKS.filter(l => !hiddenItems.includes(l.name));
 
@@ -394,7 +396,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Live Chat Widget */}
-      {showChat && <ChatWidget />}
+      {showChat && <ChatWidget color={chatWidgetColor} alignment={chatWidgetAlignment} />}
     </div>
   );
 }

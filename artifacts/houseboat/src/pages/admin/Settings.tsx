@@ -136,6 +136,8 @@ export default function AdminSettings() {
 
   // ── Widget visibility state ──────────────────────────────────────────────
   const [showChatWidget, setShowChatWidget] = useState(true);
+  const [chatWidgetColor, setChatWidgetColor] = useState("#10b981");
+  const [chatWidgetAlignment, setChatWidgetAlignment] = useState<"left" | "right">("right");
   const [showWhatsappButton, setShowWhatsappButton] = useState(true);
   const [widgetSaving, setWidgetSaving] = useState(false);
 
@@ -174,6 +176,8 @@ export default function AdminSettings() {
       setLogoPreview((settings as any).siteLogo || "");
       setHiddenItems((settings as any).navHiddenItems || []);
       setShowChatWidget((settings as any).showChatWidget !== "false");
+      setChatWidgetColor((settings as any).chatWidgetColor || "#10b981");
+      setChatWidgetAlignment(((settings as any).chatWidgetAlignment === "left" ? "left" : "right") as "left" | "right");
       setShowWhatsappButton((settings as any).showWhatsappButton !== "false");
     }
   }, [settings]);
@@ -262,6 +266,8 @@ export default function AdminSettings() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           showChatWidget: showChatWidget ? "true" : "false",
+          chatWidgetColor,
+          chatWidgetAlignment,
           showWhatsappButton: showWhatsappButton ? "true" : "false",
         }),
       });
@@ -627,7 +633,7 @@ export default function AdminSettings() {
                     Save
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">Toggle whether the chat bubble and WhatsApp button appear on the public site.</p>
+                <p className="text-sm text-muted-foreground">Toggle whether the chat bubble and WhatsApp button appear on the public site, and customise the chat widget appearance.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     { label: "Live Chat Widget", desc: "Floating chat bubble for visitors", value: showChatWidget, set: setShowChatWidget },
@@ -663,6 +669,73 @@ export default function AdminSettings() {
                       </span>
                     </button>
                   ))}
+                </div>
+
+                {/* Chat widget appearance */}
+                <div className="pt-2 border-t border-border space-y-4">
+                  <p className="text-sm font-medium text-foreground">Chat Widget Appearance</p>
+
+                  {/* Color picker */}
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">Button & Accent Color</label>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {["#10b981", "#f59e0b", "#3b82f6", "#8b5cf6", "#ef4444", "#ec4899", "#0ea5e9", "#14b8a6"].map(preset => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setChatWidgetColor(preset)}
+                          className={cn(
+                            "w-8 h-8 rounded-full border-2 transition-transform hover:scale-110",
+                            chatWidgetColor === preset ? "border-foreground scale-110" : "border-transparent"
+                          )}
+                          style={{ backgroundColor: preset }}
+                          title={preset}
+                        />
+                      ))}
+                      <div className="flex items-center gap-2 ml-1">
+                        <input
+                          type="color"
+                          value={chatWidgetColor}
+                          onChange={e => setChatWidgetColor(e.target.value)}
+                          className="w-8 h-8 rounded cursor-pointer border border-border"
+                          title="Custom color"
+                        />
+                        <span className="text-xs text-muted-foreground font-mono">{chatWidgetColor}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-muted-foreground">Preview:</span>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-md" style={{ backgroundColor: chatWidgetColor }}>
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Alignment */}
+                  <div className="space-y-2">
+                    <label className="text-sm text-muted-foreground">Widget Position</label>
+                    <div className="flex gap-3">
+                      {(["left", "right"] as const).map(side => (
+                        <button
+                          key={side}
+                          type="button"
+                          onClick={() => setChatWidgetAlignment(side)}
+                          className={cn(
+                            "flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border text-sm font-medium transition-colors",
+                            chatWidgetAlignment === side ? "bg-primary/10 border-primary text-primary" : "bg-muted/40 border-border text-muted-foreground hover:border-primary/50"
+                          )}
+                        >
+                          <div className="w-20 h-10 bg-background border border-border rounded relative">
+                            <div
+                              className="absolute bottom-1 w-5 h-5 rounded-full"
+                              style={{ backgroundColor: chatWidgetColor, [side === "left" ? "left" : "right"]: 4 }}
+                            />
+                          </div>
+                          Bottom {side.charAt(0).toUpperCase() + side.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 

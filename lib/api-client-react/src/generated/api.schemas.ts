@@ -204,6 +204,10 @@ export interface Settings {
   aboutImages: string[];
   /** @nullable */
   locationMapUrl?: string | null;
+  showChatWidget?: string;
+  chatWidgetColor?: string;
+  chatWidgetAlignment?: string;
+  showWhatsappButton?: string;
   updatedAt: string;
 }
 
@@ -224,6 +228,10 @@ export interface UpdateSettingsBody {
   aboutText?: string;
   aboutImages?: string[];
   locationMapUrl?: string;
+  showChatWidget?: string;
+  chatWidgetColor?: string;
+  chatWidgetAlignment?: string;
+  showWhatsappButton?: string;
 }
 
 export interface LoginBody {
