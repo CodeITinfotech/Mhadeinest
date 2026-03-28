@@ -1,16 +1,20 @@
 import { motion } from "framer-motion";
-import { useListPackages, useGetSettings } from "@workspace/api-client-react";
+import { useListPackages, useGetSettings, useListActivities } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Check, Users, Tag, CalendarSearch } from "lucide-react";
+import { Check, Users, Tag, CalendarSearch, Anchor } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/context/CurrencyContext";
 
 export default function Packages() {
   const { data: packages = [], isLoading } = useListPackages();
   const { data: settings } = useGetSettings();
+  const { data: activities = [] } = useListActivities();
   const { fmt, currency } = useCurrency();
 
   const activePackages = packages.filter(p => p.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
+  const activeActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
+  const marqueeItems = activeActivities.length >= 3 ? activeActivities : [];
 
   if (isLoading) {
     return <div className="min-h-[60vh] flex items-center justify-center"><div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div></div>;
@@ -162,6 +166,41 @@ export default function Packages() {
             );
           })}
         </div>
+
+        {/* Scrolling Activities Strip */}
+        {marqueeItems.length > 0 && (
+          <div className="mt-20 -mx-4 overflow-hidden border-y border-border bg-muted/40 py-6">
+            <style>{`
+              @keyframes marquee-scroll {
+                0%   { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              .marquee-track { animation: marquee-scroll 28s linear infinite; }
+              .marquee-track:hover { animation-play-state: paused; }
+            `}</style>
+            <div className="flex whitespace-nowrap">
+              <div className="marquee-track flex gap-8 pr-8">
+                {[...marqueeItems, ...marqueeItems].map((activity, idx) => {
+                  const Icon = (LucideIcons as any)[activity.icon] || Anchor;
+                  return (
+                    <div
+                      key={idx}
+                      className="inline-flex items-center gap-3 bg-background border border-border rounded-full px-6 py-3 shadow-sm shrink-0"
+                    >
+                      <span className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary shrink-0">
+                        <Icon className="w-4 h-4" />
+                      </span>
+                      <span className="font-semibold text-primary text-sm">{activity.name}</span>
+                      {activity.description && (
+                        <span className="text-muted-foreground text-xs hidden sm:inline">— {activity.description}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
