@@ -75,7 +75,7 @@ interface Award {
 }
 
 function PublicLayoutInner({ children }: { children: React.ReactNode }) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isOpen: inquiryOpen, prefill: inquiryPrefill, open: openInquiry, close: closeInquiry } = useInquiryModal();
@@ -130,7 +130,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+          <a
+            href="/"
+            onClick={e => { e.preventDefault(); navigate("/"); }}
+            className="flex items-center gap-2.5 group shrink-0 cursor-pointer"
+          >
             <img
               src={logo}
               alt="Shubhangi The Boat House"
@@ -146,7 +150,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
                 isScrolled || location !== "/" ? "text-muted-foreground" : "text-white/80 drop-shadow"
               )}>The Boat House</span>
             </div>
-          </Link>
+          </a>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex flex-1 items-center justify-center gap-8">
