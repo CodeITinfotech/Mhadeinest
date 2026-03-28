@@ -8,7 +8,7 @@ import * as LucideIcons from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useInquiryModal } from "@/context/InquiryModalContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -45,6 +45,19 @@ export default function Home() {
     .slice(0, 4);
 
   const heroImage = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
+
+  useEffect(() => {
+    if (window.location.hash === "#check-availability") {
+      setTimeout(() => {
+        const el = document.getElementById("check-availability");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          const firstInput = el.querySelector("input, select, button");
+          if (firstInput) (firstInput as HTMLElement).focus();
+        }
+      }, 400);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -101,7 +114,7 @@ export default function Home() {
         </div>
 
         {/* Availability Search — pinned to bottom on all screen sizes */}
-        <div className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 px-4">
+        <div id="check-availability" className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 px-4">
           <AvailabilitySearch />
         </div>
       </section>

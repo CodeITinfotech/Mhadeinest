@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useListPackages, useGetSettings } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Check, Users, Tag } from "lucide-react";
+import { Check, Users, Tag, CalendarSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -136,15 +136,27 @@ export default function Packages() {
                     </ul>
                   </div>
 
-                  <a href={waUrl} target="_blank" rel="noopener noreferrer">
-                    <Button
-                      size="lg"
-                      className="rounded-full px-10 text-lg w-full sm:w-auto text-white"
-                      style={{ backgroundColor: "#25D366", borderColor: "#25D366" }}
-                    >
-                      Book via WhatsApp
-                    </Button>
-                  </a>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <a href={waUrl} target="_blank" rel="noopener noreferrer">
+                      <Button
+                        size="lg"
+                        className="rounded-full px-10 text-lg w-full sm:w-auto text-white"
+                        style={{ backgroundColor: "#25D366", borderColor: "#25D366" }}
+                      >
+                        Book via WhatsApp
+                      </Button>
+                    </a>
+                    <a href="/#check-availability">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="rounded-full px-10 text-lg w-full sm:w-auto border-primary text-primary hover:bg-primary hover:text-white flex items-center gap-2"
+                      >
+                        <CalendarSearch className="w-5 h-5" />
+                        Check Availability
+                      </Button>
+                    </a>
+                  </div>
                 </div>
               </motion.div>
             );
