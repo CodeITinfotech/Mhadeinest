@@ -264,7 +264,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
               <img
                 src={logo}
                 alt="Shubhangi The Boat House"
-                className="h-14 w-auto object-contain brightness-0 invert opacity-95 drop-shadow-lg"
+                className="h-14 w-auto object-contain drop-shadow-lg"
               />
               <div>
                 <p className="font-display font-bold text-xl text-white leading-tight">Shubhangi</p>
