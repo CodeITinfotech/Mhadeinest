@@ -266,7 +266,7 @@ export default function Home() {
             >
               <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Got Questions?</p>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-primary leading-tight">
-                Frequently Asked Questions About the Overnight<br className="hidden sm:block" /> Goan Houseboat Trip
+                Frequently Asked Questions About the<br className="hidden sm:block" /> Goan Houseboat Trip
               </h2>
             </motion.div>
 
