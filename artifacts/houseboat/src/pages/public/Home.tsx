@@ -1,17 +1,31 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { useGetSettings, useListPackages } from "@workspace/api-client-react";
+import { useGetSettings, useListPackages, useListActivities } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Anchor, Wind, Sun, Coffee } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useInquiryModal } from "@/context/InquiryModalContext";
 
+const FALLBACK_FEATURES = [
+  { icon: Anchor, title: "Premium Stay", desc: "3 Luxurious Bedrooms" },
+  { icon: Wind, title: "Water Sports", desc: "Kayaking & Speed Boating" },
+  { icon: Sun, title: "Scenic Views", desc: "Golden Hour Sunsets" },
+  { icon: Coffee, title: "Gourmet Dining", desc: "Live Rooftop Restaurant" },
+];
+
 export default function Home() {
   const { data: settings } = useGetSettings();
   const { data: packages = [] } = useListPackages();
+  const { data: activities = [] } = useListActivities();
   const { fmt } = useCurrency();
   const { open: openInquiry } = useInquiryModal();
+
+  const activeActivities = activities
+    .filter((a) => a.isActive)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .slice(0, 4);
 
   const heroImage = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
 
@@ -75,32 +89,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Banner */}
+      {/* Features Banner — driven by admin Activities, falls back to static if none set */}
       <section className="bg-white py-12 border-b border-muted">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { icon: Anchor, title: "Premium Stay", desc: "3 Luxurious Bedrooms" },
-            { icon: Wind, title: "Water Sports", desc: "Kayaking & Speed Boating" },
-            { icon: Sun, title: "Scenic Views", desc: "Golden Hour Sunsets" },
-            { icon: Coffee, title: "Gourmet Dining", desc: "Live Rooftop Restaurant" },
-          ].map((feature, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="flex flex-col items-center text-center gap-3"
-            >
-              <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                <feature.icon className="w-8 h-8" />
-              </div>
-              <div>
-                <h3 className="font-display font-semibold text-lg text-foreground">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{feature.desc}</p>
-              </div>
-            </motion.div>
-          ))}
+          {activeActivities.length > 0
+            ? activeActivities.map((activity, idx) => {
+                const Icon = (LucideIcons as any)[activity.icon] || Anchor;
+                return (
+                  <motion.div
+                    key={activity.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="flex flex-col items-center text-center gap-3"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                      <Icon className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-semibold text-lg text-foreground">{activity.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>
+                    </div>
+                  </motion.div>
+                );
+              })
+            : FALLBACK_FEATURES.map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="flex flex-col items-center text-center gap-3"
+                >
+                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                    <feature.icon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-lg text-foreground">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{feature.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
         </div>
       </section>
 

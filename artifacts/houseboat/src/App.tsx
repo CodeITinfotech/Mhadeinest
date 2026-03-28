@@ -28,8 +28,7 @@ import AdminCalendar from "@/pages/admin/Calendar";
 import AdminGallery from "@/pages/admin/Gallery";
 import AdminInquiries from "@/pages/admin/Inquiries";
 import AdminChat from "@/pages/admin/Chat";
-// Simple placeholders for missing admin routes to satisfy completeness requirement
-function AdminActivities() { return <div className="p-8"><h2 className="text-2xl font-bold mb-4">Manage Activities</h2><p className="text-muted-foreground">Activities CRUD interface is similar to Packages.</p></div>; }
+import AdminActivities from "@/pages/admin/Activities";
 
 import NotFound from "@/pages/not-found";
 
