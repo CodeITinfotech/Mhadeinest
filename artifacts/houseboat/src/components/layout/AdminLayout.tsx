@@ -14,7 +14,7 @@ const logo = "/images/logo_transparent.png";
 
 const ADMIN_LINKS = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Booking Calendar", href: "/calendar", icon: CalendarDays },
+  { name: "Calendar", href: "/calendar", icon: CalendarDays },
   { name: "Packages", href: "/packages", icon: Package },
   { name: "Activities", href: "/activities", icon: ActivityIcon },
   { name: "Gallery", href: "/gallery", icon: ImageIcon },

@@ -208,7 +208,7 @@ export default function AdminCalendar() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Booking Calendar</h2>
+          <h2 className="text-2xl font-bold text-foreground">Calendar</h2>
           <p className="text-muted-foreground text-sm mt-1">Click a date to view or manage bookings</p>
         </div>
         <Button onClick={() => openAdd()} className="gap-2">
