@@ -278,7 +278,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           
           <div>
             <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Quick Links</h4>
-            <ul className="space-y-3">
+            <ul className="flex flex-wrap gap-x-5 gap-y-2 md:flex-col md:gap-0 md:space-y-3">
               {NAV_LINKS.slice(0, 5).map(link => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-primary-foreground/80 hover:text-white transition-colors">
