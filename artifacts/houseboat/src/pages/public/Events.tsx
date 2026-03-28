@@ -209,7 +209,7 @@ export default function Events() {
                       <div className="flex flex-col sm:flex-row gap-3 pt-2 mt-auto">
                         <Button
                           variant="default"
-                          className="flex-1 gap-2"
+                          className="w-full sm:flex-1 gap-2"
                           onClick={() => openInquiry({ packageService: event.name })}
                         >
                           <Users className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default function Events() {
                             href={buildWhatsAppUrl(whatsappNumber, event.name)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1"
+                            className="w-full sm:flex-1"
                           >
                             <Button variant="outline" className="w-full gap-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white">
                               <MessageCircle className="w-4 h-4" />
