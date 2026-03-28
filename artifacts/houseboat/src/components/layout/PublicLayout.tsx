@@ -70,6 +70,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
   const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
+  const showChat = (settings as any)?.showChatWidget !== "false";
+  const showWhatsapp = (settings as any)?.showWhatsappButton !== "false";
   const NAV_LINKS = ALL_NAV_LINKS.filter(l => !hiddenItems.includes(l.name));
 
   // Keep browser tab title in sync with site name
@@ -284,20 +286,22 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       <InquiryModal open={inquiryOpen} onClose={closeInquiry} initialData={inquiryPrefill ?? undefined} />
 
       {/* Floating WhatsApp Button */}
-      <a
-        href={whatsappLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-transform flex items-center justify-center group"
-      >
-        <Phone className="w-6 h-6" />
-        <span className="absolute right-full mr-4 bg-white text-foreground px-3 py-1.5 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
-          WhatsApp us
-        </span>
-      </a>
+      {showWhatsapp && (
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-transform flex items-center justify-center group"
+        >
+          <Phone className="w-6 h-6" />
+          <span className="absolute right-full mr-4 bg-white text-foreground px-3 py-1.5 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
+            WhatsApp us
+          </span>
+        </a>
+      )}
 
       {/* Live Chat Widget */}
-      <ChatWidget />
+      {showChat && <ChatWidget />}
     </div>
   );
 }

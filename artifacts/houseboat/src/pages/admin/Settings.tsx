@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
-  Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle
+  Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -131,6 +131,11 @@ export default function AdminSettings() {
   const [hiddenItems, setHiddenItems] = useState<string[]>([]);
   const [navSaving, setNavSaving] = useState(false);
 
+  // ── Widget visibility state ──────────────────────────────────────────────
+  const [showChatWidget, setShowChatWidget] = useState(true);
+  const [showWhatsappButton, setShowWhatsappButton] = useState(true);
+  const [widgetSaving, setWidgetSaving] = useState(false);
+
   // ── Site settings form ─────────────────────────────────────────────────
   const updateMutation = useUpdateSettings({
     mutation: {
@@ -162,6 +167,8 @@ export default function AdminSettings() {
       });
       setLogoPreview((settings as any).siteLogo || "");
       setHiddenItems((settings as any).navHiddenItems || []);
+      setShowChatWidget((settings as any).showChatWidget !== "false");
+      setShowWhatsappButton((settings as any).showWhatsappButton !== "false");
     }
   }, [settings]);
 
@@ -237,6 +244,28 @@ export default function AdminSettings() {
       toast({ title: "Error", description: "Failed to save menu config.", variant: "destructive" });
     } finally {
       setNavSaving(false);
+    }
+  };
+
+  // ── Widget visibility handlers ───────────────────────────────────────────
+  const saveWidgets = async () => {
+    setWidgetSaving(true);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          showChatWidget: showChatWidget ? "true" : "false",
+          showWhatsappButton: showWhatsappButton ? "true" : "false",
+        }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      toast({ title: "Widget settings saved", description: "Floating widget visibility updated." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save widget settings.", variant: "destructive" });
+    } finally {
+      setWidgetSaving(false);
     }
   };
 
@@ -569,6 +598,57 @@ export default function AdminSettings() {
                       </label>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* ── Widget Visibility ─────────────────────────────────────── */}
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-border">
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4 text-primary" />
+                    <h3 className="font-bold text-base">Floating Widget Visibility</h3>
+                  </div>
+                  <Button size="sm" onClick={saveWidgets} disabled={widgetSaving} className="gap-2">
+                    {widgetSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                    Save
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Toggle whether the chat bubble and WhatsApp button appear on the public site.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { label: "Live Chat Widget", desc: "Floating chat bubble for visitors", value: showChatWidget, set: setShowChatWidget },
+                    { label: "WhatsApp Button", desc: "Floating WhatsApp contact button", value: showWhatsappButton, set: setShowWhatsappButton },
+                  ].map(({ label, desc, value, set }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => set(!value)}
+                      className={cn(
+                        "flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors text-left w-full",
+                        value ? "bg-primary/5 border-primary/30" : "bg-muted/40 border-border"
+                      )}
+                    >
+                      <div className={cn(
+                        "relative w-10 h-6 rounded-full transition-colors shrink-0",
+                        value ? "bg-primary" : "bg-muted-foreground/30"
+                      )}>
+                        <span className={cn(
+                          "absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform",
+                          value ? "translate-x-4" : "translate-x-0"
+                        )} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{label}</p>
+                        <p className="text-xs text-muted-foreground">{desc}</p>
+                      </div>
+                      <span className={cn(
+                        "ml-auto text-xs px-2 py-0.5 rounded-full font-medium shrink-0",
+                        value ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                      )}>
+                        {value ? "Visible" : "Hidden"}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
 

@@ -442,6 +442,8 @@ export const GetSettingsResponse = zod.object({
   smtpFrom: zod.string(),
   smtpSecure: zod.string(),
   notifyEmail: zod.string(),
+  showChatWidget: zod.string(),
+  showWhatsappButton: zod.string(),
   updatedAt: zod.string(),
 });
 
@@ -471,6 +473,8 @@ export const UpdateSettingsBody = zod.object({
   smtpFrom: zod.string().optional(),
   smtpSecure: zod.string().optional(),
   notifyEmail: zod.string().optional(),
+  showChatWidget: zod.string().optional(),
+  showWhatsappButton: zod.string().optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -497,6 +501,8 @@ export const UpdateSettingsResponse = zod.object({
   smtpFrom: zod.string(),
   smtpSecure: zod.string(),
   notifyEmail: zod.string(),
+  showChatWidget: zod.string(),
+  showWhatsappButton: zod.string(),
   updatedAt: zod.string(),
 });
 
