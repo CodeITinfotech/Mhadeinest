@@ -258,7 +258,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Footer */}
       <footer className="bg-primary text-primary-foreground py-16 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div>
+          {/* Brand column */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-3 mb-6">
               <img
                 src={logo}
@@ -273,7 +274,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             <p className="text-primary-foreground/70 mb-6">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-center md:justify-start">
               {settings?.socialInstagram && (
                 <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-colors">
                   <Instagram className="w-5 h-5" />
@@ -291,10 +292,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
               )}
             </div>
           </div>
-          
-          <div>
+
+          {/* Quick Links column */}
+          <div className="text-center md:text-left">
             <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Quick Links</h4>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2 md:flex-col md:gap-0 md:space-y-3">
+            <ul className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-2 md:flex-col md:gap-0 md:space-y-3">
               {NAV_LINKS.slice(0, 5).map(link => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-primary-foreground/80 hover:text-white transition-colors">
@@ -304,8 +306,9 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
               ))}
             </ul>
           </div>
-          
-          <div>
+
+          {/* Contact column */}
+          <div className="text-center md:text-left">
             <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Contact Us</h4>
             <div className="space-y-4 text-primary-foreground/80">
               <p>Email: {settings?.inquiryEmail || "bookings@goahouseboat.com"}</p>
