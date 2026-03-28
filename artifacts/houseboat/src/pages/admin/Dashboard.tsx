@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className={cn("w-1 h-6 sm:w-1.5 sm:h-8 rounded-full opacity-60 shrink-0 ml-1", card.accent)} />
               </div>
-              <p className="text-2xl sm:text-3xl font-bold text-foreground">{card.value}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-foreground text-center">{card.value}</p>
             </button>
           );
         })}
