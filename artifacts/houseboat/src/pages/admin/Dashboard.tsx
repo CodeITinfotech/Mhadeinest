@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Top 4 Booking Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {topCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -163,28 +163,27 @@ export default function AdminDashboard() {
               key={card.key}
               onClick={() => setModalType(card.key)}
               className={cn(
-                "group text-left bg-card rounded-2xl border p-6 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer",
+                "group text-left bg-card rounded-2xl border p-4 sm:p-6 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer",
                 card.border
               )}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center", card.bg)}>
-                  <Icon className={cn("w-5 h-5", card.color)} />
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className={cn("w-8 h-8 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0", card.bg)}>
+                    <Icon className={cn("w-4 h-4 sm:w-5 sm:h-5", card.color)} />
+                  </div>
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-tight">{card.label}</p>
                 </div>
-                <div className={cn("w-1.5 h-8 rounded-full opacity-60", card.accent)} />
+                <div className={cn("w-1 h-6 sm:w-1.5 sm:h-8 rounded-full opacity-60 shrink-0 ml-1", card.accent)} />
               </div>
-              <p className="text-3xl font-bold text-foreground mb-1">{card.value}</p>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground font-medium">{card.label}</p>
-                <ArrowRight className={cn("w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity", card.color)} />
-              </div>
+              <p className="text-2xl sm:text-3xl font-bold text-foreground">{card.value}</p>
             </button>
           );
         })}
       </div>
 
       {/* Bottom 3 Compact Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         {bottomStats.map((s, i) => {
           const Icon = s.icon;
           return (
