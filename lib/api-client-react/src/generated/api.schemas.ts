@@ -200,6 +200,8 @@ export interface Settings {
   trailVideoUrl: string | null;
   aboutText: string;
   aboutImages: string[];
+  /** @nullable */
+  locationMapUrl?: string | null;
   updatedAt: string;
 }
 
@@ -217,6 +219,7 @@ export interface UpdateSettingsBody {
   trailVideoUrl?: string;
   aboutText?: string;
   aboutImages?: string[];
+  locationMapUrl?: string;
 }
 
 export interface LoginBody {

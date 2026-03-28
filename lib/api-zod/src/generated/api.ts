@@ -444,6 +444,7 @@ export const GetSettingsResponse = zod.object({
   notifyEmail: zod.string(),
   showChatWidget: zod.string(),
   showWhatsappButton: zod.string(),
+  locationMapUrl: zod.string().nullable(),
   updatedAt: zod.string(),
 });
 
@@ -475,6 +476,7 @@ export const UpdateSettingsBody = zod.object({
   notifyEmail: zod.string().optional(),
   showChatWidget: zod.string().optional(),
   showWhatsappButton: zod.string().optional(),
+  locationMapUrl: zod.string().optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -503,6 +505,7 @@ export const UpdateSettingsResponse = zod.object({
   notifyEmail: zod.string(),
   showChatWidget: zod.string(),
   showWhatsappButton: zod.string(),
+  locationMapUrl: zod.string().nullable(),
   updatedAt: zod.string(),
 });
 

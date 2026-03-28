@@ -59,6 +59,7 @@ const siteSchema = z.object({
   socialFacebook: z.string().optional(),
   socialYoutube: z.string().optional(),
   trailVideoUrl: z.string().optional(),
+  locationMapUrl: z.string().optional(),
   aboutText: z.string(),
   aboutImages: z.string(),
 });
@@ -162,6 +163,7 @@ export default function AdminSettings() {
         socialFacebook: settings.socialFacebook || "",
         socialYoutube: settings.socialYoutube || "",
         trailVideoUrl: settings.trailVideoUrl || "",
+        locationMapUrl: (settings as any).locationMapUrl || "",
         aboutText: settings.aboutText,
         aboutImages: settings.aboutImages?.join(", ") || "",
       });
@@ -536,10 +538,16 @@ export default function AdminSettings() {
                 </div>
 
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
-                  <h3 className="font-bold text-base border-b border-border pb-3">About & Trail Video</h3>
+                  <h3 className="font-bold text-base border-b border-border pb-3">About, Location & Trail</h3>
+                  <Field label="Google Maps Embed URL">
+                    <Input
+                      {...siteForm.register("locationMapUrl")}
+                      placeholder="https://www.google.com/maps/embed?pb=..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">In Google Maps, click Share → Embed a map → copy the <strong>src</strong> URL from the iframe code</p>
+                  </Field>
                   <Field label="YouTube Trail Video URL"><Input {...siteForm.register("trailVideoUrl")} placeholder="https://youtube.com/watch?v=..." /></Field>
                   <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
-                  <Field label="About Images (comma-separated URLs)"><Textarea {...siteForm.register("aboutImages")} className="min-h-[80px]" /></Field>
                 </div>
               </form>
 

@@ -28,6 +28,7 @@ export const settingsTable = pgTable("settings", {
   notifyEmail: text("notify_email").notNull().default(""),
   showChatWidget: text("show_chat_widget").notNull().default("true"),
   showWhatsappButton: text("show_whatsapp_button").notNull().default("true"),
+  locationMapUrl: text("location_map_url"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
