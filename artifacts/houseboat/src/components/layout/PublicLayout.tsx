@@ -128,12 +128,22 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <img
               src={logo}
               alt="Shubhangi The Boat House"
               className="h-12 w-auto object-contain transition-all duration-300 drop-shadow-md"
             />
+            <div className="flex flex-col leading-tight">
+              <span className={cn(
+                "font-display font-bold text-base transition-colors",
+                isScrolled || location !== "/" ? "text-primary" : "text-white drop-shadow"
+              )}>Shubhangi</span>
+              <span className={cn(
+                "font-display text-[11px] font-medium tracking-wide transition-colors",
+                isScrolled || location !== "/" ? "text-muted-foreground" : "text-white/80 drop-shadow"
+              )}>The Boat House</span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -247,12 +257,16 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       <footer className="bg-primary text-primary-foreground py-16 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex flex-col gap-3 mb-6">
               <img
                 src={logo}
                 alt="Shubhangi The Boat House"
-                className="h-16 w-auto object-contain brightness-0 invert opacity-90"
+                className="h-20 w-auto object-contain brightness-0 invert opacity-95 drop-shadow-lg"
               />
+              <div>
+                <p className="font-display font-bold text-xl text-white leading-tight">Shubhangi</p>
+                <p className="font-display text-sm text-secondary font-semibold tracking-wider">The Boat House</p>
+              </div>
             </div>
             <p className="text-primary-foreground/70 mb-6">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}
