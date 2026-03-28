@@ -122,13 +122,6 @@ export function ChatWidget() {
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || !sessionToken || sending) return;
     setSending(true);
-    const optimistic: Message = {
-      id: Date.now(),
-      sender: "visitor",
-      message: text.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, optimistic]);
     setInput("");
     try {
       await fetch(`${API}/chat/session/${sessionToken}/messages`, {
