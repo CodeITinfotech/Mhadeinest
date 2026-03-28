@@ -131,13 +131,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="bg-black rounded-xl p-1 flex items-center justify-center shrink-0">
-              <img
-                src={logo}
-                alt="Shubhangi The Boat House"
-                className="h-10 w-auto object-contain transition-all duration-300"
-              />
-            </div>
+            <img
+              src={logo}
+              alt="Shubhangi The Boat House"
+              className="h-10 w-auto object-contain transition-all duration-300 drop-shadow-md"
+            />
             <div className="flex flex-col leading-tight">
               <span className={cn(
                 "font-display font-bold text-base transition-colors",
@@ -262,13 +260,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-black rounded-xl p-1.5 flex items-center justify-center shrink-0">
-                <img
-                  src={logo}
-                  alt="Shubhangi The Boat House"
-                  className="h-14 w-auto object-contain"
-                />
-              </div>
+              <img
+                src={logo}
+                alt="Shubhangi The Boat House"
+                className="h-14 w-auto object-contain brightness-0 invert opacity-95 drop-shadow-lg"
+              />
               <div>
                 <p className="font-display font-bold text-xl text-white leading-tight">Shubhangi</p>
                 <p className="font-display text-sm text-secondary font-semibold tracking-wider">The Boat House</p>

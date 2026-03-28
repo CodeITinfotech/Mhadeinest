@@ -61,9 +61,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
         <div className="bg-primary p-8 text-center text-primary-foreground">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="bg-black rounded-xl p-1.5 flex items-center justify-center shrink-0">
-              <img src={siteLogo || defaultLogo} alt={siteName} className="h-14 w-auto object-contain" />
-            </div>
+            <img src={siteLogo || defaultLogo} alt={siteName} className="h-14 w-auto object-contain drop-shadow-lg" />
             <h1 className="text-xl font-display font-bold leading-snug text-left">{siteName}</h1>
           </div>
           <p className="text-primary-foreground/70 text-sm mt-1">Sign in to manage the website</p>
