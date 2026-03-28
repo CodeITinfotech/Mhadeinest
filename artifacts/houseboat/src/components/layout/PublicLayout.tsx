@@ -137,7 +137,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-8">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
