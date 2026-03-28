@@ -10,7 +10,7 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 // Public Pages
 import Home from "@/pages/public/Home";
 import Packages from "@/pages/public/Packages";
-import Dining from "@/pages/public/Dining";
+import Events from "@/pages/public/Events";
 import Activities from "@/pages/public/Activities";
 import Gallery from "@/pages/public/Gallery";
 import BlogList from "@/pages/public/blog/BlogList";
@@ -31,6 +31,7 @@ import AdminChat from "@/pages/admin/Chat";
 import AdminActivities from "@/pages/admin/Activities";
 import AdminAwards from "@/pages/admin/Awards";
 import AdminFaqs from "@/pages/admin/Faqs";
+import AdminEvents from "@/pages/admin/Events";
 
 import NotFound from "@/pages/not-found";
 
@@ -62,6 +63,7 @@ function Router() {
             <Route path="/chat" component={AdminChat} />
             <Route path="/awards" component={AdminAwards} />
             <Route path="/faqs" component={AdminFaqs} />
+            <Route path="/events" component={AdminEvents} />
             <Route path="/blog" component={AdminBlog} />
             <Route path="/settings" component={AdminSettings} />
             <Route component={NotFound} />
@@ -75,7 +77,7 @@ function Router() {
           <Switch>
             <Route path="/" component={Home} />
             <Route path="/packages" component={Packages} />
-            <Route path="/dining" component={Dining} />
+            <Route path="/events" component={Events} />
             <Route path="/activities" component={Activities} />
             <Route path="/gallery" component={Gallery} />
             <Route path="/blog" component={BlogList} />

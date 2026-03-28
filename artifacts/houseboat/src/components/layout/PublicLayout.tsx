@@ -14,7 +14,7 @@ const FALLBACK_LOGO = "/images/logo_transparent.png";
 const ALL_NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Packages", href: "/packages" },
-  { name: "Dining", href: "/dining" },
+  { name: "Events", href: "/events" },
   { name: "Activities", href: "/activities" },
   { name: "Gallery", href: "/gallery" },
   { name: "Blog", href: "/blog" },

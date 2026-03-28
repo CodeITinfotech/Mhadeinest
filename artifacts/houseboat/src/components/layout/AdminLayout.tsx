@@ -3,7 +3,7 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import {
   LayoutDashboard, Package, Activity as ActivityIcon, Image as ImageIcon,
   FileText, Settings, LogOut, CalendarDays, Inbox, MessageSquare, Trophy,
-  HelpCircle, Menu, X,
+  HelpCircle, Menu, X, PartyPopper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -20,6 +20,7 @@ const ADMIN_LINKS = [
   { name: "Gallery", href: "/gallery", icon: ImageIcon },
   { name: "Inquiries", href: "/inquiries", icon: Inbox },
   { name: "Live Chat", href: "/chat", icon: MessageSquare },
+  { name: "Events", href: "/events", icon: PartyPopper },
   { name: "Awards", href: "/awards", icon: Trophy },
   { name: "FAQ", href: "/faqs", icon: HelpCircle },
   { name: "Blog Posts", href: "/blog", icon: FileText },

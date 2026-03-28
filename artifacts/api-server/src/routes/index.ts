@@ -11,6 +11,7 @@ import bookingsRouter from "./bookings";
 import chatRouter from "./chat";
 import awardsRouter from "./awards";
 import faqsRouter from "./faqs";
+import eventsRouter from "./events";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(bookingsRouter);
 router.use(chatRouter);
 router.use(awardsRouter);
 router.use(faqsRouter);
+router.use(eventsRouter);
 
 export default router;

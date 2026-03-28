@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, CheckCircle, ChevronDown, User, Phone, Mail, MessageSquare, Calendar, Users, Baby } from "lucide-react";
+import { X, Send, CheckCircle, User, Phone, Mail, MessageSquare, Calendar, Users } from "lucide-react";
 import type { InquiryPrefill } from "@/context/InquiryModalContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -195,17 +195,17 @@ export function InquiryModal({ open, onClose, initialData }: Props) {
                 <div className="space-y-4">
                   <SectionLabel icon={Calendar} label="Booking Details" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField label="Package / Service" className="sm:col-span-2">
+                    <FormField label="Package / Service / Event" className="sm:col-span-2">
                       <div className="relative">
-                        <select
+                        <Input
+                          list="package-suggestions"
                           value={form.packageService}
                           onChange={set("packageService")}
-                          className="w-full h-10 pl-3 pr-8 rounded-md border border-input bg-background text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-ring"
-                        >
-                          <option value="">Select a package or service…</option>
-                          {PACKAGES.map(p => <option key={p} value={p}>{p}</option>)}
-                        </select>
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                          placeholder="e.g. Birthday Party, Overnight Stay…"
+                        />
+                        <datalist id="package-suggestions">
+                          {PACKAGES.map(p => <option key={p} value={p} />)}
+                        </datalist>
                       </div>
                     </FormField>
                     <FormField label="Preferred Date">
