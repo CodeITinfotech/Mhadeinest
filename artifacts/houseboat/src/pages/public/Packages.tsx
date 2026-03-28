@@ -5,6 +5,7 @@ import { Check, Users, Tag, CalendarSearch, Anchor } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useRef, useState, useEffect } from "react";
 
 export default function Packages() {
   const { data: packages = [], isLoading } = useListPackages();
@@ -14,7 +15,51 @@ export default function Packages() {
 
   const activePackages = packages.filter(p => p.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const activeActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
-  const marqueeItems = activeActivities.length >= 3 ? activeActivities : [];
+  const marqueeItems = activeActivities.length >= 2 ? activeActivities : [];
+
+  // Drag-to-scroll refs
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const dragStart = useRef({ x: 0, scrollLeft: 0 });
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!stripRef.current) return;
+    setIsDragging(true);
+    setPaused(true);
+    dragStart.current = { x: e.pageX, scrollLeft: stripRef.current.scrollLeft };
+    stripRef.current.style.cursor = "grabbing";
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !stripRef.current) return;
+    e.preventDefault();
+    const dx = e.pageX - dragStart.current.x;
+    stripRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+  };
+  const onMouseUp = () => {
+    setIsDragging(false);
+    if (stripRef.current) stripRef.current.style.cursor = "grab";
+    setTimeout(() => setPaused(false), 800);
+  };
+
+  // JS auto-scroll — increments scrollLeft so drag uses same mechanism
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    let animId: number;
+    const tick = () => {
+      if (!paused && el) {
+        el.scrollLeft += 0.6;
+        // Loop: when we've scrolled past the first copy, jump back silently
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft = 0;
+        }
+      }
+      animId = requestAnimationFrame(tick);
+    };
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
+  }, [paused]);
 
   if (isLoading) {
     return <div className="min-h-[60vh] flex items-center justify-center"><div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div></div>;
@@ -167,33 +212,59 @@ export default function Packages() {
           })}
         </div>
 
-        {/* Scrolling Activities Strip */}
+        {/* Scrolling Activities Strip — image cards, drag-to-scroll */}
         {marqueeItems.length > 0 && (
-          <div className="mt-20 -mx-4 overflow-hidden border-y border-border bg-muted/40 py-6">
+          <div className="mt-20 -mx-4 border-y border-border bg-muted/30 py-10">
             <style>{`
-              @keyframes marquee-scroll {
-                0%   { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-              }
-              .marquee-track { animation: marquee-scroll 28s linear infinite; }
-              .marquee-track:hover { animation-play-state: paused; }
+              .act-strip::-webkit-scrollbar { display: none; }
+              .act-strip { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
-            <div className="flex whitespace-nowrap">
-              <div className="marquee-track flex gap-8 pr-8">
+
+            {/* Header */}
+            <div className="px-8 mb-6">
+              <p className="text-xs font-semibold uppercase tracking-widest text-secondary mb-1">Experiences Aboard</p>
+              <h3 className="text-xl font-display font-bold text-primary">Activities & Highlights</h3>
+            </div>
+
+            {/* Drag strip */}
+            <div
+              ref={stripRef}
+              className="act-strip overflow-x-auto overflow-y-hidden select-none cursor-grab px-8"
+              onMouseDown={onMouseDown}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseUp}
+            >
+              <div className="flex gap-5" style={{ width: "max-content" }}>
                 {[...marqueeItems, ...marqueeItems].map((activity, idx) => {
                   const Icon = (LucideIcons as any)[activity.icon] || Anchor;
                   return (
                     <div
                       key={idx}
-                      className="inline-flex items-center gap-3 bg-background border border-border rounded-full px-6 py-3 shadow-sm shrink-0"
+                      className="shrink-0 w-48 rounded-2xl overflow-hidden bg-card border border-border shadow-md hover:shadow-xl transition-shadow duration-300 group"
                     >
-                      <span className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center text-secondary shrink-0">
-                        <Icon className="w-4 h-4" />
-                      </span>
-                      <span className="font-semibold text-primary text-sm">{activity.name}</span>
-                      {activity.description && (
-                        <span className="text-muted-foreground text-xs hidden sm:inline">— {activity.description}</span>
-                      )}
+                      {/* Image or icon placeholder */}
+                      <div className="h-36 bg-primary/10 relative overflow-hidden">
+                        {(activity as any).image ? (
+                          <img
+                            src={(activity as any).image}
+                            alt={activity.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            draggable={false}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
+                            <Icon className="w-12 h-12 text-secondary/70" />
+                          </div>
+                        )}
+                      </div>
+                      {/* Name */}
+                      <div className="px-4 py-3">
+                        <p className="font-display font-bold text-sm text-primary leading-tight">{activity.name}</p>
+                        {activity.description && (
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{activity.description}</p>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
