@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Anchor, Wind, Sun, Coffee } from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useInquiryModal } from "@/context/InquiryModalContext";
 
 export default function Home() {
   const { data: settings } = useGetSettings();
   const { data: packages = [] } = useListPackages();
   const { fmt } = useCurrency();
+  const { open: openInquiry } = useInquiryModal();
 
   const heroImage = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
 
@@ -182,9 +184,13 @@ export default function Home() {
                       <p className="text-sm text-muted-foreground mb-1">From</p>
                       <p className="text-2xl font-bold text-secondary">{fmt(pkg.pricePerNight)}<span className="text-sm text-muted-foreground font-normal">/night</span></p>
                     </div>
-                    <Link href="/packages">
-                      <Button variant="outline" className="rounded-full">Details</Button>
-                    </Link>
+                    <Button
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => openInquiry({ packageService: pkg.name })}
+                    >
+                      Inquire
+                    </Button>
                   </div>
                 </div>
               </motion.div>

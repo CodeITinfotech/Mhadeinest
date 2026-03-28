@@ -137,7 +137,11 @@ export default function Packages() {
                   </div>
 
                   <a href={waUrl} target="_blank" rel="noopener noreferrer">
-                    <Button size="lg" className="rounded-full px-10 text-lg w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      className="rounded-full px-10 text-lg w-full sm:w-auto text-white"
+                      style={{ backgroundColor: "#25D366", borderColor: "#25D366" }}
+                    >
                       Book via WhatsApp
                     </Button>
                   </a>
