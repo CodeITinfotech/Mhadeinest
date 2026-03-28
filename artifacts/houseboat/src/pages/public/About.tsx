@@ -37,14 +37,14 @@ export default function About() {
             </p>
           </motion.div>
 
-          {/* Map embed or placeholder */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            <div className="rounded-2xl overflow-hidden shadow-xl border border-border aspect-[4/3] bg-muted/30 relative">
-              {mapUrl ? (
+          {/* Map embed — only shown when configured */}
+          {mapUrl && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-border aspect-[4/3] bg-muted/30 relative">
                 <iframe
                   src={mapUrl}
                   className="w-full h-full border-0"
@@ -53,26 +53,13 @@ export default function About() {
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Shubhangi The Boat House Location"
                 />
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <MapPin className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold text-foreground">Location map not configured</p>
-                    <p className="text-sm mt-1">Add a Google Maps embed URL in Admin → Settings</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {mapUrl && (
+              </div>
               <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <Navigation className="w-4 h-4 text-primary shrink-0" />
                 <span>Chapora River, North Goa — Click the map to get directions</span>
               </div>
-            )}
-          </motion.div>
+            </motion.div>
+          )}
         </div>
 
         {/* Trail Video Section */}
