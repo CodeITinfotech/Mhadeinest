@@ -5,6 +5,7 @@ import path from "path";
 
 const port = Number(process.env.PORT) || 5173;
 const basePath = process.env.BASE_PATH || "/";
+const replitDomain = process.env.REPLIT_DEV_DOMAIN;
 
 export default defineConfig({
   base: basePath,
@@ -32,6 +33,16 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    // When running behind the Replit proxy, direct HMR WebSocket through the public domain
+    ...(replitDomain
+      ? {
+          hmr: {
+            host: replitDomain,
+            protocol: "wss",
+            clientPort: 443,
+          },
+        }
+      : {}),
   },
   preview: {
     port,

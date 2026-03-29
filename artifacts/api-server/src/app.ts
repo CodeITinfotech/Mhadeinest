@@ -4,6 +4,7 @@ import pinoHttp from "pino-http";
 import cookieParser from "cookie-parser";
 import path from "path";
 import fs from "fs";
+import http from "http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -43,6 +44,35 @@ if (process.env.NODE_ENV === "production") {
       res.sendFile(path.join(staticDir, "index.html"));
     });
   }
+} else {
+  // In development, proxy everything that isn't /api to the Vite dev server
+  const VITE_PORT = 5173;
+
+  app.use((req, res) => {
+    const options: http.RequestOptions = {
+      hostname: "127.0.0.1",
+      port: VITE_PORT,
+      path: req.url,
+      method: req.method,
+      headers: {
+        ...req.headers,
+        host: `localhost:${VITE_PORT}`,
+      },
+    };
+
+    const proxy = http.request(options, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode ?? 200, proxyRes.headers);
+      proxyRes.pipe(res, { end: true });
+    });
+
+    proxy.on("error", (_err) => {
+      if (!res.headersSent) {
+        res.status(502).send("Vite dev server not reachable. Make sure the houseboat workflow is running.");
+      }
+    });
+
+    req.pipe(proxy, { end: true });
+  });
 }
 
 export default app;
