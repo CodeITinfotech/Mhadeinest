@@ -93,6 +93,15 @@ All routes under `/api`:
 - `POST /inquiry`
 - `GET/POST /awards`, `PATCH/DELETE /awards/:id`
 - `GET/POST /faqs`, `PATCH/DELETE /faqs/:id`
+- `GET/POST /events`, `PATCH/DELETE /events/:id`
+- `GET /admin/export-sql?type=postgresql|mysql` — download full DB schema + data as .sql (admin only)
+- `GET/PATCH /bookings`, `DELETE /bookings/:id`
+- `GET/POST /chat/sessions`, `GET/POST /chat/sessions/:token/messages`, `PATCH /chat/sessions/:token/close`
+
+### Workflows
+
+- `artifacts/houseboat: web` — React+Vite frontend on PORT=5173
+- `artifacts/api-server: API Server` — Express API on PORT=8080 (use `PORT=8080 pnpm --filter @workspace/api-server run dev`)
 
 ## TypeScript & Composite Projects
 

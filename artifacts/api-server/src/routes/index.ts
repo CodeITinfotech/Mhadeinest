@@ -12,6 +12,7 @@ import chatRouter from "./chat";
 import awardsRouter from "./awards";
 import faqsRouter from "./faqs";
 import eventsRouter from "./events";
+import exportSqlRouter from "./export-sql";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(chatRouter);
 router.use(awardsRouter);
 router.use(faqsRouter);
 router.use(eventsRouter);
+router.use(exportSqlRouter);
 
 export default router;
