@@ -12,7 +12,7 @@ import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
   Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid,
-  Database, FolderOpen, FolderTree, ChevronRight, Download,
+  Database, FolderOpen, FolderTree, ChevronRight, Download, Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -154,6 +154,7 @@ export default function AdminSettings() {
   const [uploadRootPath, setUploadRootPath] = useState("/home/youruser/public_html/uploads");
   const [deploySaving, setDeploySaving] = useState(false);
   const [sqlDownloading, setSqlDownloading] = useState<"postgresql" | "mysql" | null>(null);
+  const [zipDownloading, setZipDownloading] = useState(false);
 
   // ── Site settings form ─────────────────────────────────────────────────
   const updateMutation = useUpdateSettings({
@@ -486,6 +487,28 @@ export default function AdminSettings() {
       toast({ title: "Export failed", description: "Could not generate SQL file. Please try again.", variant: "destructive" });
     } finally {
       setSqlDownloading(null);
+    }
+  };
+
+  const downloadZip = async () => {
+    setZipDownloading(true);
+    try {
+      const res = await fetch(`${API}/admin/export-zip`, { credentials: "include" });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `shubhangi_boathouse_database_backup_${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: "Downloaded", description: "Database backup ZIP downloaded successfully." });
+    } catch {
+      toast({ title: "Export failed", description: "Could not generate ZIP file. Please try again.", variant: "destructive" });
+    } finally {
+      setZipDownloading(false);
     }
   };
 
@@ -1333,38 +1356,53 @@ export default function AdminSettings() {
               <h3 className="font-bold text-base">Database Export</h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              Download the complete database schema and all data as a <code className="bg-muted px-1.5 py-0.5 rounded text-xs">.sql</code> file.
-              Import it directly into your hosting server database via cPanel phpMyAdmin or the command line.
+              Download the complete database schema and all data. The ZIP includes both PostgreSQL and MySQL
+              <code className="bg-muted px-1.5 py-0.5 rounded text-xs">.sql</code> files — ready to import
+              into your hosting server via cPanel phpMyAdmin or the command line.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+
+            {/* Primary: ZIP download */}
+            <Button
+              type="button"
+              onClick={downloadZip}
+              disabled={zipDownloading || sqlDownloading !== null}
+              className="w-full gap-2 h-11 text-base font-semibold"
+            >
+              {zipDownloading
+                ? <Loader2 className="w-5 h-5 animate-spin" />
+                : <Archive className="w-5 h-5" />}
+              {zipDownloading ? "Generating ZIP…" : "Download Database as ZIP"}
+            </Button>
+
+            {/* Secondary: individual SQL files */}
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button
                 type="button"
-                variant={dbType === "postgresql" ? "default" : "outline"}
+                variant={dbType === "postgresql" ? "secondary" : "outline"}
+                size="sm"
                 onClick={() => downloadSql("postgresql")}
-                disabled={sqlDownloading !== null}
+                disabled={sqlDownloading !== null || zipDownloading}
                 className="gap-2 flex-1"
               >
                 {sqlDownloading === "postgresql"
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : <Download className="w-4 h-4" />}
-                Download PostgreSQL .sql
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Download className="w-3.5 h-3.5" />}
+                PostgreSQL only
               </Button>
               <Button
                 type="button"
-                variant={dbType === "mysql" ? "default" : "outline"}
+                variant={dbType === "mysql" ? "secondary" : "outline"}
+                size="sm"
                 onClick={() => downloadSql("mysql")}
-                disabled={sqlDownloading !== null}
+                disabled={sqlDownloading !== null || zipDownloading}
                 className="gap-2 flex-1"
               >
                 {sqlDownloading === "mysql"
-                  ? <Loader2 className="w-4 h-4 animate-spin" />
-                  : <Download className="w-4 h-4" />}
-                Download MySQL .sql
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Download className="w-3.5 h-3.5" />}
+                MySQL only
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              The filled button matches your currently selected database type above. Both formats are always available.
-            </p>
           </div>
 
           {/* ── Save button ─────────────────────────────────────────── */}

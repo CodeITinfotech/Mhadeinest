@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, adminUsersTable } from "@workspace/db";
 import { generateSql } from "../lib/sql-export";
+import { createZipBuffer } from "../lib/zip-writer";
 
 const router: IRouter = Router();
 
@@ -35,6 +36,42 @@ router.get("/admin/export-sql", async (req, res): Promise<void> => {
   } catch (err) {
     console.error("SQL export error:", err);
     res.status(500).json({ error: "Failed to generate SQL export" });
+  }
+});
+
+router.get("/admin/export-zip", async (req, res): Promise<void> => {
+  const isAdmin = await checkAdminSession(req);
+  if (!isAdmin) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const [pgSql, mySql] = await Promise.all([
+      generateSql("postgresql"),
+      generateSql("mysql"),
+    ]);
+
+    const zipBuf = createZipBuffer([
+      {
+        name: `shubhangi_boathouse_postgresql_${dateStr}.sql`,
+        data: Buffer.from(pgSql, "utf8"),
+      },
+      {
+        name: `shubhangi_boathouse_mysql_${dateStr}.sql`,
+        data: Buffer.from(mySql, "utf8"),
+      },
+    ]);
+
+    const filename = `shubhangi_boathouse_database_backup_${dateStr}.zip`;
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Length", zipBuf.length);
+    res.send(zipBuf);
+  } catch (err) {
+    console.error("ZIP export error:", err);
+    res.status(500).json({ error: "Failed to generate ZIP export" });
   }
 });
 
