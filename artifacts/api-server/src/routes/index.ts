@@ -13,6 +13,7 @@ import awardsRouter from "./awards";
 import faqsRouter from "./faqs";
 import eventsRouter from "./events";
 import exportSqlRouter from "./export-sql";
+import dbInfoRouter from "./db-info";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(awardsRouter);
 router.use(faqsRouter);
 router.use(eventsRouter);
 router.use(exportSqlRouter);
+router.use(dbInfoRouter);
 
 export default router;

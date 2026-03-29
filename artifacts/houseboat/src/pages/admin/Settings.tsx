@@ -12,7 +12,7 @@ import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
   Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid,
-  Database, FolderOpen, FolderTree, ChevronRight, Download, Archive,
+  Database, FolderOpen, FolderTree, ChevronRight, Download, Archive, Copy, Check, Wifi,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -155,6 +155,12 @@ export default function AdminSettings() {
   const [deploySaving, setDeploySaving] = useState(false);
   const [sqlDownloading, setSqlDownloading] = useState<"postgresql" | "mysql" | null>(null);
   const [zipDownloading, setZipDownloading] = useState(false);
+  const [dbInfo, setDbInfo] = useState<{
+    provider: string; connected: boolean; host?: string; port?: string;
+    database?: string; user?: string; hasPassword?: boolean; sslmode?: string; maskedUrl?: string;
+  } | null>(null);
+  const [dbInfoLoading, setDbInfoLoading] = useState(false);
+  const [dbUrlCopied, setDbUrlCopied] = useState(false);
 
   // ── Site settings form ─────────────────────────────────────────────────
   const updateMutation = useUpdateSettings({
@@ -401,6 +407,24 @@ export default function AdminSettings() {
       .catch(() => {})
       .finally(() => setProfileLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "deployment" || dbInfo !== null || dbInfoLoading) return;
+    setDbInfoLoading(true);
+    fetch(`${API}/admin/db-info`, { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setDbInfo(data); })
+      .catch(() => {})
+      .finally(() => setDbInfoLoading(false));
+  }, [activeTab]);
+
+  const copyDbUrl = () => {
+    if (!dbInfo?.maskedUrl) return;
+    navigator.clipboard.writeText(dbInfo.maskedUrl).then(() => {
+      setDbUrlCopied(true);
+      setTimeout(() => setDbUrlCopied(false), 2000);
+    });
+  };
 
   const onProfileSubmit = async (data: z.infer<typeof profileSchema>) => {
     setProfileSaving(true);
@@ -1346,6 +1370,109 @@ export default function AdminSettings() {
                   )}
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* ── Current Database Connection ──────────────────────────── */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Wifi className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Current Database Connection</h3>
+              {dbInfo?.connected && (
+                <span className="ml-auto flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Connected
+                </span>
+              )}
+            </div>
+
+            {dbInfoLoading && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Loading connection info…
+              </div>
+            )}
+
+            {dbInfo && !dbInfoLoading && (
+              <>
+                {/* Provider badge */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Provider</span>
+                  <span className={cn(
+                    "text-xs font-semibold px-2.5 py-0.5 rounded-full",
+                    dbInfo.provider === "replit"
+                      ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+                      : "bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400"
+                  )}>
+                    {dbInfo.provider === "replit" ? "Replit PostgreSQL" :
+                     dbInfo.provider === "supabase" ? "Supabase" :
+                     dbInfo.provider === "neon" ? "Neon" :
+                     dbInfo.provider === "railway" ? "Railway" :
+                     dbInfo.provider === "elephantsql" ? "ElephantSQL" :
+                     "External PostgreSQL"}
+                  </span>
+                </div>
+
+                {/* Connection fields grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    { label: "Host", value: dbInfo.host },
+                    { label: "Port", value: dbInfo.port },
+                    { label: "Database", value: dbInfo.database },
+                    { label: "User", value: dbInfo.user },
+                    { label: "Password", value: dbInfo.hasPassword ? "••••••••" : "(none)" },
+                    { label: "SSL Mode", value: dbInfo.sslmode },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="bg-muted rounded-lg px-3 py-2">
+                      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                      <p className="text-sm font-mono font-medium truncate">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Masked connection string */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Connection String (password hidden)</p>
+                  <div className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2">
+                    <code className="text-xs flex-1 break-all font-mono">{dbInfo.maskedUrl}</code>
+                    <button
+                      onClick={copyDbUrl}
+                      className="shrink-0 p-1 rounded hover:bg-border transition-colors"
+                      title="Copy (password hidden)"
+                    >
+                      {dbUrlCopied
+                        ? <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Migration instructions */}
+                {dbInfo.provider === "replit" && (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-900/50 p-4 space-y-2">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-400">To switch to an external PostgreSQL server:</p>
+                    <ol className="text-xs text-amber-700 dark:text-amber-500 space-y-1.5 list-decimal pl-4">
+                      <li>First download your database backup below (keep this safe!)</li>
+                      <li>Create a PostgreSQL database on your external provider (Supabase, Neon, Railway, cPanel, etc.)</li>
+                      <li>Import the downloaded <strong>.sql</strong> file into that new database</li>
+                      <li>In Replit, go to <strong>Tools → Secrets</strong> and add or update the key <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">DATABASE_URL</code> with your new server's connection string</li>
+                      <li>Restart the app — it will automatically connect to the new database</li>
+                    </ol>
+                    <div className="mt-2 pt-2 border-t border-amber-200 dark:border-amber-900/50">
+                      <p className="text-xs font-semibold text-amber-800 dark:text-amber-400 mb-1">External connection string format:</p>
+                      <code className="text-xs break-all text-amber-900 dark:text-amber-300">
+                        postgresql://YOUR_USER:YOUR_PASSWORD@YOUR_HOST:5432/YOUR_DB?sslmode=require
+                      </code>
+                    </div>
+                  </div>
+                )}
+
+                {dbInfo.provider !== "replit" && (
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/30 p-3 text-xs text-emerald-700 dark:text-emerald-400">
+                    You are connected to an external PostgreSQL server. To revert to Replit's built-in database,
+                    remove the <code className="bg-emerald-100 dark:bg-emerald-900/40 px-1 rounded">DATABASE_URL</code> secret from Replit Secrets.
+                  </div>
+                )}
+              </>
             )}
           </div>
 
