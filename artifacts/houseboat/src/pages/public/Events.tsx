@@ -242,12 +242,12 @@ export default function Events() {
           <div className="text-center py-20 text-muted-foreground">
             <p className="text-lg">Events coming soon — please reach out to us directly to discuss your event.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-              <Button onClick={() => openInquiry()} className="gap-2">
+              <Button onClick={() => openInquiry()} className="w-full sm:w-auto gap-2">
                 <Users className="w-4 h-4" /> Send Inquiry
               </Button>
               {whatsappNumber && (
-                <a href={buildWhatsAppUrl(whatsappNumber, "an event")} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" className="gap-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white">
+                <a href={buildWhatsAppUrl(whatsappNumber, "an event")} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full gap-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white">
                     <MessageCircle className="w-4 h-4" /> WhatsApp Us
                   </Button>
                 </a>
