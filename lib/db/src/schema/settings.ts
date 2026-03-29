@@ -33,6 +33,14 @@ export const settingsTable = pgTable("settings", {
   chatWidgetAlignment: text("chat_widget_alignment").notNull().default("right"),
   showWhatsappButton: text("show_whatsapp_button").notNull().default("true"),
   locationMapUrl: text("location_map_url"),
+  dbType: text("db_type").notNull().default("postgresql"),
+  dbHost: text("db_host").notNull().default(""),
+  dbPort: text("db_port").notNull().default("3306"),
+  dbName: text("db_name").notNull().default(""),
+  dbUser: text("db_user").notNull().default(""),
+  dbPass: text("db_pass").notNull().default(""),
+  deployDomain: text("deploy_domain").notNull().default(""),
+  uploadRootPath: text("upload_root_path").notNull().default("/home/youruser/public_html/uploads"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

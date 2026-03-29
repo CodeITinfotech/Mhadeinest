@@ -11,14 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
-  Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid
+  Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid,
+  Database, FolderOpen, FolderTree, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
 
-type Tab = "site" | "email" | "profile";
+type Tab = "site" | "email" | "profile" | "deployment";
 
 const ALL_NAV_ITEMS = [
   { key: "Home",       href: "/" },
@@ -141,6 +142,18 @@ export default function AdminSettings() {
   const [showWhatsappButton, setShowWhatsappButton] = useState(true);
   const [widgetSaving, setWidgetSaving] = useState(false);
 
+  // ── Deployment settings state ───────────────────────────────────────────
+  const [dbType, setDbType] = useState<"postgresql" | "mysql">("postgresql");
+  const [dbHost, setDbHost] = useState("localhost");
+  const [dbPort, setDbPort] = useState("3306");
+  const [dbName, setDbName] = useState("");
+  const [dbUser, setDbUser] = useState("");
+  const [dbPass, setDbPass] = useState("");
+  const [showDbPass, setShowDbPass] = useState(false);
+  const [deployDomain, setDeployDomain] = useState("");
+  const [uploadRootPath, setUploadRootPath] = useState("/home/youruser/public_html/uploads");
+  const [deploySaving, setDeploySaving] = useState(false);
+
   // ── Site settings form ─────────────────────────────────────────────────
   const updateMutation = useUpdateSettings({
     mutation: {
@@ -179,6 +192,15 @@ export default function AdminSettings() {
       setChatWidgetColor((settings as any).chatWidgetColor || "#10b981");
       setChatWidgetAlignment(((settings as any).chatWidgetAlignment === "left" ? "left" : "right") as "left" | "right");
       setShowWhatsappButton((settings as any).showWhatsappButton !== "false");
+      // Deployment settings
+      setDbType(((settings as any).dbType === "mysql" ? "mysql" : "postgresql") as "postgresql" | "mysql");
+      setDbHost((settings as any).dbHost || "localhost");
+      setDbPort((settings as any).dbPort || "3306");
+      setDbName((settings as any).dbName || "");
+      setDbUser((settings as any).dbUser || "");
+      setDbPass((settings as any).dbPass || "");
+      setDeployDomain((settings as any).deployDomain || "");
+      setUploadRootPath((settings as any).uploadRootPath || "/home/youruser/public_html/uploads");
     }
   }, [settings]);
 
@@ -416,16 +438,55 @@ export default function AdminSettings() {
     }
   };
 
+  const saveDeploymentSettings = async () => {
+    setDeploySaving(true);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          dbType,
+          dbHost,
+          dbPort,
+          dbName,
+          dbUser,
+          dbPass,
+          deployDomain,
+          uploadRootPath,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      toast({ title: "Saved", description: "Deployment settings updated successfully." });
+    } catch {
+      toast({ title: "Error", description: "Could not save deployment settings.", variant: "destructive" });
+    } finally {
+      setDeploySaving(false);
+    }
+  };
+
+  const IMAGE_FOLDERS = [
+    { name: "gallery",     label: "Gallery images" },
+    { name: "packages",    label: "Package images" },
+    { name: "blog",        label: "Blog post images" },
+    { name: "events",      label: "Event images" },
+    { name: "activities",  label: "Activity images" },
+    { name: "awards",      label: "Award / recognition images" },
+    { name: "site",        label: "Logo, hero & about images" },
+  ];
+
   const tabs = [
     { key: "site" as Tab, label: "Site Settings", icon: Globe },
     { key: "email" as Tab, label: "Email Settings", icon: Mail },
     { key: "profile" as Tab, label: "Admin Profile", icon: User },
+    { key: "deployment" as Tab, label: "Deployment", icon: Server },
   ];
 
   return (
     <div className="max-w-4xl space-y-6">
       {/* Tab bar */}
-      <div className="flex gap-1 bg-muted p-1 rounded-xl w-fit">
+      <div className="flex gap-1 bg-muted p-1 rounded-xl overflow-x-auto w-full sm:w-fit [&::-webkit-scrollbar]:hidden">
         {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -1038,6 +1099,217 @@ export default function AdminSettings() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── DEPLOYMENT TAB ────────────────────────────────────────────── */}
+      {activeTab === "deployment" && (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-bold">Deployment Configuration</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">Configure your database, domain, and image storage for self-hosting on your own server.</p>
+          </div>
+
+          {/* ── Database type ───────────────────────────────────────── */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Database className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Database</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">Select the database engine you are using on your hosting server.</p>
+
+            {/* Type selector cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(["postgresql", "mysql"] as const).map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setDbType(type)}
+                  className={cn(
+                    "flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all",
+                    dbType === type
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/40 hover:bg-muted/40"
+                  )}
+                >
+                  <div className={cn(
+                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5",
+                    dbType === type ? "border-primary" : "border-muted-foreground/40"
+                  )}>
+                    {dbType === type && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">
+                      {type === "postgresql" ? "PostgreSQL" : "MySQL"}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {type === "postgresql"
+                        ? "Replit-managed PostgreSQL (current setup)"
+                        : "External MySQL / cPanel database"}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* PostgreSQL info box */}
+            {dbType === "postgresql" && (
+              <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+                <CheckCircle className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
+                <div>
+                  <p className="font-semibold">Using Replit PostgreSQL</p>
+                  <p className="mt-0.5 text-blue-700">The application is connected automatically via the <code className="bg-blue-100 px-1 rounded">DATABASE_URL</code> environment variable. No credentials needed here.</p>
+                </div>
+              </div>
+            )}
+
+            {/* MySQL credential fields */}
+            {dbType === "mysql" && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <Field label="Database Host">
+                  <Input
+                    placeholder="localhost or your cPanel host"
+                    value={dbHost}
+                    onChange={e => setDbHost(e.target.value)}
+                  />
+                </Field>
+                <Field label="Port">
+                  <Input
+                    placeholder="3306"
+                    value={dbPort}
+                    onChange={e => setDbPort(e.target.value)}
+                  />
+                </Field>
+                <Field label="Database Name">
+                  <Input
+                    placeholder="e.g. cpanelusername_houseboatdb"
+                    value={dbName}
+                    onChange={e => setDbName(e.target.value)}
+                  />
+                </Field>
+                <Field label="Database Username">
+                  <Input
+                    placeholder="e.g. cpanelusername_dbuser"
+                    value={dbUser}
+                    onChange={e => setDbUser(e.target.value)}
+                  />
+                </Field>
+                <Field label="Database Password" className="sm:col-span-2">
+                  <div className="relative">
+                    <Input
+                      type={showDbPass ? "text" : "password"}
+                      placeholder="Your database password"
+                      value={dbPass}
+                      onChange={e => setDbPass(e.target.value)}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowDbPass(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showDbPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </Field>
+
+                {/* Generated connection string preview */}
+                {dbHost && dbName && dbUser && (
+                  <div className="sm:col-span-2 bg-muted rounded-lg p-3 text-xs font-mono text-muted-foreground break-all">
+                    mysql://{dbUser}:{dbPass ? "••••••" : "<password>"}@{dbHost}:{dbPort}/{dbName}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Domain ──────────────────────────────────────────────── */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <Globe className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Application Domain</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">The URL where your houseboat website will be publicly accessible.</p>
+            <Field label="Domain URL">
+              <Input
+                placeholder="https://yourdomain.com"
+                value={deployDomain}
+                onChange={e => setDeployDomain(e.target.value)}
+              />
+            </Field>
+            {deployDomain && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-lg px-3 py-2">
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                Public site: <span className="font-medium text-foreground ml-1">{deployDomain.replace(/\/$/, "")}/</span>
+              </div>
+            )}
+          </div>
+
+          {/* ── Image storage ───────────────────────────────────────── */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border">
+              <FolderTree className="w-4 h-4 text-primary" />
+              <h3 className="font-bold text-base">Image Storage Path</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The root folder on your server where uploaded images will be stored. On cPanel this is usually inside <code className="bg-muted px-1.5 py-0.5 rounded text-xs">public_html</code>.
+            </p>
+            <Field label="Upload Root Folder (absolute path on server)">
+              <Input
+                placeholder="/home/youruser/public_html/uploads"
+                value={uploadRootPath}
+                onChange={e => setUploadRootPath(e.target.value)}
+              />
+            </Field>
+
+            {/* Live folder tree preview */}
+            {uploadRootPath && (
+              <div className="mt-2">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Folder structure preview</p>
+                <div className="bg-muted rounded-xl p-4 font-mono text-xs space-y-1 text-muted-foreground">
+                  <div className="flex items-center gap-1.5 text-foreground font-semibold">
+                    <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                    {uploadRootPath.replace(/\/$/, "")}/
+                  </div>
+                  {IMAGE_FOLDERS.map((folder, idx) => {
+                    const isLast = idx === IMAGE_FOLDERS.length - 1;
+                    return (
+                      <div key={folder.name} className="flex items-center gap-1.5 pl-4">
+                        <span className="text-border select-none">{isLast ? "└─" : "├─"}</span>
+                        <FolderOpen className="w-3 h-3 text-amber-400 shrink-0" />
+                        <span className="text-foreground">{folder.name}/</span>
+                        <span className="text-muted-foreground/60 ml-1">← {folder.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Full path example */}
+                <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs">
+                  <p className="text-xs font-semibold text-primary mb-1">Example — a gallery image will be saved as:</p>
+                  <code className="text-foreground break-all">
+                    {uploadRootPath.replace(/\/$/, "")}/gallery/IMG_20240101_001.jpg
+                  </code>
+                  {deployDomain && (
+                    <>
+                      <p className="text-xs font-semibold text-primary mt-2 mb-1">And accessed publicly at:</p>
+                      <code className="text-foreground break-all">
+                        {deployDomain.replace(/\/$/, "")}/uploads/gallery/IMG_20240101_001.jpg
+                      </code>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Save button ─────────────────────────────────────────── */}
+          <div className="flex justify-end">
+            <Button onClick={saveDeploymentSettings} disabled={deploySaving} className="gap-2">
+              {deploySaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Deployment Settings
+            </Button>
+          </div>
         </div>
       )}
     </div>
