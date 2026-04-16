@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Goa Houseboat"
+title = "Mhadeinest"
 version = "1.0.0"
 id = "artifacts/houseboat"
 router = "path"
