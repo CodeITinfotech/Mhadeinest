@@ -76,7 +76,7 @@ export default function Events() {
           <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Host With Us</p>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-primary mb-6">Events on the Water</h1>
           <p className="text-lg text-muted-foreground">
-            Celebrate life's most precious moments aboard Shubhangi The Boat House. From intimate anniversaries to grand family gatherings — we make every occasion unforgettable.
+            Celebrate life's most precious moments aboard Mhadeinest. From intimate anniversaries to grand family gatherings — we make every occasion unforgettable.
           </p>
         </div>
 

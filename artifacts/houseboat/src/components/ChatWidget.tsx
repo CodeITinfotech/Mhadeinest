@@ -213,7 +213,7 @@ export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidge
                 <MessageCircle className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm leading-tight">Shubhangi The Boat House</p>
+                <p className="font-bold text-sm leading-tight">Mhadeinest</p>
                 <p className="text-[11px] text-white/70 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-300 inline-block"></span>
                   Online · Usually replies quickly
@@ -233,7 +233,7 @@ export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidge
                 </div>
                 <div className="flex-1">
                   <div className="bg-muted rounded-2xl rounded-tl-sm px-3 py-2 text-sm text-foreground inline-block max-w-[85%]">
-                    <p className="font-medium">👋 Hello! Welcome to Shubhangi The Boat House.</p>
+                    <p className="font-medium">👋 Hello! Welcome to Mhadeinest.</p>
                     <p className="mt-1 text-muted-foreground text-xs">How can we help you today? Choose a question below or type your own.</p>
                   </div>
                 </div>

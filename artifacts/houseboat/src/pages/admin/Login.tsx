@@ -24,7 +24,7 @@ export default function AdminLogin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const loginMutation = useAdminLogin();
-  const [siteName, setSiteName] = useState("Shubhangi The Boat House");
+  const [siteName, setSiteName] = useState("Mhadeinest");
   const [siteLogo, setSiteLogo] = useState<string | null>(null);
 
   useEffect(() => {

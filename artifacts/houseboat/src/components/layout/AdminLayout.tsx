@@ -30,7 +30,7 @@ const ADMIN_LINKS = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { isAuthenticated, isLoading, logout } = useAdminAuth();
-  const [siteName, setSiteName] = useState("Shubhangi The Boat House");
+  const [siteName, setSiteName] = useState("Mhadeinest");
   const [siteLogo, setSiteLogo] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

@@ -74,7 +74,7 @@ export default function About() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Shubhangi The Boat House Location"
+                  title="Mhadeinest Location"
                 />
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">

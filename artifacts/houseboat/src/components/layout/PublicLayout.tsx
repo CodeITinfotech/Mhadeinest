@@ -137,18 +137,14 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           >
             <img
               src={logo}
-              alt="Shubhangi The Boat House"
+              alt="Mhadeinest"
               className="h-10 w-auto object-contain transition-all duration-300 drop-shadow-md"
             />
             <div className="flex flex-col leading-tight">
               <span className={cn(
                 "font-display font-bold text-base transition-colors",
                 isScrolled || location !== "/" ? "text-primary" : "text-white drop-shadow"
-              )}>Shubhangi</span>
-              <span className={cn(
-                "font-display text-[11px] font-medium tracking-wide transition-colors",
-                isScrolled || location !== "/" ? "text-muted-foreground" : "text-white/80 drop-shadow"
-              )}>The Boat House</span>
+              )}>Mhadeinest</span>
             </div>
           </a>
 
@@ -267,12 +263,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3 mb-6">
               <img
                 src={logo}
-                alt="Shubhangi The Boat House"
+                alt="Mhadeinest"
                 className="h-14 w-auto object-contain drop-shadow-lg"
               />
               <div>
-                <p className="font-display font-bold text-xl text-white leading-tight">Shubhangi</p>
-                <p className="font-display text-sm text-secondary font-semibold tracking-wider">The Boat House</p>
+                <p className="font-display font-bold text-xl text-white leading-tight">Mhadeinest</p>
               </div>
             </div>
             <p className="text-primary-foreground/70 mb-6">

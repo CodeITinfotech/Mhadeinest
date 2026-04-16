@@ -501,7 +501,7 @@ export default function AdminSettings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `shubhangi_boathouse_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
+      a.download = `mhadeinest_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -523,7 +523,7 @@ export default function AdminSettings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `shubhangi_boathouse_database_backup_${new Date().toISOString().slice(0, 10)}.zip`;
+      a.download = `mhadeinest_database_backup_${new Date().toISOString().slice(0, 10)}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -658,7 +658,7 @@ export default function AdminSettings() {
                   <h3 className="font-bold text-base border-b border-border pb-3">General & Page Name</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <Field label="Page / Site Name" className="md:col-span-2">
-                      <Input {...siteForm.register("siteName")} placeholder="e.g. Shubhangi Floating House Boat" />
+                      <Input {...siteForm.register("siteName")} placeholder="e.g. Mhadeinest" />
                       <p className="text-xs text-muted-foreground mt-1">This sets the browser tab title and the site name shown in the footer.</p>
                     </Field>
                     <Field label="Tagline (Footer)"><Input {...siteForm.register("tagline")} /></Field>
@@ -971,7 +971,7 @@ export default function AdminSettings() {
               </Field>
               <Field label="From Name / Email" className="sm:col-span-2">
                 <Input
-                  placeholder="Shubhangi The Boat House <noreply@yourdomain.com>"
+                  placeholder="Mhadeinest <noreply@yourdomain.com>"
                   value={smtpForm.smtpFrom}
                   onChange={e => setSmtpForm(f => ({ ...f, smtpFrom: e.target.value }))}
                 />
