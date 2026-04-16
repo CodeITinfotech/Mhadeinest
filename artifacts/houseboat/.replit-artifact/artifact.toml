@@ -17,15 +17,6 @@ localPort = 5173
 [services.development]
 run = "pnpm --filter @workspace/houseboat run dev"
 
-[services.production]
-build = [ "pnpm", "--filter", "@workspace/houseboat", "run", "build" ]
-publicDir = "artifacts/houseboat/dist/public"
-serve = "static"
-
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
-
 [services.env]
 PORT = "5173"
 BASE_PATH = "/"
