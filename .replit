@@ -46,13 +46,13 @@ waitForPort = 8080
 name = "artifacts/houseboat: web"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/houseboat run dev"
 waitForPort = 5173
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [agent]
 stack = "PNPM_WORKSPACE"
