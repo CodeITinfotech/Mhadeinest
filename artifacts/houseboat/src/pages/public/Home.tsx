@@ -67,7 +67,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <img
             src={heroImage}
-            alt="Goa Houseboat Hero"
+            alt="Mhadeinest Hero"
             className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/75" />
@@ -89,7 +89,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-base md:text-lg text-white/85 mb-5 font-light drop-shadow-md max-w-xl mx-auto"
           >
-            {settings?.heroSubtitle || "Experience the serene backwaters of Goa in our premium 3-bedroom wooden houseboat."}
+            {settings?.heroSubtitle || "Experience the serene backwaters of Goa with Mhadeinest — luxury, comfort, and nature in perfect harmony."}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,7 @@ export default function Home() {
               A Floating Paradise in the Heart of Goa
             </h3>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              {settings?.aboutText ? settings.aboutText.substring(0, 250) + "..." : "Immerse yourself in the tranquility of Goa's backwaters. Our premium wooden houseboat offers an unparalleled blend of traditional charm and modern luxury. With three exquisitely designed bedrooms, a rooftop restaurant, and thrilling water activities, your perfect getaway awaits."}
+              {settings?.aboutText ? settings.aboutText.substring(0, 250) + "..." : "Immerse yourself in the tranquility of Goa's backwaters with Mhadeinest. We offer an unparalleled blend of traditional charm and modern luxury — three exquisitely designed bedrooms, a rooftop restaurant, and thrilling water activities await."}
             </p>
             <Link href="/about">
               <Button variant="outline" className="rounded-full px-8">Read Our Story</Button>
@@ -195,7 +195,7 @@ export default function Home() {
             <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
               <img 
                 src={`${import.meta.env.BASE_URL}images/about.png`} 
-                alt="Houseboat exterior" 
+                alt="Mhadeinest exterior" 
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -279,7 +279,7 @@ export default function Home() {
             >
               <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Got Questions?</p>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-primary leading-tight">
-                Frequently Asked Questions About the<br className="hidden sm:block" /> Goan Houseboat Trip
+                Frequently Asked Questions About<br className="hidden sm:block" /> Mhadeinest
               </h2>
             </motion.div>
 

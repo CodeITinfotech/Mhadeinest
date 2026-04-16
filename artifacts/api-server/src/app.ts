@@ -67,7 +67,7 @@ if (process.env.NODE_ENV === "production") {
 
     proxy.on("error", (_err) => {
       if (!res.headersSent) {
-        res.status(502).send("Vite dev server not reachable. Make sure the houseboat workflow is running.");
+        res.status(502).send("Vite dev server not reachable. Make sure the Mhadeinest workflow is running.");
       }
     });
 

@@ -220,7 +220,7 @@ export default function AdminSettings() {
       }
     });
     // Also update the page title immediately
-    document.title = `${data.siteName} | Luxury Houseboat Experience in Goa`;
+    document.title = `${data.siteName} | Mhadeinest`;
   };
 
   // ── Logo handlers ───────────────────────────────────────────────────────
@@ -1252,7 +1252,7 @@ export default function AdminSettings() {
                 </Field>
                 <Field label="Database Name">
                   <Input
-                    placeholder="e.g. cpanelusername_houseboatdb"
+                    placeholder="e.g. cpanelusername_mhadeinestdb"
                     value={dbName}
                     onChange={e => setDbName(e.target.value)}
                   />
@@ -1299,7 +1299,7 @@ export default function AdminSettings() {
               <Globe className="w-4 h-4 text-primary" />
               <h3 className="font-bold text-base">Application Domain</h3>
             </div>
-            <p className="text-sm text-muted-foreground">The URL where your houseboat website will be publicly accessible.</p>
+            <p className="text-sm text-muted-foreground">The URL where your Mhadeinest website will be publicly accessible.</p>
             <Field label="Domain URL">
               <Input
                 placeholder="https://yourdomain.com"

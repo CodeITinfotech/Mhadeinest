@@ -4,7 +4,7 @@ import { useListGallery } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
-const CATEGORIES = ["All", "Houseboat", "Dining", "Activities", "Guests"];
+const CATEGORIES = ["All", "Mhadeinest", "Dining", "Activities", "Guests"];
 
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState("All");

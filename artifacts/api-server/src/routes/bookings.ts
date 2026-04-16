@@ -92,7 +92,7 @@ router.get("/bookings/availability", async (req, res) => {
       res.status(400).json({ error: "Provide a valid date (YYYY-MM-DD)" });
       return;
     }
-    const MAX_GUESTS = 12; // max adults the houseboat can hold
+    const MAX_GUESTS = 12; // max adults Mhadeinest can hold
     const bookings = await db
       .select()
       .from(bookingsTable)

@@ -60,7 +60,7 @@ export async function sendInquiryEmail(data: InquiryEmailData): Promise<{ sent: 
 <div class="wrapper">
   <div class="header">
     <h1>New Inquiry Received</h1>
-    <p>${siteName || "Shubhangi The Boat House"}</p>
+    <p>${siteName || "Mhadeinest"}</p>
     <span class="badge">NEW INQUIRY</span>
   </div>
   <div class="body">
@@ -83,7 +83,7 @@ export async function sendInquiryEmail(data: InquiryEmailData): Promise<{ sent: 
 
     ${data.whatsapp || data.phone ? `
     <div class="cta">
-      <a href="https://wa.me/${(data.whatsapp || data.phone).replace(/\D/g, "")}?text=Hi+${encodeURIComponent(data.name)}%2C+thank+you+for+your+inquiry+about+our+houseboat!">
+      <a href="https://wa.me/${(data.whatsapp || data.phone).replace(/\D/g, "")}?text=Hi+${encodeURIComponent(data.name)}%2C+thank+you+for+your+inquiry+about+Mhadeinest!">
         Reply on WhatsApp
       </a>
     </div>
@@ -98,7 +98,7 @@ export async function sendInquiryEmail(data: InquiryEmailData): Promise<{ sent: 
       from: smtpFrom || smtpUser,
       to: notifyEmail,
       replyTo: data.email,
-      subject: `New Inquiry from ${data.name} — ${siteName || "Shubhangi The Boat House"}`,
+      subject: `New Inquiry from ${data.name} — ${siteName || "Mhadeinest"}`,
       html,
     });
 

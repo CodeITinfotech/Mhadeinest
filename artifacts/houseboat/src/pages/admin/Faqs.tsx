@@ -21,12 +21,12 @@ interface Faq {
 const FAQS_KEY = ["admin-faqs"];
 
 const DEFAULT_FAQS = [
-  { question: "How can I book the overnight houseboat trip in Goa / Chapora river?", answer: "To book the overnight houseboat trip or Riceboat trip, you can just send me an email with your required dates and the number of pax and I will get back to you with the availability." },
+  { question: "How can I book a stay at Mhadeinest in Goa / Chapora river?", answer: "To book a stay at Mhadeinest or a Riceboat trip, you can just send me an email with your required dates and the number of pax and I will get back to you with the availability." },
   { question: "If I have booked the overnight Riceboat trip can it be cancelled?", answer: "Yes, cancellations are possible. Please contact us at least 48 hours before your scheduled trip for a full refund. Cancellations within 48 hours may be subject to a cancellation fee." },
   { question: "What is included in the price for the overnight Goan Rice boat trip?", answer: "The price includes accommodation for the night, all meals (dinner and breakfast), welcome drinks, and access to all onboard facilities. Water sports and additional activities are available at extra cost." },
-  { question: "Does the rooms in the Goan overnight boat trip include Air Conditioner?", answer: "Yes, all rooms on the houseboat are fully air-conditioned to ensure your comfort throughout the night." },
+  { question: "Does the rooms at Mhadeinest include Air Conditioner?", answer: "Yes, all rooms at Mhadeinest are fully air-conditioned to ensure your comfort throughout the night." },
   { question: "Can we include an extra person in a single room?", answer: "Yes, an extra mattress can be arranged in the room for an additional charge. Please inform us in advance so we can make the necessary arrangements." },
-  { question: "How much time does it take to reach from Candolim to the houseboat at Chapora?", answer: "It typically takes about 45 minutes to 1 hour to reach Chapora river from Candolim by road. We can also assist with arranging transportation if needed." },
+  { question: "How much time does it take to reach from Candolim to Mhadeinest at Chapora?", answer: "It typically takes about 45 minutes to 1 hour to reach Chapora river from Candolim by road. We can also assist with arranging transportation if needed." },
 ];
 
 export default function AdminFaqs() {
@@ -103,7 +103,7 @@ export default function AdminFaqs() {
   };
 
   const seedDefaults = async () => {
-    if (!confirm("This will add the 6 default FAQs based on common houseboat questions. Continue?")) return;
+    if (!confirm("This will add the 6 default FAQs for Mhadeinest. Continue?")) return;
     setSeeding(true);
     try {
       for (let i = 0; i < DEFAULT_FAQS.length; i++) {
@@ -222,7 +222,7 @@ export default function AdminFaqs() {
               <Input
                 value={form.question}
                 onChange={e => setForm(f => ({ ...f, question: e.target.value }))}
-                placeholder="e.g. How can I book the overnight houseboat trip?"
+                placeholder="e.g. How can I book a stay at Mhadeinest?"
                 className="mt-1"
                 required
               />

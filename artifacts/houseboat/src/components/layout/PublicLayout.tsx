@@ -102,7 +102,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   // Keep browser tab title in sync with site name
   useEffect(() => {
     if (settings?.siteName) {
-      document.title = `${settings.siteName} | Luxury Houseboat Experience in Goa`;
+      document.title = `${settings.siteName} | Mhadeinest`;
     }
   }, [settings?.siteName]);
 
@@ -115,7 +115,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   }, []);
 
   const whatsappLink = settings?.whatsappNumber 
-    ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}?text=Hello!%20I%20would%20like%20to%20inquire%20about%20the%20houseboat.`
+    ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}?text=Hello!%20I%20would%20like%20to%20inquire%20about%20Mhadeinest.`
     : "#";
 
   return (
@@ -310,7 +310,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           <div className="text-center md:text-left">
             <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Contact Us</h4>
             <div className="space-y-4 text-primary-foreground/80">
-              <p>Email: {settings?.inquiryEmail || "bookings@goahouseboat.com"}</p>
+              <p>Email: {settings?.inquiryEmail || "bookings@mhadeinest.com"}</p>
               <p>Phone: {settings?.whatsappNumber || "+91 98765 43210"}</p>
               <Link href="/admin/login" className="inline-block mt-8 text-sm opacity-50 hover:opacity-100 transition-opacity">
                 Admin Login
@@ -375,7 +375,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         )}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
-          © {new Date().getFullYear()} {settings?.siteName || "Goa Houseboat"}. All rights reserved.
+          © {new Date().getFullYear()} {settings?.siteName || "Mhadeinest"}. All rights reserved.
         </div>
       </footer>
 

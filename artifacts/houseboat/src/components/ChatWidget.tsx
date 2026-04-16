@@ -10,7 +10,7 @@ const QUICK_QUESTIONS = [
   "What are your package prices?",
   "What's included in the packages?",
   "How can I make a booking?",
-  "Is the houseboat available for my dates?",
+  "Is Mhadeinest available for my dates?",
   "What activities are available?",
   "Where are you located?",
 ];

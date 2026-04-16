@@ -348,7 +348,7 @@ export default function AdminInquiries() {
               {/* WhatsApp quick reply */}
               {(selected.whatsapp || selected.phone) && (
                 <a
-                  href={`https://wa.me/${(selected.whatsapp || selected.phone).replace(/\D/g, "")}?text=Hello%20${encodeURIComponent(selected.name)}%2C%20thank%20you%20for%20your%20inquiry%20about%20${encodeURIComponent(selected.packageService || "our houseboat")}!`}
+                  href={`https://wa.me/${(selected.whatsapp || selected.phone).replace(/\D/g, "")}?text=Hello%20${encodeURIComponent(selected.name)}%2C%20thank%20you%20for%20your%20inquiry%20about%20${encodeURIComponent(selected.packageService || "Mhadeinest")}!`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#25D366] text-white rounded-xl font-medium text-sm hover:bg-[#1da851] transition-colors"

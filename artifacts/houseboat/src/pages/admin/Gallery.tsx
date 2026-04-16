@@ -275,7 +275,7 @@ function ImageEditor({ state, onChange, onRemove }: ImageEditorProps) {
 
 // ─── Main AdminGallery page ────────────────────────────────────────────────
 
-const GALLERY_CATEGORIES = ["general", "houseboat", "dining", "activities", "guests"];
+const GALLERY_CATEGORIES = ["general", "mhadeinest", "dining", "activities", "guests"];
 
 export default function AdminGallery() {
   const { toast } = useToast();

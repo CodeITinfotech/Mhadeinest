@@ -29,7 +29,7 @@ router.get("/admin/export-sql", async (req, res): Promise<void> => {
   const type = req.query.type === "mysql" ? "mysql" : "postgresql";
   try {
     const sql = await generateSql(type);
-    const filename = `shubhangi_boathouse_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
+    const filename = `mhadeinest_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
     res.setHeader("Content-Type", "application/sql");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(sql);
@@ -55,16 +55,16 @@ router.get("/admin/export-zip", async (req, res): Promise<void> => {
 
     const zipBuf = createZipBuffer([
       {
-        name: `shubhangi_boathouse_postgresql_${dateStr}.sql`,
+        name: `mhadeinest_postgresql_${dateStr}.sql`,
         data: Buffer.from(pgSql, "utf8"),
       },
       {
-        name: `shubhangi_boathouse_mysql_${dateStr}.sql`,
+        name: `mhadeinest_mysql_${dateStr}.sql`,
         data: Buffer.from(mySql, "utf8"),
       },
     ]);
 
-    const filename = `shubhangi_boathouse_database_backup_${dateStr}.zip`;
+    const filename = `mhadeinest_database_backup_${dateStr}.zip`;
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.setHeader("Content-Length", zipBuf.length);

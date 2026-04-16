@@ -32,7 +32,7 @@ const QA: Record<string, string> = {
     "All packages include meals (breakfast, lunch & dinner), water activities, dedicated crew, and air-conditioned cabins. Check our Packages page for exact inclusions per package!",
   "How can I make a booking?":
     "Easy! You can book via WhatsApp by clicking the 'Book Now' button, or fill in our Inquiry form and we'll get back to you within a few hours. 🙌",
-  "Is the houseboat available for my dates?":
+  "Is Mhadeinest available for my dates?":
     "Please share your preferred dates and we'll check availability right away! You can also use the 'Check Availability' tool on our home page for an instant answer. 📅",
   "What activities are available?":
     "We offer kayaking, speed boating, fishing, sunset cruises, swimming, and more! Our Activities page has all the details. 🌊",

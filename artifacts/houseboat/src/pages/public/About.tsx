@@ -39,7 +39,7 @@ export default function About() {
           <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Find Us</p>
           <h1 className="text-4xl md:text-5xl font-display font-bold text-primary mb-6">Our Story & Location</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover the rich heritage of Goan backwaters aboard our meticulously crafted wooden houseboat.
+            Discover the rich heritage of Goan backwaters with Mhadeinest — a meticulously crafted floating experience.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function About() {
           >
             <h2 className="text-3xl font-display font-bold text-primary mb-6">The Floating Haven</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              {settings?.aboutText || "Built by master craftsmen using traditional methods, our houseboat represents a perfect synergy between cultural heritage and modern luxury. Cruising through the serene backwaters of Goa, it offers a unique vantage point to witness the vibrant local ecosystem and untouched natural beauty."}
+              {settings?.aboutText || "Built by master craftsmen using traditional methods, Mhadeinest represents a perfect synergy between cultural heritage and modern luxury. Cruising through the serene backwaters of Goa, it offers a unique vantage point to witness the vibrant local ecosystem and untouched natural beauty."}
             </p>
             <p className="text-muted-foreground leading-relaxed">
               We pride ourselves on offering a sustainable yet lavish experience. Our dedicated crew ensures your every need is met, from gourmet dining on the rooftop deck to guiding you through hidden waterways on kayaks.
@@ -101,14 +101,14 @@ export default function About() {
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                title="Houseboat trail video"
+                title="Mhadeinest trail video"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center flex-col text-white/50">
                 <img
                   src={`${import.meta.env.BASE_URL}images/about.png`}
                   className="absolute inset-0 w-full h-full object-cover opacity-50"
-                  alt="Houseboat"
+                  alt="Mhadeinest"
                 />
                 <div className="z-10 bg-black/60 p-6 rounded-full backdrop-blur-sm border border-white/20">
                   <Play className="w-12 h-12 text-white ml-1" fill="currentColor" />
