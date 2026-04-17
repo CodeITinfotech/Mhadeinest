@@ -217,9 +217,14 @@ export default function AdminSettings() {
       data: {
         ...data,
         aboutImages: data.aboutImages ? data.aboutImages.split(",").map(s => s.trim()) : [],
+        // Nav & widget state merged into the same save
+        navHiddenItems: hiddenItems,
+        showChatWidget: showChatWidget ? "true" : "false",
+        chatWidgetColor,
+        chatWidgetAlignment,
+        showWhatsappButton: showWhatsappButton ? "true" : "false",
       }
     });
-    // Also update the page title immediately
     document.title = `${data.siteName} | Mhadeinest`;
   };
 
@@ -584,7 +589,7 @@ export default function AdminSettings() {
             </div>
             <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2">
               {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Save Changes
+              {updateMutation.isPending ? "Saving…" : "Save Settings"}
             </Button>
           </div>
 
@@ -704,15 +709,9 @@ export default function AdminSettings() {
 
               {/* ── NAV MENU CONFIG ──────────────────────────────────── */}
               <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <Menu className="w-4 h-4 text-primary" />
-                    <h3 className="font-bold text-base">Navigation Menu</h3>
-                  </div>
-                  <Button size="sm" className="gap-2" onClick={saveNavMenu} disabled={navSaving}>
-                    {navSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {navSaving ? "Saving…" : "Save Menu"}
-                  </Button>
+                <div className="flex items-center gap-2 pb-3 border-b border-border">
+                  <Menu className="w-4 h-4 text-primary" />
+                  <h3 className="font-bold text-base">Navigation Menu</h3>
                 </div>
                 <p className="text-xs text-muted-foreground">Toggle which pages appear in the public navigation bar. Hidden pages are still accessible via direct URL.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -762,15 +761,9 @@ export default function AdminSettings() {
 
               {/* ── Widget Visibility ─────────────────────────────────────── */}
               <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <LayoutGrid className="w-4 h-4 text-primary" />
-                    <h3 className="font-bold text-base">Floating Widget Visibility</h3>
-                  </div>
-                  <Button size="sm" onClick={saveWidgets} disabled={widgetSaving} className="gap-2">
-                    {widgetSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                    Save
-                  </Button>
+                <div className="flex items-center gap-2 pb-3 border-b border-border">
+                  <LayoutGrid className="w-4 h-4 text-primary" />
+                  <h3 className="font-bold text-base">Floating Widget Visibility</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">Toggle whether the chat bubble and WhatsApp button appear on the public site, and customise the chat widget appearance.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -878,6 +871,13 @@ export default function AdminSettings() {
                 </div>
               </div>
 
+              {/* ── Bottom Save ─────────────────────────────────────── */}
+              <div className="flex justify-end pt-2 pb-4">
+                <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2 px-8">
+                  {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {updateMutation.isPending ? "Saving…" : "Save Settings"}
+                </Button>
+              </div>
             </div>
           )}
         </>
