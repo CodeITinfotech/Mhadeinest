@@ -90,15 +90,15 @@ async function getBotReply(message: string): Promise<string | null> {
       const list = pkgs
         .map(p => `• *${p.name}* — ₹${Number(p.pricePerNight || 0).toLocaleString("en-IN")}/night (up to ${p.capacity} guests)`)
         .join("\n");
-      return `Here are our current packages:\n\n${list}\n\nEach package includes meals, crew, and cabin. Visit our Packages page for full details! 🛥️`;
+      return `Here are our current packages at ${siteName}:\n\n${list}\n\nAll packages include meals and accommodation. Visit our Packages page for full details! 🌿`;
     }
   }
 
   // Activity query
-  if (/activit|kayak|boat|swim|fish|water sport|adventure|what can|things to do/.test(msg)) {
+  if (/activit|trek|hike|nature|bird|forest|walk|camp|outdoor|adventure|what can|things to do/.test(msg)) {
     if (acts.length > 0) {
       const list = acts.map(a => `${a.icon || "•"} ${a.name}`).join("\n");
-      return `We offer a great range of activities:\n\n${list}\n\nMost are included in our packages. Ask us to know more! 🌊`;
+      return `We offer a wonderful range of nature experiences:\n\n${list}\n\nMost are included in our packages. Ask us to know more! 🌳`;
     }
   }
 
@@ -107,14 +107,14 @@ async function getBotReply(message: string): Promise<string | null> {
     const wa = cfg?.whatsappNumber;
     if (wa) {
       const waLink = `https://wa.me/${wa.replace(/\D/g, "")}`;
-      return `Booking is easy! You can:\n\n👉 [WhatsApp us directly](${waLink})\n📝 Or use the Inquiry form on our website\n\nWe usually confirm within a few hours. 🙌`;
+      return `Booking at ${siteName} is easy! You can:\n\n👉 [WhatsApp us directly](${waLink})\n📝 Or use the Inquiry form on our website\n\nWe usually confirm within a few hours. 🙌`;
     }
-    return "To make a booking, please use the Inquiry form on our website or reach out via WhatsApp. We'll confirm within a few hours!";
+    return `To book your stay at ${siteName}, please use the Inquiry form on our website or reach out via WhatsApp. We'll confirm within a few hours!`;
   }
 
   // Location query
   if (/locat|where|address|map|reach|direction|near|place|find you/.test(msg)) {
-    return `${siteName} is based on ${location}. We'll share the exact pickup point once your booking is confirmed. 📍`;
+    return `${siteName} is nestled in ${location}. We'll share the exact directions and resort location once your booking is confirmed. 📍`;
   }
 
   // Contact query
@@ -124,17 +124,17 @@ async function getBotReply(message: string): Promise<string | null> {
     const parts = [];
     if (wa) parts.push(`📱 WhatsApp / Call: ${wa}`);
     if (email) parts.push(`📧 Email: ${email}`);
-    if (parts.length) return `You can reach us at:\n\n${parts.join("\n")}\n\nWe're available 9am–8pm IST every day!`;
+    if (parts.length) return `You can reach the ${siteName} team at:\n\n${parts.join("\n")}\n\nWe're available 9am–8pm IST every day!`;
   }
 
   // Greeting
   if (/^(hi|hello|hey|good morning|good afternoon|good evening|namaste|hola)/.test(msg)) {
-    return `Hello! 👋 Welcome to ${siteName}. How can I help you today? Feel free to ask about our packages, activities, bookings, or location!`;
+    return `Hello! 👋 Welcome to ${siteName} — your Nature Nest getaway. How can I help you today? Feel free to ask about our packages, activities, bookings, or location!`;
   }
 
   // Thank you
   if (/thank|thanks|thx|ty|great|awesome|perfect|wonderful/.test(msg)) {
-    return `You're most welcome! 😊 Is there anything else I can help you with? We're here to make your stay unforgettable!`;
+    return `You're most welcome! 😊 Is there anything else I can help you with? We're here to make your nature retreat truly unforgettable! 🌿`;
   }
 
   return null; // No match → caller will use fallback
@@ -153,7 +153,7 @@ function buildFallback(cfg: { whatsappNumber?: string | null; inquiryEmail?: str
   if (wa) lines.push(`📞 Call / WhatsApp: ${wa}`);
   if (waLink) lines.push(`👉 [Chat on WhatsApp](${waLink})`);
   if (email) lines.push(`📧 Email: ${email}`);
-  lines.push("", "We're available 9am–8pm IST and usually respond within minutes! 🛥️");
+  lines.push("", "We're available 9am–8pm IST and usually respond within minutes! 🌿");
 
   return lines.join("\n");
 }
