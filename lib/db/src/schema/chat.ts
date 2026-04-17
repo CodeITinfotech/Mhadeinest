@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 
 export const chatSessionsTable = pgTable("chat_sessions", {
   id: serial("id").primaryKey(),
@@ -17,5 +17,15 @@ export const chatMessagesTable = pgTable("chat_messages", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const chatTrainingTable = pgTable("chat_training", {
+  id: serial("id").primaryKey(),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type ChatSession = typeof chatSessionsTable.$inferSelect;
 export type ChatMessage = typeof chatMessagesTable.$inferSelect;
+export type ChatTraining = typeof chatTrainingTable.$inferSelect;
