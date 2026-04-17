@@ -54,6 +54,7 @@ const siteSchema = z.object({
   heroTitle: z.string(),
   heroSubtitle: z.string(),
   heroImage: z.string(),
+  heroLocationTag: z.string(),
   whatsappNumber: z.string(),
   inquiryEmail: z.string().email(),
   socialInstagram: z.string().optional(),
@@ -64,7 +65,27 @@ const siteSchema = z.object({
   trailDescription: z.string(),
   locationMapUrl: z.string().optional(),
   aboutText: z.string(),
+  aboutStoryTitle: z.string(),
+  aboutStoryParagraph2: z.string(),
+  mapDescription: z.string(),
   aboutImages: z.string(),
+  exploreLabel: z.string(),
+  exploreTitle: z.string(),
+  exploreSubtitle: z.string(),
+  welcomeLabel: z.string(),
+  welcomeTitle: z.string(),
+  welcomeRatingText: z.string(),
+  welcomeReviewText: z.string(),
+  welcomeReviewAttribution: z.string(),
+  welcomeImage: z.string(),
+  packagesLabel: z.string(),
+  packagesTitle: z.string(),
+  galleryLabel: z.string(),
+  galleryTitle: z.string(),
+  bannerLabel: z.string(),
+  bannerTitle: z.string(),
+  bannerDescription: z.string(),
+  bannerImage: z.string(),
 });
 
 const profileSchema = z.object({
@@ -182,6 +203,7 @@ export default function AdminSettings() {
         heroTitle: settings.heroTitle,
         heroSubtitle: settings.heroSubtitle,
         heroImage: settings.heroImage,
+        heroLocationTag: (settings as any).heroLocationTag || "Mandovi River, Goa",
         whatsappNumber: settings.whatsappNumber,
         inquiryEmail: settings.inquiryEmail,
         socialInstagram: settings.socialInstagram || "",
@@ -192,7 +214,27 @@ export default function AdminSettings() {
         trailDescription: (settings as any).trailDescription || "Take a virtual tour of our regular cruise route. Watch as we navigate through mangroves, local fishing villages, and open waters.",
         locationMapUrl: (settings as any).locationMapUrl || "",
         aboutText: settings.aboutText,
+        aboutStoryTitle: (settings as any).aboutStoryTitle || "The Floating Haven",
+        aboutStoryParagraph2: (settings as any).aboutStoryParagraph2 || "We pride ourselves on offering a sustainable yet lavish experience. Our dedicated crew ensures your every need is met, from gourmet dining on the rooftop deck to guiding you through hidden waterways on kayaks.",
+        mapDescription: (settings as any).mapDescription || "Chapora River, North Goa — Click the map to get directions",
         aboutImages: settings.aboutImages?.join(", ") || "",
+        exploreLabel: (settings as any).exploreLabel || "Everything in One Place",
+        exploreTitle: (settings as any).exploreTitle || "Explore Mhadeinest's Backwater Experience",
+        exploreSubtitle: (settings as any).exploreSubtitle || "From your first sunrise over the Mandovi to a candle-lit rooftop dinner, every moment aboard Mhadeinest is thoughtfully curated. Choose your experience below.",
+        welcomeLabel: (settings as any).welcomeLabel || "Welcome Aboard",
+        welcomeTitle: (settings as any).welcomeTitle || "A Floating Paradise in the Heart of Goa",
+        welcomeRatingText: (settings as any).welcomeRatingText || "5.0 · 200+ stays",
+        welcomeReviewText: (settings as any).welcomeReviewText || "An unforgettable experience on the water.",
+        welcomeReviewAttribution: (settings as any).welcomeReviewAttribution || "Verified guest · Goa, 2024",
+        welcomeImage: (settings as any).welcomeImage || "",
+        packagesLabel: (settings as any).packagesLabel || "Our Offerings",
+        packagesTitle: (settings as any).packagesTitle || "Packages & Deals",
+        galleryLabel: (settings as any).galleryLabel || "A Glimpse Inside",
+        galleryTitle: (settings as any).galleryTitle || "Photo Gallery",
+        bannerLabel: (settings as any).bannerLabel || "The Mhadeinest Way",
+        bannerTitle: (settings as any).bannerTitle || "Experience Goa Like You Never Have Before",
+        bannerDescription: (settings as any).bannerDescription || "Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds.",
+        bannerImage: (settings as any).bannerImage || "",
       });
       setLogoPreview((settings as any).siteLogo || "");
       setHiddenItems((settings as any).navHiddenItems || []);
@@ -217,13 +259,12 @@ export default function AdminSettings() {
       data: {
         ...data,
         aboutImages: data.aboutImages ? data.aboutImages.split(",").map(s => s.trim()) : [],
-        // Nav & widget state merged into the same save
         navHiddenItems: hiddenItems,
         showChatWidget: showChatWidget ? "true" : "false",
         chatWidgetColor,
         chatWidgetAlignment,
         showWhatsappButton: showWhatsappButton ? "true" : "false",
-      }
+      } as any
     });
     document.title = `${data.siteName} | Mhadeinest`;
   };
@@ -660,15 +701,81 @@ export default function AdminSettings() {
               {/* ── GENERAL & HERO ───────────────────────────────────── */}
               <form className="space-y-6">
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
-                  <h3 className="font-bold text-base border-b border-border pb-3">General & Page Name</h3>
+                  <h3 className="font-bold text-base border-b border-border pb-3">General & Hero Section</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <Field label="Page / Site Name" className="md:col-span-2">
                       <Input {...siteForm.register("siteName")} placeholder="e.g. Mhadeinest" />
-                      <p className="text-xs text-muted-foreground mt-1">This sets the browser tab title and the site name shown in the footer.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Sets the browser tab title and the site name shown in the footer.</p>
                     </Field>
-                    <Field label="Tagline (Footer)"><Input {...siteForm.register("tagline")} /></Field>
-                    <Field label="Hero Title"><Input {...siteForm.register("heroTitle")} /></Field>
-                    <Field label="Hero Subtitle"><Input {...siteForm.register("heroSubtitle")} /></Field>
+                    <Field label="Tagline (Footer)" className="md:col-span-2"><Input {...siteForm.register("tagline")} /></Field>
+                    <Field label="Hero Title" className="md:col-span-2"><Input {...siteForm.register("heroTitle")} /></Field>
+                    <Field label="Hero Subtitle" className="md:col-span-2"><Input {...siteForm.register("heroSubtitle")} /></Field>
+                    <Field label="Hero Location Tag">
+                      <Input {...siteForm.register("heroLocationTag")} placeholder="Mandovi River, Goa" />
+                      <p className="text-xs text-muted-foreground mt-1">Small badge shown over the hero image (e.g. "Mandovi River, Goa")</p>
+                    </Field>
+                    <Field label="Hero Image URL">
+                      <Input {...siteForm.register("heroImage")} placeholder="https://... or /images/hero.png" />
+                      <p className="text-xs text-muted-foreground mt-1">Full-screen background image for the hero section</p>
+                    </Field>
+                  </div>
+                </div>
+
+                {/* ── EXPLORE SECTION ───────────────────────────────── */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">Homepage — Explore Section</h3>
+                  <Field label="Section Label">
+                    <Input {...siteForm.register("exploreLabel")} placeholder="Everything in One Place" />
+                    <p className="text-xs text-muted-foreground mt-1">Small uppercase label above the section title</p>
+                  </Field>
+                  <Field label="Section Title"><Input {...siteForm.register("exploreTitle")} placeholder="Explore Mhadeinest's Backwater Experience" /></Field>
+                  <Field label="Section Description"><Textarea {...siteForm.register("exploreSubtitle")} className="min-h-[80px]" placeholder="From your first sunrise over the Mandovi..." /></Field>
+                </div>
+
+                {/* ── WELCOME / ABOUT SECTION ───────────────────────── */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">Homepage — Welcome Section</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field label="Section Label"><Input {...siteForm.register("welcomeLabel")} placeholder="Welcome Aboard" /></Field>
+                    <Field label="Section Title"><Input {...siteForm.register("welcomeTitle")} placeholder="A Floating Paradise in the Heart of Goa" /></Field>
+                    <Field label="Rating Text">
+                      <Input {...siteForm.register("welcomeRatingText")} placeholder="5.0 · 200+ stays" />
+                      <p className="text-xs text-muted-foreground mt-1">Shown next to the 5-star row</p>
+                    </Field>
+                    <Field label="Section Image URL">
+                      <Input {...siteForm.register("welcomeImage")} placeholder="images/resort3.jpg" />
+                      <p className="text-xs text-muted-foreground mt-1">Image shown on the right side of the welcome block</p>
+                    </Field>
+                    <Field label="Review Quote" className="md:col-span-2"><Input {...siteForm.register("welcomeReviewText")} placeholder="An unforgettable experience on the water." /></Field>
+                    <Field label="Review Attribution"><Input {...siteForm.register("welcomeReviewAttribution")} placeholder="Verified guest · Goa, 2024" /></Field>
+                  </div>
+                </div>
+
+                {/* ── PACKAGES & GALLERY SECTIONS ───────────────────── */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">Homepage — Packages & Gallery Headings</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field label="Packages Label"><Input {...siteForm.register("packagesLabel")} placeholder="Our Offerings" /></Field>
+                    <Field label="Packages Title"><Input {...siteForm.register("packagesTitle")} placeholder="Packages & Deals" /></Field>
+                    <Field label="Gallery Label"><Input {...siteForm.register("galleryLabel")} placeholder="A Glimpse Inside" /></Field>
+                    <Field label="Gallery Title"><Input {...siteForm.register("galleryTitle")} placeholder="Photo Gallery" /></Field>
+                  </div>
+                  <p className="text-xs text-muted-foreground">The packages shown are managed in the Packages section. The gallery images shown on the home page are pulled automatically from the Gallery section.</p>
+                </div>
+
+                {/* ── BANNER SECTION ────────────────────────────────── */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-base border-b border-border pb-3">Homepage — Full-Width Banner</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <Field label="Banner Label"><Input {...siteForm.register("bannerLabel")} placeholder="The Mhadeinest Way" /></Field>
+                    <Field label="Banner Title"><Input {...siteForm.register("bannerTitle")} placeholder="Experience Goa Like You Never Have Before" /></Field>
+                    <Field label="Banner Image URL">
+                      <Input {...siteForm.register("bannerImage")} placeholder="images/activities.png" />
+                      <p className="text-xs text-muted-foreground mt-1">Background image behind the green overlay</p>
+                    </Field>
+                    <Field label="Banner Description" className="md:col-span-1">
+                      <Textarea {...siteForm.register("bannerDescription")} className="min-h-[80px]" placeholder="Wake up on the river. Kayak at sunrise..." />
+                    </Field>
                   </div>
                 </div>
 
@@ -703,7 +810,13 @@ export default function AdminSettings() {
                       Paste any YouTube URL — <code className="bg-muted px-1 rounded">watch?v=</code>, <code className="bg-muted px-1 rounded">youtu.be/</code>, or <code className="bg-muted px-1 rounded">youtube.com/shorts/</code> all work automatically.
                     </p>
                   </Field>
-                  <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
+                  <Field label="About Page — Story Title"><Input {...siteForm.register("aboutStoryTitle")} placeholder="The Floating Haven" /></Field>
+                  <Field label="About Page — Main Text (paragraph 1)"><Textarea {...siteForm.register("aboutText")} className="min-h-[120px]" /></Field>
+                  <Field label="About Page — Secondary Paragraph"><Textarea {...siteForm.register("aboutStoryParagraph2")} className="min-h-[100px]" /></Field>
+                  <Field label="Map Location Label">
+                    <Input {...siteForm.register("mapDescription")} placeholder="Chapora River, North Goa — Click the map to get directions" />
+                    <p className="text-xs text-muted-foreground mt-1">Caption shown below the embedded map</p>
+                  </Field>
                 </div>
               </form>
 

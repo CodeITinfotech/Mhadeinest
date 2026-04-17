@@ -69,12 +69,12 @@ export default function About() {
             viewport={{ once: true }}
             className="prose prose-lg text-muted-foreground"
           >
-            <h2 className="text-3xl font-display font-bold text-primary mb-6">The Floating Haven</h2>
+            <h2 className="text-3xl font-display font-bold text-primary mb-6">{(settings as any)?.aboutStoryTitle || "The Floating Haven"}</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
               {settings?.aboutText || "Built by master craftsmen using traditional methods, Mhadeinest represents a perfect synergy between cultural heritage and modern luxury. Cruising through the serene backwaters of Goa, it offers a unique vantage point to witness the vibrant local ecosystem and untouched natural beauty."}
             </p>
             <p className="text-muted-foreground leading-relaxed">
-              We pride ourselves on offering a sustainable yet lavish experience. Our dedicated crew ensures your every need is met, from gourmet dining on the rooftop deck to guiding you through hidden waterways on kayaks.
+              {(settings as any)?.aboutStoryParagraph2 || "We pride ourselves on offering a sustainable yet lavish experience. Our dedicated crew ensures your every need is met, from gourmet dining on the rooftop deck to guiding you through hidden waterways on kayaks."}
             </p>
           </motion.div>
 
@@ -97,7 +97,7 @@ export default function About() {
               </div>
               <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <Navigation className="w-4 h-4 text-primary shrink-0" />
-                <span>Chapora River, North Goa — Click the map to get directions</span>
+                <span>{(settings as any)?.mapDescription || "Chapora River, North Goa — Click the map to get directions"}</span>
               </div>
             </motion.div>
           )}

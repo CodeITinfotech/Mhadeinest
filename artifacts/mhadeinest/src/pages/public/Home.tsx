@@ -29,7 +29,7 @@ const EXPLORE_CATEGORIES = [
   { label: "The Resort", image: `${BASE}images/resort2.jpg`, href: "/about" },
 ];
 
-const GALLERY_IMAGES = [
+const FALLBACK_GALLERY = [
   `${BASE}images/gallery-1.jpg`,
   `${BASE}images/gallery-2.jpg`,
   `${BASE}images/gallery-3.jpg`,
@@ -37,6 +37,8 @@ const GALLERY_IMAGES = [
   `${BASE}images/gallery-5.jpg`,
   `${BASE}images/gallery-6.jpg`,
 ];
+
+interface GalleryItem { id: number; imageUrl: string; isActive: boolean; sortOrder: number; }
 
 export default function Home() {
   const { data: settings } = useGetSettings();
@@ -54,6 +56,21 @@ export default function Home() {
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  const { data: galleryItems = [] } = useQuery<GalleryItem[]>({
+    queryKey: ["gallery-public-home"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/gallery`);
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const activeGalleryImages = galleryItems
+    .filter(g => g.isActive)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .slice(0, 6)
+    .map(g => g.imageUrl);
   const activeFaqs = allFaqs.filter(f => f.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
   const activeActivities = activities
@@ -101,7 +118,7 @@ export default function Home() {
           className="absolute top-[30%] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
         >
           <MapPin className="w-3.5 h-3.5 text-secondary" />
-          <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">Mandovi River, Goa</span>
+          <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">{(settings as any)?.heroLocationTag || "Mandovi River, Goa"}</span>
         </motion.div>
 
         {/* Hero headline block */}
@@ -186,13 +203,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-12">
             <div>
-              <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Everything in One Place</p>
+              <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">{(settings as any)?.exploreLabel || "Everything in One Place"}</p>
               <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-tight">
-                Explore Mhadeinest's<br />Backwater Experience
+                {(settings as any)?.exploreTitle || "Explore Mhadeinest's Backwater Experience"}
               </h2>
             </div>
             <p className="text-muted-foreground leading-relaxed text-[15px]">
-              From your first sunrise over the Mandovi to a candle-lit rooftop dinner, every moment aboard Mhadeinest is thoughtfully curated. Choose your experience below.
+              {(settings as any)?.exploreSubtitle || "From your first sunrise over the Mandovi to a candle-lit rooftop dinner, every moment aboard Mhadeinest is thoughtfully curated. Choose your experience below."}
             </p>
           </div>
 
@@ -237,9 +254,9 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Welcome Aboard</p>
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">{(settings as any)?.welcomeLabel || "Welcome Aboard"}</p>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-snug mb-6">
-              A Floating Paradise<br />in the Heart of Goa
+              {(settings as any)?.welcomeTitle || "A Floating Paradise in the Heart of Goa"}
             </h2>
             <p className="text-muted-foreground leading-relaxed text-[15px] mb-5">
               {settings?.aboutText
@@ -251,7 +268,7 @@ export default function Home() {
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-secondary text-secondary" />)}
               </div>
-              <span className="text-sm text-muted-foreground font-medium">5.0 · 200+ stays</span>
+              <span className="text-sm text-muted-foreground font-medium">{(settings as any)?.welcomeRatingText || "5.0 · 200+ stays"}</span>
             </div>
             <Link href="/about">
               <Button variant="outline" className="rounded-sm px-8 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
@@ -269,7 +286,7 @@ export default function Home() {
           >
             <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-xl">
               <img
-                src={`${BASE}images/resort3.jpg`}
+                src={(settings as any)?.welcomeImage || `${BASE}images/resort3.jpg`}
                 alt="Mhadeinest resort on the Goa backwaters"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
@@ -277,12 +294,12 @@ export default function Home() {
             {/* Floating review card */}
             <div className="absolute -bottom-6 -left-6 bg-white p-5 rounded-lg shadow-lg max-w-[220px] hidden md:block border border-border/60">
               <p className="font-display text-sm font-semibold text-foreground leading-snug mb-2">
-                "An unforgettable experience on the water."
+                "{(settings as any)?.welcomeReviewText || "An unforgettable experience on the water."}"
               </p>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-secondary text-secondary" />)}
               </div>
-              <p className="text-[11px] text-muted-foreground mt-1.5">Verified guest · Goa, 2024</p>
+              <p className="text-[11px] text-muted-foreground mt-1.5">{(settings as any)?.welcomeReviewAttribution || "Verified guest · Goa, 2024"}</p>
             </div>
           </motion.div>
         </div>
@@ -292,8 +309,8 @@ export default function Home() {
       <section className="py-20 bg-background">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Our Offerings</p>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Packages & Deals</h2>
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">{(settings as any)?.packagesLabel || "Our Offerings"}</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">{(settings as any)?.packagesTitle || "Packages & Deals"}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -389,11 +406,11 @@ export default function Home() {
       <section className="py-20 bg-muted/30">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
-            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">A Glimpse Inside</p>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Photo Gallery</h2>
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">{(settings as any)?.galleryLabel || "A Glimpse Inside"}</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">{(settings as any)?.galleryTitle || "Photo Gallery"}</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {GALLERY_IMAGES.map((src, idx) => (
+            {(activeGalleryImages.length > 0 ? activeGalleryImages : FALLBACK_GALLERY).map((src, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, scale: 0.97 }}
@@ -424,11 +441,10 @@ export default function Home() {
       <section className="relative py-0 overflow-hidden">
         <div className="relative h-[480px] md:h-[520px]">
           <img
-            src={`${BASE}images/activities.png`}
+            src={(settings as any)?.bannerImage || `${BASE}images/activities.png`}
             alt="Experience Mhadeinest"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
-          {/* Dark primary green overlay — nature feel */}
           <div className="absolute inset-0 bg-primary/82" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
             <motion.p
@@ -437,7 +453,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-secondary text-xs font-semibold uppercase tracking-[0.18em] mb-4"
             >
-              The Mhadeinest Way
+              {(settings as any)?.bannerLabel || "The Mhadeinest Way"}
             </motion.p>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -446,8 +462,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="text-3xl md:text-5xl font-display font-bold text-white leading-tight max-w-2xl mb-5"
             >
-              Experience Goa Like<br />
-              <em className="font-normal italic text-secondary/90">You Never Have Before</em>
+              {(settings as any)?.bannerTitle || "Experience Goa Like You Never Have Before"}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 16 }}
@@ -456,7 +471,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-white/68 text-base max-w-lg mb-8 leading-relaxed"
             >
-              Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds.
+              {(settings as any)?.bannerDescription || "Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds."}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 12 }}
