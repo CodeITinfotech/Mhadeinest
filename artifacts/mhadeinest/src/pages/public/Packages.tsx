@@ -17,6 +17,17 @@ export default function Packages() {
   const activeActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const marqueeItems = activeActivities.length >= 2 ? activeActivities : [];
 
+  // Scroll to a specific package when navigating from the homepage via #package-{id}
+  useEffect(() => {
+    if (!activePackages.length) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const el = document.querySelector(hash);
+    if (el) {
+      setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+    }
+  }, [activePackages.length]);
+
   // Drag-to-scroll refs
   const stripRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -96,11 +107,12 @@ export default function Packages() {
             return (
               <motion.div
                 key={pkg.id}
+                id={`package-${pkg.id}`}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.6 }}
-                className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center`}
+                className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-12 items-center scroll-mt-28`}
               >
                 {/* Image block */}
                 <div className="w-full lg:w-1/2 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl relative">

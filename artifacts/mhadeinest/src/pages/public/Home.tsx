@@ -304,35 +304,59 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.15 }}
-                className="bg-card rounded-lg overflow-hidden border border-border group hover:shadow-lg transition-all duration-300"
+                className="bg-card rounded-lg overflow-hidden border border-border group hover:shadow-lg transition-all duration-300 flex flex-col"
               >
-                <div className="aspect-[16/10] relative overflow-hidden">
-                  <img
-                    src={pkg.images?.[0] || `${BASE}images/room-luxury.jpg`}
-                    alt={pkg.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3 bg-primary/90 text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-sm tracking-wide uppercase">
-                    Up to {pkg.capacity} guests
+                {/* Clickable image area → navigates to the package detail */}
+                <Link href={`/packages#package-${pkg.id}`} className="block">
+                  <div className="aspect-[16/10] relative overflow-hidden">
+                    <img
+                      src={pkg.images?.[0] || `${BASE}images/room-luxury.jpg`}
+                      alt={pkg.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 bg-primary/90 text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-sm tracking-wide uppercase">
+                      Up to {pkg.capacity} guests
+                    </div>
+                    {/* Hover overlay — "View Details" prompt */}
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-all duration-300 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-primary text-xs font-bold px-4 py-2 rounded-sm tracking-wide uppercase flex items-center gap-2">
+                        <ArrowRight className="w-3.5 h-3.5" />
+                        View Details
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="font-display font-bold text-lg text-foreground mb-1.5">{pkg.name}</h3>
+                </Link>
+
+                <div className="p-6 flex flex-col flex-1">
+                  <Link href={`/packages#package-${pkg.id}`} className="block mb-1.5">
+                    <h3 className="font-display font-bold text-lg text-foreground group-hover:text-primary transition-colors">{pkg.name}</h3>
+                  </Link>
                   <p className="text-muted-foreground text-sm mb-5 line-clamp-2 leading-relaxed">{pkg.description}</p>
-                  <div className="flex items-end justify-between pt-4 border-t border-border">
+                  <div className="flex items-end justify-between pt-4 border-t border-border mt-auto">
                     <div>
                       <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">From</p>
                       <p className="text-xl font-bold text-secondary font-sans">
                         {fmt(pkg.pricePerNight)}<span className="text-xs text-muted-foreground font-normal"> / night</span>
                       </p>
                     </div>
-                    <Button
-                      size="sm"
-                      className="rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold tracking-wide px-5"
-                      onClick={() => openInquiry({ packageService: pkg.name })}
-                    >
-                      Inquire
-                    </Button>
+                    <div className="flex gap-2">
+                      <Link href={`/packages#package-${pkg.id}`}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-sm border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-semibold px-4"
+                        >
+                          Details
+                        </Button>
+                      </Link>
+                      <Button
+                        size="sm"
+                        className="rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold tracking-wide px-4"
+                        onClick={(e) => { e.stopPropagation(); openInquiry({ packageService: pkg.name }); }}
+                      >
+                        Inquire
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
