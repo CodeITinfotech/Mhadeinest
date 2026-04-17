@@ -15,6 +15,24 @@ interface Award {
 
 const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+function toEmbedUrl(url: string): string {
+  if (!url) return "";
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const m = url.match(pattern);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+  }
+  if (/^[a-zA-Z0-9_-]{11}$/.test(url.trim())) {
+    return `https://www.youtube.com/embed/${url.trim()}`;
+  }
+  return url;
+}
+
 export default function About() {
   const { data: settings } = useGetSettings();
 
@@ -97,7 +115,7 @@ export default function About() {
           <div className="aspect-video w-full max-w-4xl mx-auto bg-black rounded-2xl overflow-hidden shadow-2xl relative">
             {trailVideoUrl ? (
               <iframe
-                src={trailVideoUrl.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                src={toEmbedUrl(trailVideoUrl)}
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

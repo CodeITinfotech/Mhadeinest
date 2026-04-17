@@ -689,7 +689,15 @@ export default function AdminSettings() {
                   </Field>
                   <Field label="Trail Section Title"><Input {...siteForm.register("trailTitle")} placeholder="Our Trail" /></Field>
                   <Field label="Trail Section Description"><Textarea {...siteForm.register("trailDescription")} className="min-h-[80px]" placeholder="Describe the trail video section..." /></Field>
-                  <Field label="YouTube Trail Video URL"><Input {...siteForm.register("trailVideoUrl")} placeholder="https://youtube.com/watch?v=..." /></Field>
+                  <Field label="Trail Video URL">
+                    <Input
+                      {...siteForm.register("trailVideoUrl")}
+                      placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      Paste any YouTube URL — <code className="bg-muted px-1 rounded">watch?v=</code>, <code className="bg-muted px-1 rounded">youtu.be/</code>, or <code className="bg-muted px-1 rounded">youtube.com/shorts/</code> all work automatically.
+                    </p>
+                  </Field>
                   <Field label="About Text"><Textarea {...siteForm.register("aboutText")} className="min-h-[140px]" /></Field>
                 </div>
               </form>
