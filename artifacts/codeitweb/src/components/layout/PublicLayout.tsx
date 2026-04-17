@@ -9,7 +9,6 @@ import { InquiryModal } from "@/components/InquiryModal";
 import { InquiryModalProvider, useInquiryModal } from "@/context/InquiryModalContext";
 import { CurrencyProvider, useCurrency, type Currency } from "@/context/CurrencyContext";
 import { ChatWidget } from "@/components/ChatWidget";
-const FALLBACK_LOGO = "/images/logo_transparent.png";
 
 const ALL_NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -92,7 +91,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   const activeAwards = allAwards.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
   const hasCustomLogo = Boolean((settings as any)?.siteLogo);
-  const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
+  const logo = (settings as any)?.siteLogo ?? "";
   const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
   const showChat = (settings as any)?.showChatWidget !== "false";
   const chatWidgetColor: string = (settings as any)?.chatWidgetColor || "#10b981";
