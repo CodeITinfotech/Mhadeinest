@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -24,28 +24,28 @@
 }
 
 :root {
-  /* Warm tropical luxury palette */
-  --background: 40 33% 98%; /* Warm off-white */
-  --foreground: 220 20% 15%; /* Deep slate */
-  
-  --primary: 215 50% 23%; /* Ocean Blue */
-  --primary-foreground: 40 33% 98%;
-  
-  --secondary: 35 80% 55%; /* Warm Sunset Gold */
-  --secondary-foreground: 220 20% 15%;
-  
-  --accent: 175 60% 40%; /* Tropical Teal */
-  --accent-foreground: 40 33% 98%;
-  
-  --muted: 40 20% 90%;
-  --muted-foreground: 220 10% 40%;
-  
+  /* Nature-inspired palette — warm, organic, clean */
+  --background: 43 32% 97%;        /* Sunlit paper cream */
+  --foreground: 160 18% 16%;       /* Deep mangrove */
+
+  --primary: 162 42% 22%;          /* Forest / mangrove green */
+  --primary-foreground: 43 32% 97%;
+
+  --secondary: 33 76% 52%;         /* Warm amber / sunset */
+  --secondary-foreground: 0 0% 100%;
+
+  --accent: 178 40% 38%;           /* River teal */
+  --accent-foreground: 0 0% 100%;
+
+  --muted: 43 22% 91%;             /* Warm sand */
+  --muted-foreground: 160 12% 42%;
+
   --card: 0 0% 100%;
-  --card-foreground: 220 20% 15%;
-  
-  --border: 40 20% 88%;
-  --ring: 35 80% 55%;
-  
+  --card-foreground: 160 18% 16%;
+
+  --border: 43 20% 86%;
+  --ring: 33 76% 52%;
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 }
@@ -55,7 +55,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-secondary/30 selection:text-foreground;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-secondary/20 selection:text-foreground;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
@@ -63,17 +63,7 @@
   }
 }
 
-/* Custom scrollbar for a premium feel */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.45); }

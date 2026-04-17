@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetSettings, useListPackages, useListActivities } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Anchor, Wind, Sun, Coffee, ChevronDown } from "lucide-react";
+import { Anchor, Wind, Sun, Coffee, ChevronDown, ArrowRight, Waves, Star, MapPin } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { AvailabilitySearch } from "@/components/AvailabilitySearch";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -11,14 +11,22 @@ import { useInquiryModal } from "@/context/InquiryModalContext";
 import { useState, useEffect } from "react";
 
 const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = import.meta.env.BASE_URL;
 
 interface Faq { id: number; question: string; answer: string; isActive: boolean; sortOrder: number; }
 
 const FALLBACK_FEATURES = [
-  { icon: Anchor, title: "Premium Stay", desc: "3 Luxurious Bedrooms" },
-  { icon: Wind, title: "Water Sports", desc: "Kayaking & Speed Boating" },
-  { icon: Sun, title: "Scenic Views", desc: "Golden Hour Sunsets" },
-  { icon: Coffee, title: "Gourmet Dining", desc: "Live Rooftop Restaurant" },
+  { icon: Anchor, title: "3 Luxury Bedrooms", desc: "Private en-suite rooms with deck access and river views." },
+  { icon: Wind, title: "Water Adventures", desc: "Kayaking, speed boating, and sunset river cruises." },
+  { icon: Sun, title: "Golden Hour Views", desc: "Watch Goa's sky turn amber from your private rooftop." },
+  { icon: Coffee, title: "Rooftop Dining", desc: "Live Goan cuisine prepared fresh, right on the water." },
+];
+
+const EXPLORE_CATEGORIES = [
+  { label: "Stay & Comfort", image: `${BASE}images/bedroom.png`, href: "/packages" },
+  { label: "Dining & Cuisine", image: `${BASE}images/dining.png`, href: "/packages" },
+  { label: "Water Activities", image: `${BASE}images/activities.png`, href: "/activities" },
+  { label: "About the Vessel", image: `${BASE}images/about.png`, href: "/about" },
 ];
 
 export default function Home() {
@@ -44,7 +52,7 @@ export default function Home() {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .slice(0, 4);
 
-  const heroImage = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
+  const heroImage = settings?.heroImage || `${BASE}images/hero.png`;
 
   useEffect(() => {
     if (window.location.hash === "#check-availability") {
@@ -59,53 +67,67 @@ export default function Home() {
     }
   }, []);
 
+  const activePackages = packages.filter(p => p.isActive).slice(0, 3);
+
   return (
     <div className="flex flex-col">
-      {/* Hero Section — widget lives inside at 45% */}
-      <section className="relative h-screen overflow-hidden">
-        {/* Background */}
+
+      {/* ─── HERO ─── */}
+      <section className="relative h-screen min-h-[600px] overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src={heroImage}
-            alt="Mhadeinest Hero"
+            alt="Mhadeinest — luxury houseboat on the Goa backwaters"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/75" />
+          {/* Lighter, more natural gradient — image earns its place */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-black/68" />
         </div>
 
-        {/* Hero text — tight block in the upper 38% */}
-        <div className="absolute top-[7%] left-0 right-0 z-10 text-center px-4">
+        {/* Location tag */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="absolute top-[22%] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
+        >
+          <MapPin className="w-3.5 h-3.5 text-secondary" />
+          <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">Mandovi River, Goa</span>
+        </motion.div>
+
+        {/* Hero headline block */}
+        <div className="absolute top-[28%] left-0 right-0 z-10 text-center px-4">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-3 leading-tight drop-shadow-lg"
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-4xl md:text-5xl lg:text-[3.75rem] font-display font-bold text-white mb-4 leading-[1.1] drop-shadow-md"
           >
-            {settings?.heroTitle || "Escape to Luxury"}
+            {settings?.heroTitle || "Experience Goa\nFrom the Water"}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-base md:text-lg text-white/85 mb-5 font-light drop-shadow-md max-w-xl mx-auto"
+            transition={{ duration: 0.8, delay: 0.18 }}
+            className="text-base md:text-lg text-white/78 mb-7 font-light drop-shadow max-w-lg mx-auto leading-relaxed"
           >
-            {settings?.heroSubtitle || "Experience the serene backwaters of Goa with Mhadeinest — luxury, comfort, and nature in perfect harmony."}
+            {settings?.heroSubtitle || "A luxury houseboat stay on Goa's backwaters — three private bedrooms, rooftop dining, and the river all to yourself."}
           </motion.p>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.8, delay: 0.32 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Link href="/packages">
-              <Button size="default" className="w-full sm:w-auto px-7 py-2.5 rounded-full">
+              <Button size="default" className="px-8 py-2.5 rounded-sm bg-secondary hover:bg-secondary/90 text-white font-semibold tracking-wide shadow-lg">
                 View Packages
               </Button>
             </Link>
             <Button
               size="default"
-              variant="outline"
-              className="w-full sm:w-auto px-7 py-2.5 rounded-full text-white border-white hover:bg-white/20 hover:text-white backdrop-blur-sm"
+              variant="ghost"
+              className="px-8 py-2.5 rounded-sm text-white border border-white/40 hover:bg-white/12 hover:text-white backdrop-blur-sm font-medium"
               onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Discover More
@@ -113,141 +135,191 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Availability Search — pinned to bottom on all screen sizes */}
+        {/* Availability widget — anchored to bottom */}
         <div id="check-availability" className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 px-4">
           <AvailabilitySearch />
         </div>
       </section>
 
-      {/* Features Banner — driven by admin Activities, falls back to static if none set */}
-      <section className="bg-white py-12 border-b border-muted">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {activeActivities.length > 0
-            ? activeActivities.map((activity, idx) => {
-                const Icon = (LucideIcons as any)[activity.icon] || Anchor;
-                return (
-                  <motion.div
-                    key={activity.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex flex-col items-center text-center gap-3"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                      <Icon className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h3 className="font-display font-semibold text-lg text-foreground">{activity.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>
-                    </div>
-                  </motion.div>
-                );
-              })
-            : FALLBACK_FEATURES.map((feature, idx) => (
+      {/* ─── FEATURES STRIP ─── */}
+      <section className="bg-white py-14 border-b border-border">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-border">
+            {(activeActivities.length > 0 ? activeActivities : FALLBACK_FEATURES).map((item, idx) => {
+              const Icon = activeActivities.length > 0
+                ? ((LucideIcons as any)[(item as any).icon] || Waves)
+                : (item as any).icon;
+              const title = activeActivities.length > 0 ? (item as any).name : (item as any).title;
+              const desc = activeActivities.length > 0 ? (item as any).description : (item as any).desc;
+              return (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex flex-col items-center text-center gap-3"
+                  transition={{ delay: idx * 0.08, duration: 0.5 }}
+                  className="flex flex-col items-center text-center px-6 py-8 group"
                 >
-                  <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                    <feature.icon className="w-8 h-8" />
+                  <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-full bg-primary/8 group-hover:bg-primary/14 transition-colors">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-display font-semibold text-lg text-foreground">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{feature.desc}</p>
-                  </div>
+                  <h3 className="font-display font-semibold text-base text-foreground mb-1.5">{title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
                 </motion.div>
-              ))}
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* About Preview */}
-      <section id="about" className="py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
+      {/* ─── EXPLORE MHADEINEST ─── */}
+      <section className="py-20 bg-background">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-12">
+            <div>
+              <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Everything in One Place</p>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-tight">
+                Explore Mhadeinest's<br />Backwater Experience
+              </h2>
+            </div>
+            <p className="text-muted-foreground leading-relaxed text-[15px]">
+              From your first sunrise over the Mandovi to a candle-lit rooftop dinner, every moment aboard Mhadeinest is thoughtfully curated. Choose your experience below.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {EXPLORE_CATEGORIES.map((cat, idx) => (
+              <motion.a
+                key={cat.label}
+                href={cat.href}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="relative group overflow-hidden rounded-lg aspect-[3/4] block cursor-pointer"
+              >
+                <img
+                  src={cat.image}
+                  alt={cat.label}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-106"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `${BASE}images/hero.png`;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="text-white font-display font-semibold text-base leading-tight">{cat.label}</p>
+                  <span className="text-white/60 text-xs flex items-center gap-1 mt-1 group-hover:text-secondary transition-colors">
+                    Explore <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── WELCOME / ABOUT ─── */}
+      <section id="about" className="py-20 bg-muted/40">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -32 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-sm font-bold tracking-widest text-secondary uppercase mb-3">Welcome Aboard</h2>
-            <h3 className="text-4xl md:text-5xl font-display font-bold text-primary mb-6 leading-tight">
-              A Floating Paradise in the Heart of Goa
-            </h3>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              {settings?.aboutText ? settings.aboutText.substring(0, 250) + "..." : "Immerse yourself in the tranquility of Goa's backwaters with Mhadeinest. We offer an unparalleled blend of traditional charm and modern luxury — three exquisitely designed bedrooms, a rooftop restaurant, and thrilling water activities await."}
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Welcome Aboard</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-snug mb-6">
+              A Floating Paradise<br />in the Heart of Goa
+            </h2>
+            <p className="text-muted-foreground leading-relaxed text-[15px] mb-5">
+              {settings?.aboutText
+                ? settings.aboutText.substring(0, 260) + "..."
+                : "Immerse yourself in the tranquility of Goa's backwaters with Mhadeinest. We offer an unparalleled blend of traditional charm and modern luxury — three exquisitely designed bedrooms, a rooftop restaurant, and thrilling water activities await."}
             </p>
+            {/* Star rating */}
+            <div className="flex items-center gap-2 mb-7">
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-secondary text-secondary" />)}
+              </div>
+              <span className="text-sm text-muted-foreground font-medium">5.0 · 200+ stays</span>
+            </div>
             <Link href="/about">
-              <Button variant="outline" className="rounded-full px-8">Read Our Story</Button>
+              <Button variant="outline" className="rounded-sm px-8 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                Read Our Story
+              </Button>
             </Link>
           </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.65 }}
             className="relative"
           >
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src={`${import.meta.env.BASE_URL}images/about.png`} 
-                alt="Mhadeinest exterior" 
+            <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-xl">
+              <img
+                src={`${BASE}images/about.png`}
+                alt="Mhadeinest exterior on the Goa backwaters"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
-            <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-xl max-w-xs hidden md:block">
-              <p className="font-display text-xl font-bold text-primary">"An unforgettable magical experience."</p>
-              <div className="flex items-center gap-2 mt-2 text-secondary">
-                {"★★★★★".split("").map((star, i) => <span key={i}>{star}</span>)}
+            {/* Floating review card */}
+            <div className="absolute -bottom-6 -left-6 bg-white p-5 rounded-lg shadow-lg max-w-[220px] hidden md:block border border-border/60">
+              <p className="font-display text-sm font-semibold text-foreground leading-snug mb-2">
+                "An unforgettable experience on the water."
+              </p>
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-secondary text-secondary" />)}
               </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">Verified guest · Goa, 2024</p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Featured Packages */}
-      <section className="py-24 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-sm font-bold tracking-widest text-secondary uppercase mb-3">Our Offerings</h2>
-            <h3 className="text-4xl md:text-5xl font-display font-bold text-primary">Choose Your Experience</h3>
+      {/* ─── PACKAGES & DEALS ─── */}
+      <section className="py-20 bg-background">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Our Offerings</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Packages & Deals</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {packages.filter(p => p.isActive).slice(0, 3).map((pkg, idx) => (
-              <motion.div 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {activePackages.length > 0 ? activePackages.map((pkg, idx) => (
+              <motion.div
                 key={pkg.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className="bg-card rounded-2xl overflow-hidden shadow-lg border border-border group hover:shadow-xl transition-all hover:-translate-y-1"
+                transition={{ delay: idx * 0.15 }}
+                className="bg-card rounded-lg overflow-hidden border border-border group hover:shadow-lg transition-all duration-300"
               >
                 <div className="aspect-[16/10] relative overflow-hidden">
-                  <img 
-                    src={pkg.images?.[0] || `${import.meta.env.BASE_URL}images/bedroom.png`} 
+                  <img
+                    src={pkg.images?.[0] || `${BASE}images/bedroom.png`}
                     alt={pkg.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-primary font-bold text-sm shadow-sm">
-                    Up to {pkg.capacity} Guests
+                  <div className="absolute top-3 left-3 bg-primary/90 text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-sm tracking-wide uppercase">
+                    Up to {pkg.capacity} guests
                   </div>
                 </div>
-                <div className="p-8">
-                  <h4 className="text-2xl font-display font-bold text-primary mb-2">{pkg.name}</h4>
-                  <p className="text-muted-foreground text-sm mb-6 line-clamp-2">{pkg.description}</p>
-                  <div className="flex items-end justify-between mt-auto pt-6 border-t border-muted">
+                <div className="p-6">
+                  <h3 className="font-display font-bold text-lg text-foreground mb-1.5">{pkg.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-5 line-clamp-2 leading-relaxed">{pkg.description}</p>
+                  <div className="flex items-end justify-between pt-4 border-t border-border">
                     <div>
-                      <p className="text-sm text-muted-foreground mb-1">From</p>
-                      <p className="text-2xl font-bold text-secondary">{fmt(pkg.pricePerNight)}<span className="text-sm text-muted-foreground font-normal">/night</span></p>
+                      <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-0.5">From</p>
+                      <p className="text-xl font-bold text-secondary font-sans">
+                        {fmt(pkg.pricePerNight)}<span className="text-xs text-muted-foreground font-normal"> / night</span>
+                      </p>
                     </div>
                     <Button
-                      variant="outline"
-                      className="rounded-full"
+                      size="sm"
+                      className="rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold tracking-wide px-5"
                       onClick={() => openInquiry({ packageService: pkg.name })}
                     >
                       Inquire
@@ -255,53 +327,168 @@ export default function Home() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+            )) : (
+              /* Skeleton placeholder while packages load */
+              [0,1,2].map(i => (
+                <div key={i} className="bg-card rounded-lg overflow-hidden border border-border animate-pulse">
+                  <div className="aspect-[16/10] bg-muted" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-5 bg-muted rounded w-3/4" />
+                    <div className="h-3 bg-muted rounded w-full" />
+                    <div className="h-3 bg-muted rounded w-2/3" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-          
-          <div className="text-center mt-12">
+
+          <div className="text-center mt-10">
             <Link href="/packages">
-              <Button size="lg" className="rounded-full px-10">View All Packages</Button>
+              <Button variant="outline" className="rounded-sm px-10 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                View All Packages <ArrowRight className="w-4 h-4 ml-2 inline-block" />
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      {activeFaqs.length > 0 && (
-        <section className="py-20 bg-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
+      {/* ─── IMMERSIVE EXPERIENCE BANNER ─── */}
+      <section className="relative py-0 overflow-hidden">
+        <div className="relative h-[480px] md:h-[520px]">
+          <img
+            src={`${BASE}images/hero.png`}
+            alt="Experience Mhadeinest"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+          {/* Dark primary green overlay — nature feel */}
+          <div className="absolute inset-0 bg-primary/82" />
+          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-secondary text-xs font-semibold uppercase tracking-[0.18em] mb-4"
+            >
+              The Mhadeinest Way
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-14 max-w-3xl mx-auto"
+              className="text-3xl md:text-5xl font-display font-bold text-white leading-tight max-w-2xl mb-5"
             >
-              <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Got Questions?</p>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-primary leading-tight">
-                Frequently Asked Questions About<br className="hidden sm:block" /> Mhadeinest
+              Experience Goa Like<br />
+              <em className="font-normal italic text-secondary/90">You Never Have Before</em>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-white/68 text-base max-w-lg mb-8 leading-relaxed"
+            >
+              Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.28 }}
+              className="flex gap-4 flex-wrap justify-center"
+            >
+              <Link href="/packages">
+                <Button className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-8 font-semibold tracking-wide shadow-lg">
+                  Explore Packages
+                </Button>
+              </Link>
+              <Button
+                variant="ghost"
+                className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-8 font-medium"
+                onClick={() => openInquiry()}
+              >
+                Plan My Stay
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── ACTIVITIES ─── */}
+      {activeActivities.length > 0 && (
+        <section className="py-20 bg-muted/40">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">What To Do</p>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+                On-Board Activities & Experiences
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {activeActivities.map((activity, idx) => {
+                const Icon = (LucideIcons as any)[activity.icon] || Waves;
+                return (
+                  <motion.div
+                    key={activity.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="bg-white rounded-lg p-6 text-center border border-border hover:shadow-md transition-shadow group"
+                  >
+                    <div className="w-14 h-14 rounded-full bg-primary/8 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/15 transition-colors">
+                      <Icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="font-display font-semibold text-base text-foreground mb-2">{activity.name}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{activity.description}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-8">
+              <Link href="/activities">
+                <Button variant="outline" className="rounded-sm px-8 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                  All Activities <ArrowRight className="w-4 h-4 ml-1 inline" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── FAQ ─── */}
+      {activeFaqs.length > 0 && (
+        <section className="py-20 bg-background">
+          <div className="max-w-3xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Got Questions?</p>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+                Frequently Asked Questions
               </h2>
             </motion.div>
 
-            <div className="divide-y divide-border border border-border rounded-2xl bg-card overflow-hidden shadow-sm">
+            <div className="divide-y divide-border border border-border rounded-lg bg-card overflow-hidden">
               {activeFaqs.map((faq, idx) => {
                 const isOpen = openFaqId === faq.id;
                 return (
                   <motion.div
                     key={faq.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.06, duration: 0.4 }}
+                    transition={{ delay: idx * 0.05 }}
                   >
                     <button
                       onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
                       className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-muted/50 transition-colors"
                     >
-                      <span className="font-medium text-foreground leading-snug pr-2">{faq.question}</span>
-                      <ChevronDown
-                        className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-                      />
+                      <span className="font-medium text-foreground text-[15px] leading-snug pr-2">{faq.question}</span>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                     </button>
                     <AnimatePresence initial={false}>
                       {isOpen && (
@@ -313,8 +500,8 @@ export default function Home() {
                           transition={{ duration: 0.3, ease: "easeInOut" }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 pb-6 pt-0">
-                            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{faq.answer}</p>
+                          <div className="px-6 pb-6 pt-1">
+                            <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{faq.answer}</p>
                           </div>
                         </motion.div>
                       )}
@@ -326,6 +513,32 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* ─── KEEP IN TOUCH / CTA STRIP ─── */}
+      <section className="py-16 bg-primary">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">
+            Ready to Experience Mhadeinest?
+          </h2>
+          <p className="text-primary-foreground/65 mb-7 text-[15px]">
+            Reach out to plan your stay — our team responds within a few hours.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-10 font-semibold tracking-wide shadow-lg"
+              onClick={() => openInquiry()}
+            >
+              Send an Inquiry
+            </Button>
+            <Link href="/packages">
+              <Button variant="ghost" className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-10 font-medium">
+                Browse Packages
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
