@@ -78,7 +78,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isOpen: inquiryOpen, prefill: inquiryPrefill, open: openInquiry, close: closeInquiry } = useInquiryModal();
-  const { data: settings } = useGetSettings();
+  const { data: settings, isLoading: settingsLoading } = useGetSettings();
 
   const { data: allAwards = [] } = useQuery<Award[]>({
     queryKey: ["awards-public"],
@@ -138,7 +138,9 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             onClick={e => { e.preventDefault(); window.location.href = "/"; }}
             className="flex items-center shrink-0 cursor-pointer group"
           >
-            {hasCustomLogo ? (
+            {settingsLoading ? (
+              <div className={cn("w-auto transition-all duration-300 max-w-[200px]", isScrolled ? "h-10" : "h-14")} />
+            ) : hasCustomLogo ? (
               <img
                 src={logo}
                 alt={settings?.siteName || "Mhadeinest"}
