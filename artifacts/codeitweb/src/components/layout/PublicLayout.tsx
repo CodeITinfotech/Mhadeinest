@@ -139,14 +139,14 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             className="flex items-center shrink-0 cursor-pointer group"
           >
             {settingsLoading ? (
-              <div className={cn("w-auto transition-all duration-300 max-w-[200px]", isScrolled ? "h-10" : "h-14")} />
+              <div className={cn("w-auto transition-all duration-300 max-w-[300px]", isScrolled ? "h-12" : "h-[68px]")} />
             ) : hasCustomLogo ? (
               <img
                 src={logo}
                 alt={settings?.siteName || "Mhadeinest"}
                 className={cn(
-                  "w-auto object-contain transition-all duration-300 max-w-[200px]",
-                  isScrolled ? "h-10" : "h-14"
+                  "w-auto object-contain transition-all duration-300 max-w-[300px]",
+                  isScrolled ? "h-12" : "h-[68px]"
                 )}
               />
             ) : (
