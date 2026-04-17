@@ -106,6 +106,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
     }
   }, [settings?.siteName]);
 
+  // Close mobile menu whenever the route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -199,52 +204,83 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile / Tablet Dropdown Menu — slides from below the header, not fullscreen */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-background pt-24 px-6 md:hidden"
-          >
-            <div className="flex flex-col gap-6 text-xl font-display">
-              {/* Currency switcher */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground font-sans font-medium">Currency:</span>
-                <CurrencySwitcher scrolled={true} onHome={false} />
+          <>
+            {/* Backdrop (click to close, does NOT cover header) */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ top: isScrolled ? 56 : 72 }}
+              className="fixed inset-x-0 bottom-0 z-30 bg-black/30 backdrop-blur-[2px] md:hidden"
+            />
+
+            {/* Dropdown panel */}
+            <motion.div
+              key="dropdown"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              style={{ top: isScrolled ? 56 : 72, maxHeight: `calc(100vh - ${isScrolled ? 56 : 72}px)` }}
+              className="fixed left-0 right-0 z-40 bg-background/97 backdrop-blur-md border-b border-border shadow-2xl md:hidden overflow-y-auto"
+            >
+              <div className="px-5 py-4 space-y-1">
+                {/* Nav links */}
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-3 rounded-xl text-base font-medium transition-colors",
+                      location === link.href
+                        ? "bg-primary/8 text-secondary font-semibold"
+                        : "text-foreground hover:bg-muted"
+                    )}
+                  >
+                    {location === link.href && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
+                    )}
+                    {link.name}
+                  </Link>
+                ))}
+
+                {/* Divider */}
+                <div className="h-px bg-border my-2" />
+
+                {/* Currency + action buttons */}
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <span className="text-xs text-muted-foreground font-medium">Currency:</span>
+                  <CurrencySwitcher scrolled={true} onHome={false} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-1 pb-2">
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); openInquiry(); }}
+                    className="px-4 py-3 rounded-xl border border-border text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-muted transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    Inquire
+                  </button>
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-secondary/90 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    Book Now
+                  </a>
+                </div>
               </div>
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "border-b border-border pb-4",
-                    location === link.href ? "text-secondary" : "text-foreground"
-                  )}
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <button
-                onClick={() => { setMobileMenuOpen(false); openInquiry(); }}
-                className="px-6 py-4 rounded-xl border border-border text-foreground font-bold text-center flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Send an Inquiry
-              </button>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-4 rounded-xl bg-secondary text-secondary-foreground font-bold text-center flex items-center justify-center gap-2"
-              >
-                <Phone className="w-5 h-5" />
-                Book via WhatsApp
-              </a>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
