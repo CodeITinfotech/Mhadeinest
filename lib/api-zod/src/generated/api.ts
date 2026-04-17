@@ -470,6 +470,7 @@ export const GetSettingsResponse = zod.object({
   bannerTitle: zod.string(),
   bannerDescription: zod.string(),
   bannerImage: zod.string(),
+  bannerVideoUrl: zod.string(),
   updatedAt: zod.string(),
 });
 
@@ -527,6 +528,7 @@ export const UpdateSettingsBody = zod.object({
   bannerTitle: zod.string().optional(),
   bannerDescription: zod.string().optional(),
   bannerImage: zod.string().optional(),
+  bannerVideoUrl: zod.string().optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -581,6 +583,7 @@ export const UpdateSettingsResponse = zod.object({
   bannerTitle: zod.string(),
   bannerDescription: zod.string(),
   bannerImage: zod.string(),
+  bannerVideoUrl: zod.string(),
   updatedAt: zod.string(),
 });
 

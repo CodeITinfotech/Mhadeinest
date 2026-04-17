@@ -86,6 +86,7 @@ const siteSchema = z.object({
   bannerTitle: z.string(),
   bannerDescription: z.string(),
   bannerImage: z.string(),
+  bannerVideoUrl: z.string(),
 });
 
 const profileSchema = z.object({
@@ -235,6 +236,7 @@ export default function AdminSettings() {
         bannerTitle: (settings as any).bannerTitle || "Experience Goa Like You Never Have Before",
         bannerDescription: (settings as any).bannerDescription || "Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds.",
         bannerImage: (settings as any).bannerImage || "",
+        bannerVideoUrl: (settings as any).bannerVideoUrl || "",
       });
       setLogoPreview((settings as any).siteLogo || "");
       setHiddenItems((settings as any).navHiddenItems || []);
@@ -769,11 +771,15 @@ export default function AdminSettings() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <Field label="Banner Label"><Input {...siteForm.register("bannerLabel")} placeholder="The Mhadeinest Way" /></Field>
                     <Field label="Banner Title"><Input {...siteForm.register("bannerTitle")} placeholder="Experience Goa Like You Never Have Before" /></Field>
-                    <Field label="Banner Image URL">
+                    <Field label="Banner Image URL" className="md:col-span-2">
                       <Input {...siteForm.register("bannerImage")} placeholder="images/activities.png" />
-                      <p className="text-xs text-muted-foreground mt-1">Background image behind the green overlay</p>
+                      <p className="text-xs text-muted-foreground mt-1">Fallback background image (used when no video is set, or while the video loads)</p>
                     </Field>
-                    <Field label="Banner Description" className="md:col-span-1">
+                    <Field label="Banner Video URL" className="md:col-span-2">
+                      <Input {...siteForm.register("bannerVideoUrl")} placeholder="https://example.com/banner-video.mp4" />
+                      <p className="text-xs text-muted-foreground mt-1">Optional. Paste a direct .mp4 video link — it will autoplay silently as the banner background, like a cinematic reel. Leave blank to use the image instead.</p>
+                    </Field>
+                    <Field label="Banner Description" className="md:col-span-2">
                       <Textarea {...siteForm.register("bannerDescription")} className="min-h-[80px]" placeholder="Wake up on the river. Kayak at sunrise..." />
                     </Field>
                   </div>

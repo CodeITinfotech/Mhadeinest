@@ -440,11 +440,36 @@ export default function Home() {
       {/* ─── IMMERSIVE EXPERIENCE BANNER ─── */}
       <section className="relative py-0 overflow-hidden">
         <div className="relative h-[480px] md:h-[520px]">
-          <img
-            src={(settings as any)?.bannerImage || `${BASE}images/activities.png`}
-            alt="Experience Mhadeinest"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
+          {/* Video background — shown when a video URL is configured */}
+          {(settings as any)?.bannerVideoUrl ? (
+            <>
+              <video
+                key={(settings as any).bannerVideoUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              >
+                <source src={(settings as any).bannerVideoUrl} type="video/mp4" />
+              </video>
+              {/* Fallback poster image while video loads */}
+              {(settings as any)?.bannerImage && (
+                <img
+                  src={(settings as any).bannerImage}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 w-full h-full object-cover object-center -z-10"
+                />
+              )}
+            </>
+          ) : (
+            <img
+              src={(settings as any)?.bannerImage || `${BASE}images/activities.png`}
+              alt="Experience Mhadeinest"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          )}
           <div className="absolute inset-0 bg-primary/82" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
             <motion.p

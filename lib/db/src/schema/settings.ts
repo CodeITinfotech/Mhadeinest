@@ -54,6 +54,7 @@ export const settingsTable = pgTable("settings", {
   bannerTitle: text("banner_title").notNull().default("Experience Goa Like You Never Have Before"),
   bannerDescription: text("banner_description").notNull().default("Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds."),
   bannerImage: text("banner_image").notNull().default(""),
+  bannerVideoUrl: text("banner_video_url").notNull().default(""),
   dbType: text("db_type").notNull().default("postgresql"),
   dbHost: text("db_host").notNull().default(""),
   dbPort: text("db_port").notNull().default("3306"),
