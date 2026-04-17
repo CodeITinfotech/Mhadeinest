@@ -51,13 +51,13 @@ waitForPort = 8080
 name = "artifacts/Mhadeinest: web"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/houseboat run dev"
+args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/mhadeinest run dev"
 waitForPort = 5173
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow]]
 name = "artifacts/mockup-sandbox: Component Preview Server"

@@ -86,7 +86,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <img
             src={heroImage}
-            alt="Mhadeinest — luxury houseboat on the Goa backwaters"
+            alt="Mhadeinest — luxury river resort on the Goa backwaters"
             className="w-full h-full object-cover object-center"
           />
           {/* Lighter, more natural gradient — image earns its place */}
@@ -120,7 +120,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.18 }}
             className="text-base md:text-lg text-white/78 mb-7 font-light drop-shadow max-w-lg mx-auto leading-relaxed"
           >
-            {settings?.heroSubtitle || "A luxury houseboat stay on Goa's backwaters — three private bedrooms, rooftop dining, and the river all to yourself."}
+            {settings?.heroSubtitle || "A luxury river resort on Goa's backwaters — three private bedrooms, rooftop dining, and the river all to yourself."}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 24 }}

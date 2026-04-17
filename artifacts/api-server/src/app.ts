@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use("/api", router);
 
 if (process.env.NODE_ENV === "production") {
-  const staticDir = path.join(process.cwd(), "artifacts/houseboat/dist/public");
+  const staticDir = path.join(process.cwd(), "artifacts/mhadeinest/dist/public");
   if (fs.existsSync(staticDir)) {
     app.use(express.static(staticDir));
     app.use((_req, res) => {
