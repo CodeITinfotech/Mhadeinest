@@ -31,9 +31,10 @@ function formatTime(iso: string) {
 interface ChatWidgetProps {
   color?: string;
   alignment?: "left" | "right";
+  withWhatsapp?: boolean;
 }
 
-export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidgetProps) {
+export function ChatWidget({ color = "#10b981", alignment = "right", withWhatsapp = false }: ChatWidgetProps) {
   const [open, setOpen] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [visitorName, setVisitorName] = useState("");
@@ -50,6 +51,11 @@ export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidge
 
   const isLeft = alignment === "left";
   const posClass = isLeft ? "left-6" : "right-6";
+  // When WhatsApp button is also visible, stack chat button above it
+  // WhatsApp sits at bottom-6 (24px). WhatsApp button is 56px tall + 8px gap = 88px.
+  const btnBottom = withWhatsapp ? "5.5rem" : "1.5rem";
+  // Chat panel sits above the chat button: button height (56px) + 8px gap
+  const panelBottom = withWhatsapp ? "10.5rem" : "5.5rem";
 
   // Load existing session token
   useEffect(() => {
@@ -159,10 +165,10 @@ export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidge
       <button
         onClick={() => setOpen(o => !o)}
         className={cn(
-          "fixed bottom-24 z-50 w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-all group",
+          "fixed z-50 w-14 h-14 rounded-full text-white shadow-2xl flex items-center justify-center hover:scale-110 transition-all group",
           posClass
         )}
-        style={{ backgroundColor: color }}
+        style={{ backgroundColor: color, bottom: btnBottom }}
         aria-label="Open chat"
       >
         <AnimatePresence mode="wait">
@@ -202,10 +208,10 @@ export function ChatWidget({ color = "#10b981", alignment = "right" }: ChatWidge
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.22 }}
             className={cn(
-              "fixed bottom-44 z-50 w-[360px] max-w-[calc(100vw-24px)] rounded-2xl overflow-hidden shadow-2xl border border-border flex flex-col",
+              "fixed z-50 w-[360px] max-w-[calc(100vw-24px)] rounded-2xl overflow-hidden shadow-2xl border border-border flex flex-col",
               posClass
             )}
-            style={{ height: 480 }}
+            style={{ bottom: panelBottom, height: "min(480px, calc(100dvh - 10rem))" }}
           >
             {/* Header */}
             <div className="text-white px-4 py-3 flex items-center gap-3 shrink-0" style={{ backgroundColor: color }}>

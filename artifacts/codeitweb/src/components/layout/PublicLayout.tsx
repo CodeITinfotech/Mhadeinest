@@ -423,23 +423,35 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Inquiry Modal */}
       <InquiryModal open={inquiryOpen} onClose={closeInquiry} initialData={inquiryPrefill ?? undefined} />
 
-      {/* Floating WhatsApp Button */}
+      {/* Floating WhatsApp Button — always in same corner as chat widget */}
       {showWhatsapp && (
         <a
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-transform flex items-center justify-center group"
+          className={cn(
+            "fixed bottom-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-110 transition-transform flex items-center justify-center group",
+            chatWidgetAlignment === "left" ? "left-6" : "right-6"
+          )}
         >
           <Phone className="w-6 h-6" />
-          <span className="absolute right-full mr-4 bg-white text-foreground px-3 py-1.5 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
+          <span className={cn(
+            "absolute bg-white text-foreground px-3 py-1.5 rounded-lg text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none",
+            chatWidgetAlignment === "left" ? "left-full ml-4" : "right-full mr-4"
+          )}>
             WhatsApp us
           </span>
         </a>
       )}
 
       {/* Live Chat Widget */}
-      {showChat && <ChatWidget color={chatWidgetColor} alignment={chatWidgetAlignment} />}
+      {showChat && (
+        <ChatWidget
+          color={chatWidgetColor}
+          alignment={chatWidgetAlignment}
+          withWhatsapp={showWhatsapp}
+        />
+      )}
     </div>
   );
 }
