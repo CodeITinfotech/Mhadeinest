@@ -102,7 +102,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   // Keep browser tab title in sync with site name
   useEffect(() => {
     if (settings?.siteName) {
-      document.title = `${settings.siteName} | Mhadeinest`;
+      document.title = `${settings.siteName} | Luxury River Experience in Goa`;
     }
   }, [settings?.siteName]);
 

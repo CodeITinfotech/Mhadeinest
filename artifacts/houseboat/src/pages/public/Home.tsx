@@ -23,10 +23,19 @@ const FALLBACK_FEATURES = [
 ];
 
 const EXPLORE_CATEGORIES = [
-  { label: "Stay & Comfort", image: `${BASE}images/bedroom.png`, href: "/packages" },
+  { label: "Luxury Rooms", image: `${BASE}images/room-luxury.jpg`, href: "/packages" },
   { label: "Dining & Cuisine", image: `${BASE}images/dining.png`, href: "/packages" },
-  { label: "Water Activities", image: `${BASE}images/activities.png`, href: "/activities" },
-  { label: "About the Vessel", image: `${BASE}images/about.png`, href: "/about" },
+  { label: "Water Activities", image: `${BASE}images/boating.jpg`, href: "/activities" },
+  { label: "The Resort", image: `${BASE}images/resort2.jpg`, href: "/about" },
+];
+
+const GALLERY_IMAGES = [
+  `${BASE}images/gallery-1.jpg`,
+  `${BASE}images/gallery-2.jpg`,
+  `${BASE}images/gallery-3.jpg`,
+  `${BASE}images/gallery-4.jpg`,
+  `${BASE}images/gallery-5.jpg`,
+  `${BASE}images/gallery-6.jpg`,
 ];
 
 export default function Home() {
@@ -260,8 +269,8 @@ export default function Home() {
           >
             <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-xl">
               <img
-                src={`${BASE}images/about.png`}
-                alt="Mhadeinest exterior on the Goa backwaters"
+                src={`${BASE}images/resort3.jpg`}
+                alt="Mhadeinest resort on the Goa backwaters"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -299,7 +308,7 @@ export default function Home() {
               >
                 <div className="aspect-[16/10] relative overflow-hidden">
                   <img
-                    src={pkg.images?.[0] || `${BASE}images/bedroom.png`}
+                    src={pkg.images?.[0] || `${BASE}images/room-luxury.jpg`}
                     alt={pkg.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -352,11 +361,46 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── PHOTO GALLERY ─── */}
+      <section className="py-20 bg-muted/30">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">A Glimpse Inside</p>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Photo Gallery</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {GALLERY_IMAGES.map((src, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.97 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.07 }}
+                className={`overflow-hidden rounded-lg group cursor-pointer ${idx === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+              >
+                <img
+                  src={src}
+                  alt={`Resort view ${idx + 1}`}
+                  className={`w-full object-cover group-hover:scale-105 transition-transform duration-500 ${idx === 0 ? "h-72 md:h-full" : "h-48"}`}
+                />
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link href="/gallery">
+              <Button variant="outline" className="rounded-sm px-8 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all">
+                View Full Gallery <ArrowRight className="w-4 h-4 ml-1 inline" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ─── IMMERSIVE EXPERIENCE BANNER ─── */}
       <section className="relative py-0 overflow-hidden">
         <div className="relative h-[480px] md:h-[520px]">
           <img
-            src={`${BASE}images/hero.png`}
+            src={`${BASE}images/activities.png`}
             alt="Experience Mhadeinest"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
