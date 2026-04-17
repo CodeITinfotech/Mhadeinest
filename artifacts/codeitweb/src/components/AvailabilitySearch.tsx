@@ -121,10 +121,10 @@ export function AvailabilitySearch() {
 
         {/* Fields */}
         <div className="px-5 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 items-end">
 
             {/* Package / Service */}
-            <div className="space-y-1.5 lg:col-span-1">
+            <div className="space-y-1.5">
               <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wide flex items-center gap-1 whitespace-nowrap">
                 Package / Service
               </label>
@@ -180,7 +180,7 @@ export function AvailabilitySearch() {
             </div>
 
             {/* Button */}
-            <div className="sm:col-span-2 lg:col-span-1 space-y-1.5">
+            <div className="sm:col-span-2 xl:col-span-1 space-y-1.5">
               <label className="text-[10px] font-semibold text-transparent uppercase tracking-wide">·</label>
               <button
                 onClick={e => { e.stopPropagation(); handleSearch(); }}
