@@ -143,8 +143,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
                 src={logo}
                 alt={settings?.siteName || "Mhadeinest"}
                 className={cn(
-                  "w-auto object-contain transition-all duration-300",
-                  isScrolled ? "h-8" : "h-10"
+                  "w-auto object-contain transition-all duration-300 max-w-[200px]",
+                  isScrolled ? "h-10" : "h-14"
                 )}
               />
             ) : (
