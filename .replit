@@ -31,6 +31,10 @@ args = "artifacts/api-server: API Server"
 task = "workflow.run"
 args = "artifacts/Mhadeinest: web"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/mockup-sandbox: Component Preview Server"
+
 [[workflows.workflow]]
 name = "artifacts/api-server: API Server"
 author = "agent"
@@ -54,6 +58,19 @@ waitForPort = 5173
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "artifacts/mockup-sandbox: Component Preview Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=8081 BASE_PATH=/__mockup pnpm --filter @workspace/mockup-sandbox run dev"
+waitForPort = 8081
+
+[workflows.workflow.metadata]
+outputType = "console"
+isCanvasWorkflow = true
 
 [agent]
 stack = "PNPM_WORKSPACE"
