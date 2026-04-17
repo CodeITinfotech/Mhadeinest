@@ -148,7 +148,10 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
                 )}
               />
             ) : (
-              <span className="font-display font-bold text-base text-primary transition-colors group-hover:text-secondary">
+              <span className={cn(
+                "font-display font-bold text-primary transition-all duration-300 group-hover:text-secondary",
+                isScrolled ? "text-lg" : "text-2xl"
+              )}>
                 {settings?.siteName || "Mhadeinest"}
               </span>
             )}
