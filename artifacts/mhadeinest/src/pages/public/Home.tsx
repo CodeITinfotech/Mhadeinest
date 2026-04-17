@@ -98,14 +98,14 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="absolute top-[22%] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
+          className="absolute top-[30%] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
         >
           <MapPin className="w-3.5 h-3.5 text-secondary" />
           <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">Mandovi River, Goa</span>
         </motion.div>
 
         {/* Hero headline block */}
-        <div className="absolute top-[28%] left-0 right-0 z-10 text-center px-4">
+        <div className="absolute top-[36%] left-0 right-0 z-10 text-center px-4">
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}

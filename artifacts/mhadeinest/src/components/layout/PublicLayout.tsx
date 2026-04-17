@@ -120,13 +120,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-foreground">
-      {/* Header */}
+      {/* Header — always visible, scroll deepens the shadow */}
       <header
         className={cn(
-          "fixed top-0 w-full z-50 transition-all duration-300 border-b border-transparent",
-          isScrolled || location !== "/"
-            ? "bg-background/95 backdrop-blur-md shadow-sm border-border py-3"
-            : "bg-transparent py-5"
+          "fixed top-0 w-full z-50 transition-all duration-300 bg-background/97 backdrop-blur-md border-b border-border",
+          isScrolled ? "shadow-md py-3" : "shadow-sm py-4"
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -138,44 +136,44 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             <img
               src={logo}
               alt="Mhadeinest"
-              className="h-10 w-auto object-contain transition-all duration-300 drop-shadow-md"
+              className={cn(
+                "w-auto object-contain transition-all duration-300",
+                isScrolled ? "h-8" : "h-10"
+              )}
             />
-            <div className="flex flex-col leading-tight">
-              <span className={cn(
-                "font-display font-bold text-base transition-colors",
-                isScrolled || location !== "/" ? "text-primary" : "text-white drop-shadow"
-              )}>Mhadeinest</span>
-            </div>
+            <span className="font-display font-bold text-base text-primary transition-colors group-hover:text-secondary">
+              {settings?.siteName || "Mhadeinest"}
+            </span>
           </a>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex flex-1 items-center justify-center gap-8">
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-7">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-secondary",
-                  location === link.href 
-                    ? "text-secondary" 
-                    : (isScrolled || location !== "/" ? "text-foreground" : "text-white/90")
+                  "text-sm font-medium transition-colors relative py-1 group",
+                  location === link.href
+                    ? "text-secondary"
+                    : "text-foreground/80 hover:text-primary"
                 )}
               >
                 {link.name}
+                {/* Active underline indicator */}
+                <span className={cn(
+                  "absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all duration-200 bg-secondary",
+                  location === link.href ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100"
+                )} />
               </Link>
             ))}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <CurrencySwitcher scrolled={isScrolled} onHome={location === "/"} />
+            <CurrencySwitcher scrolled={true} onHome={false} />
             <button
               onClick={() => openInquiry()}
-              className={cn(
-                "px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 shadow-sm flex items-center gap-2 border",
-                isScrolled || location !== "/"
-                  ? "bg-background border-border text-foreground hover:bg-muted"
-                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
-              )}
+              className="px-5 py-2 rounded-full font-semibold text-sm transition-all hover:scale-105 shadow-sm flex items-center gap-2 border bg-background border-border text-foreground hover:bg-muted"
             >
               <MessageCircle className="w-4 h-4" />
               Inquire
@@ -196,7 +194,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
             className="md:hidden p-2 text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X /> : <Menu className={cn(isScrolled || location !== "/" ? "text-foreground" : "text-white")} />}
+            {mobileMenuOpen ? <X className="text-foreground" /> : <Menu className="text-foreground" />}
           </button>
         </div>
       </header>
