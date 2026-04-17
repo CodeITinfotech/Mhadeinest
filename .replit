@@ -29,11 +29,11 @@ args = "artifacts/api-server: API Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "artifacts/Mhadeinest: web"
+args = "artifacts/mockup-sandbox: Component Preview Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "artifacts/mockup-sandbox: Component Preview Server"
+args = "artifacts/codeitweb: web"
 
 [[workflows.workflow]]
 name = "artifacts/api-server: API Server"
@@ -48,18 +48,6 @@ args = "PORT=8080 pnpm --filter @workspace/api-server run dev"
 waitForPort = 8080
 
 [[workflows.workflow]]
-name = "artifacts/Mhadeinest: web"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/mhadeinest run dev"
-waitForPort = 5173
-
-[[workflows.workflow]]
 name = "artifacts/mockup-sandbox: Component Preview Server"
 author = "agent"
 
@@ -71,6 +59,18 @@ waitForPort = 8081
 [workflows.workflow.metadata]
 outputType = "console"
 isCanvasWorkflow = true
+
+[[workflows.workflow]]
+name = "artifacts/codeitweb: web"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5173 BASE_PATH=/ pnpm --filter @workspace/codeitweb run dev"
+waitForPort = 5173
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"

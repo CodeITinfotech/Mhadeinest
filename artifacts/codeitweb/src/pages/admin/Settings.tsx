@@ -549,7 +549,7 @@ export default function AdminSettings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `mhadeinest_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
+      a.download = `codeitweb_${type}_${new Date().toISOString().slice(0, 10)}.sql`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -571,7 +571,7 @@ export default function AdminSettings() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `mhadeinest_database_backup_${new Date().toISOString().slice(0, 10)}.zip`;
+      a.download = `codeitweb_database_backup_${new Date().toISOString().slice(0, 10)}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

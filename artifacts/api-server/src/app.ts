@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use("/api", router);
 
 if (process.env.NODE_ENV === "production") {
-  const staticDir = path.join(process.cwd(), "artifacts/mhadeinest/dist/public");
+  const staticDir = path.join(process.cwd(), "artifacts/codeitweb/dist/public");
   if (fs.existsSync(staticDir)) {
     app.use(express.static(staticDir));
     app.use((_req, res) => {
@@ -67,7 +67,7 @@ if (process.env.NODE_ENV === "production") {
 
     proxy.on("error", (_err) => {
       if (!res.headersSent) {
-        res.status(502).send("Vite dev server not reachable. Make sure the Mhadeinest workflow is running.");
+        res.status(502).send("Vite dev server not reachable. Make sure the codeitweb workflow is running.");
       }
     });
 
