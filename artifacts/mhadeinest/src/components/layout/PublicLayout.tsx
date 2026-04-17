@@ -91,6 +91,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
   });
   const activeAwards = allAwards.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
 
+  const hasCustomLogo = Boolean((settings as any)?.siteLogo);
   const logo = (settings as any)?.siteLogo || FALLBACK_LOGO;
   const hiddenItems: string[] = (settings as any)?.navHiddenItems || [];
   const showChat = (settings as any)?.showChatWidget !== "false";
@@ -135,20 +136,23 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <a
             href="/"
-            onClick={e => { e.preventDefault(); navigate("/"); }}
-            className="flex items-center gap-2.5 group shrink-0 cursor-pointer"
+            onClick={e => { e.preventDefault(); window.location.href = "/"; }}
+            className="flex items-center shrink-0 cursor-pointer group"
           >
-            <img
-              src={logo}
-              alt="Mhadeinest"
-              className={cn(
-                "w-auto object-contain transition-all duration-300",
-                isScrolled ? "h-8" : "h-10"
-              )}
-            />
-            <span className="font-display font-bold text-base text-primary transition-colors group-hover:text-secondary">
-              {settings?.siteName || "Mhadeinest"}
-            </span>
+            {hasCustomLogo ? (
+              <img
+                src={logo}
+                alt={settings?.siteName || "Mhadeinest"}
+                className={cn(
+                  "w-auto object-contain transition-all duration-300",
+                  isScrolled ? "h-8" : "h-10"
+                )}
+              />
+            ) : (
+              <span className="font-display font-bold text-base text-primary transition-colors group-hover:text-secondary">
+                {settings?.siteName || "Mhadeinest"}
+              </span>
+            )}
           </a>
 
           {/* Desktop Nav */}
@@ -295,14 +299,17 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-3 mb-6">
-              <img
-                src={logo}
-                alt="Mhadeinest"
-                className="h-14 w-auto object-contain drop-shadow-lg"
-              />
-              <div>
-                <p className="font-display font-bold text-xl text-white leading-tight">Mhadeinest</p>
-              </div>
+              {hasCustomLogo ? (
+                <img
+                  src={logo}
+                  alt={settings?.siteName || "Mhadeinest"}
+                  className="h-14 w-auto object-contain drop-shadow-lg"
+                />
+              ) : (
+                <p className="font-display font-bold text-2xl text-white leading-tight">
+                  {settings?.siteName || "Mhadeinest"}
+                </p>
+              )}
             </div>
             <p className="text-primary-foreground/70 mb-6">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}
