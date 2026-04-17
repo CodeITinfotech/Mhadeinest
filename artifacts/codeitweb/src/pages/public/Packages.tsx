@@ -80,7 +80,7 @@ export default function Packages() {
     <div className="pt-24 pb-24 bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h1 className="text-5xl font-display font-bold text-primary mb-6">Our Packages</h1>
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-primary mb-6">Our Packages</h1>
           <p className="text-lg text-muted-foreground">
             Whether you're planning a romantic getaway, a family vacation, or a private party,
             we have the perfect package to make your stay unforgettable.
@@ -156,7 +156,7 @@ export default function Packages() {
 
                 {/* Content block */}
                 <div className="w-full lg:w-1/2">
-                  <h2 className="text-4xl font-display font-bold text-primary mb-4">{pkg.name}</h2>
+                  <h2 className="text-2xl md:text-4xl font-display font-bold text-primary mb-4">{pkg.name}</h2>
 
                   {/* Price display in text area */}
                   <div className="mb-6 flex items-baseline gap-3 flex-wrap">

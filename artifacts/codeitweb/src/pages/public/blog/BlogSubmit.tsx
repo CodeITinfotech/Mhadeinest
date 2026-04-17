@@ -89,7 +89,7 @@ export default function BlogSubmit() {
         className="w-full max-w-2xl bg-card rounded-3xl shadow-xl p-8 md:p-12 border border-border"
       >
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-display font-bold text-primary mb-4">Share Your Story</h1>
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-primary mb-4">Share Your Story</h1>
           <p className="text-muted-foreground">
             {step === "email" && "Enter your email to get started. We use OTP to prevent spam."}
             {step === "otp" && `Enter the 6-digit code sent to ${userEmail}`}

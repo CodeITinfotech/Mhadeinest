@@ -22,7 +22,7 @@ export default function Gallery() {
     <div className="pt-24 pb-24 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-display font-bold text-primary mb-6">Photo Gallery</h1>
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-primary mb-6">Photo Gallery</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
             A glimpse into the luxurious life aboard our floating resort.
           </p>

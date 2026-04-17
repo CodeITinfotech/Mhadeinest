@@ -55,7 +55,7 @@ export default function About() {
         {/* Page Header */}
         <div className="text-center mb-16">
           <p className="text-secondary font-semibold text-sm uppercase tracking-widest mb-3">Find Us</p>
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary mb-6">Our Story & Location</h1>
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-primary mb-6">Our Story & Location</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Discover the rich heritage of Goan backwaters with Mhadeinest — a meticulously crafted floating experience.
           </p>
