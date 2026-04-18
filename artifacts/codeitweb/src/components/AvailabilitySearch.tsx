@@ -188,8 +188,8 @@ export function AvailabilitySearch() {
                 className="w-full h-10 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               >
                 {loading
-                  ? <><Loader2 className="w-4 h-4 animate-spin" /> Checking…</>
-                  : <><Search className="w-4 h-4" /> Check</>
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <Search className="w-4 h-4" />
                 }
               </button>
             </div>
