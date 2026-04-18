@@ -96,6 +96,13 @@ export default function AdminEvents() {
     },
   });
 
+  const categoryOptions = Array.from(
+    new Set([
+      ...events.map(e => e.category).filter(Boolean),
+      ...CATEGORY_PRESETS,
+    ])
+  ).sort();
+
   const form = useForm<EventForm>({
     resolver: zodResolver(eventSchema),
     defaultValues: EMPTY_FORM,
@@ -341,7 +348,7 @@ export default function AdminEvents() {
                 placeholder="e.g. Birthday Party, Anniversary…"
               />
               <datalist id="category-presets">
-                {CATEGORY_PRESETS.map(c => <option key={c} value={c} />)}
+                {categoryOptions.map(c => <option key={c} value={c} />)}
               </datalist>
               <p className="text-xs text-muted-foreground">Used to group events on the public page. Type custom or pick from suggestions.</p>
             </div>
