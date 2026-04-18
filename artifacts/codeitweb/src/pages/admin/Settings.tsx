@@ -12,7 +12,7 @@ import {
   Save, Globe, User, Shield, Mail, Phone, Lock,
   KeyRound, BadgeCheck, CalendarDays, Loader2, Eye, EyeOff,
   Upload, X, ImageIcon, Menu, Send, Server, CheckCircle, XCircle, LayoutGrid,
-  Database, FolderOpen, FolderTree, ChevronRight, Download, Archive, Copy, Check, Wifi,
+  Database, FolderOpen, FolderTree, ChevronRight, Download, Archive, Copy, Check, Wifi, RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { processImage } from "@/lib/imageUtils";
@@ -1168,24 +1168,81 @@ export default function AdminSettings() {
       {/* ── THEME TAB ─────────────────────────────────────────────────── */}
       {activeTab === "theme" && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-bold">Website Theme</h2>
               <p className="text-sm text-muted-foreground mt-0.5">Customise colours for key areas of your website. Leave blank to use the default theme.</p>
             </div>
-            <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2">
-              {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {updateMutation.isPending ? "Saving…" : "Save Theme"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  siteForm.setValue("themeNavBg", "");
+                  siteForm.setValue("themeFooterBg", "");
+                  siteForm.setValue("themeButtonColor", "");
+                  siteForm.setValue("themeTextColor", "");
+                }}
+                className="gap-2 text-muted-foreground"
+              >
+                <RotateCcw className="w-4 h-4" /> Reset to Defaults
+              </Button>
+              <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2">
+                {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {updateMutation.isPending ? "Saving…" : "Save Theme"}
+              </Button>
+            </div>
           </div>
+
+          {/* Current config summary */}
+          {(() => {
+            const DEFAULTS: Record<string, { label: string; color: string }> = {
+              themeNavBg:      { label: "Nav",     color: "#f5f0e8" },
+              themeFooterBg:   { label: "Footer",  color: "#1e5244" },
+              themeButtonColor:{ label: "Button",  color: "#d4862b" },
+              themeTextColor:  { label: "Text",    color: "#1a2e2a" },
+            };
+            const saved = {
+              themeNavBg:       (settings as any)?.themeNavBg || "",
+              themeFooterBg:    (settings as any)?.themeFooterBg || "",
+              themeButtonColor: (settings as any)?.themeButtonColor || "",
+              themeTextColor:   (settings as any)?.themeTextColor || "",
+            };
+            const anyCustom = Object.values(saved).some(v => !!v);
+            return (
+              <div className="bg-muted/40 border border-border rounded-xl px-5 py-4 flex flex-wrap items-center gap-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">Current Config</p>
+                {(Object.entries(DEFAULTS) as [string, { label: string; color: string }][]).map(([key, def]) => {
+                  const savedVal = saved[key as keyof typeof saved];
+                  const isCustom = /^#[0-9a-fA-F]{6}$/.test(savedVal);
+                  const displayColor = isCustom ? savedVal : def.color;
+                  return (
+                    <div key={key} className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-md border border-border shadow-sm shrink-0" style={{ backgroundColor: displayColor }} />
+                      <div>
+                        <p className="text-xs font-medium leading-none">{def.label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{isCustom ? savedVal : "default"}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                {!anyCustom && (
+                  <span className="ml-auto text-xs text-muted-foreground italic">Using all defaults</span>
+                )}
+                {anyCustom && (
+                  <span className="ml-auto text-xs text-secondary font-medium">Custom theme active</span>
+                )}
+              </div>
+            );
+          })()}
 
           <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
             {([
-              { label: "Header / Nav background", field: "themeNavBg", hint: "The top navigation bar background colour" },
-              { label: "Footer background",        field: "themeFooterBg", hint: "The footer section background colour" },
-              { label: "Button / Accent colour",   field: "themeButtonColor", hint: "CTA buttons, active links, and highlight accents" },
-              { label: "Body text colour",          field: "themeTextColor", hint: "Main paragraph and UI text across the site" },
-            ] as { label: string; field: "themeNavBg" | "themeFooterBg" | "themeButtonColor" | "themeTextColor"; hint: string }[]).map(({ label, field, hint }) => {
+              { label: "Header / Nav background", field: "themeNavBg",       hint: "The top navigation bar background colour",        defaultColor: "#f5f0e8" },
+              { label: "Footer background",        field: "themeFooterBg",    hint: "The footer section background colour",             defaultColor: "#1e5244" },
+              { label: "Button / Accent colour",   field: "themeButtonColor", hint: "CTA buttons, active links, and highlight accents", defaultColor: "#d4862b" },
+              { label: "Body text colour",          field: "themeTextColor",   hint: "Main paragraph and UI text across the site",       defaultColor: "#1a2e2a" },
+            ] as { label: string; field: "themeNavBg" | "themeFooterBg" | "themeButtonColor" | "themeTextColor"; hint: string; defaultColor: string }[]).map(({ label, field, hint, defaultColor }) => {
               const val: string = siteForm.watch(field) || "";
               const isValid = /^#[0-9a-fA-F]{6}$/.test(val);
               return (
@@ -1193,6 +1250,10 @@ export default function AdminSettings() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground">{label}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <div className="w-4 h-4 rounded border border-border" style={{ backgroundColor: defaultColor }} />
+                      <span className="text-[10px] text-muted-foreground font-mono">default: {defaultColor}</span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <div
@@ -1202,7 +1263,7 @@ export default function AdminSettings() {
                     >
                       <input
                         type="color"
-                        value={isValid ? val : "#ffffff"}
+                        value={isValid ? val : defaultColor}
                         onChange={e => siteForm.setValue(field, e.target.value)}
                         className="w-full h-full opacity-0 cursor-pointer"
                       />
@@ -1218,8 +1279,9 @@ export default function AdminSettings() {
                         type="button"
                         onClick={() => siteForm.setValue(field, "")}
                         className="text-xs text-muted-foreground hover:text-destructive transition-colors whitespace-nowrap"
+                        title="Clear to use default"
                       >
-                        Reset
+                        Clear
                       </button>
                     )}
                   </div>
