@@ -18,6 +18,8 @@ export const eventsTable = pgTable("events", {
   minHours: integer("min_hours").notNull().default(2),
   sortOrder: integer("sort_order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  mrp: integer("mrp"),
+  sellingPrice: integer("selling_price"),
 });
 
 export const insertEventSchema = createInsertSchema(eventsTable).omit({ id: true });

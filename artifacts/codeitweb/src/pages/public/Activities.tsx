@@ -40,6 +40,10 @@ export default function Activities() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {activeActivities.map((activity, idx) => {
             const IconComponent = (LucideIcons as any)[activity.icon] || LucideIcons.Activity;
+            const mrp = (activity as any).mrp as number | null;
+            const sp = (activity as any).sellingPrice as number | null;
+            const hasDiscount = mrp && sp && mrp > sp;
+            const discountPct = hasDiscount ? Math.round(((mrp - sp) / mrp) * 100) : 0;
             return (
               <Link key={activity.id} href={`/activities/${activity.id}`}>
                 <motion.div 
@@ -47,8 +51,15 @@ export default function Activities() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-secondary/50 transition-all group cursor-pointer h-full flex flex-col"
+                  className="relative bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-secondary/50 transition-all group cursor-pointer h-full flex flex-col"
                 >
+                  {/* Discount badge */}
+                  {hasDiscount && (
+                    <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md z-10">
+                      {discountPct}% OFF
+                    </div>
+                  )}
+
                   <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 group-hover:bg-secondary/20 group-hover:text-secondary transition-all">
                     <IconComponent className="w-7 h-7" />
                   </div>
@@ -61,7 +72,16 @@ export default function Activities() {
                       <img src={activity.image} alt={activity.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                   )}
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-secondary text-sm font-semibold">
+
+                  {/* Pricing row */}
+                  {sp && (
+                    <div className="mt-4 flex items-baseline gap-2">
+                      <span className="text-lg font-bold text-primary">₹{sp.toLocaleString()}</span>
+                      {hasDiscount && <span className="text-sm text-muted-foreground line-through">₹{mrp!.toLocaleString()}</span>}
+                    </div>
+                  )}
+
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-secondary text-sm font-semibold">
                     Read more <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </motion.div>

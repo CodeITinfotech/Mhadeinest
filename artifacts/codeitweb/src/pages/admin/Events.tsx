@@ -46,6 +46,8 @@ const eventSchema = z.object({
   minHours: z.coerce.number().min(1, "Minimum 1 hour").default(2),
   sortOrder: z.coerce.number().default(0),
   isActive: z.boolean().default(true),
+  mrp: z.coerce.number().nullable().optional(),
+  sellingPrice: z.coerce.number().nullable().optional(),
 });
 
 type EventForm = z.infer<typeof eventSchema>;
@@ -72,6 +74,8 @@ const EMPTY_FORM: EventForm = {
   minHours: 2,
   sortOrder: 0,
   isActive: true,
+  mrp: null,
+  sellingPrice: null,
 };
 
 export default function AdminEvents() {
@@ -123,6 +127,8 @@ export default function AdminEvents() {
       minHours: event.minHours || 2,
       sortOrder: event.sortOrder || 0,
       isActive: event.isActive,
+      mrp: (event as any).mrp ?? null,
+      sellingPrice: (event as any).sellingPrice ?? null,
     });
     setIsDialogOpen(true);
   };
@@ -432,6 +438,33 @@ export default function AdminEvents() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/20">
+              <div>
+                <p className="text-sm font-semibold">Pricing (optional)</p>
+                <p className="text-xs text-muted-foreground mt-0.5">When both MRP and Selling Price are set, a discount badge is shown on the public Events page.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">MRP (₹)</label>
+                  <Input type="number" min={0} {...form.register("mrp")} placeholder="e.g. 5000" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Selling Price (₹)</label>
+                  <Input type="number" min={0} {...form.register("sellingPrice")} placeholder="e.g. 3999" />
+                </div>
+              </div>
+              {(() => {
+                const mrp = Number(form.watch("mrp"));
+                const sp = Number(form.watch("sellingPrice"));
+                if (mrp > 0 && sp > 0 && mrp > sp) {
+                  const pct = Math.round(((mrp - sp) / mrp) * 100);
+                  return <p className="text-xs text-green-600 font-semibold">Discount badge will show: {pct}% OFF</p>;
+                }
+                return null;
+              })()}
             </div>
 
             {/* Sort order + Active */}

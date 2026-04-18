@@ -22,6 +22,8 @@ const activitySchema = z.object({
   icon: z.string().default("Activity"),
   sortOrder: z.coerce.number().default(0),
   isActive: z.boolean().default(true),
+  mrp: z.coerce.number().nullable().optional(),
+  sellingPrice: z.coerce.number().nullable().optional(),
 });
 
 type ActivityForm = z.infer<typeof activitySchema>;
@@ -82,7 +84,7 @@ export default function AdminActivities() {
     setEditingId(null);
     setImagePreview("");
     setImageChanged(false);
-    form.reset({ name: "", description: "", icon: "Activity", sortOrder: activities.length, isActive: true });
+    form.reset({ name: "", description: "", icon: "Activity", sortOrder: activities.length, isActive: true, mrp: null, sellingPrice: null });
     setIsDialogOpen(true);
   }
 
@@ -96,6 +98,8 @@ export default function AdminActivities() {
       icon: a.icon || "Activity",
       sortOrder: a.sortOrder ?? 0,
       isActive: a.isActive ?? true,
+      mrp: a.mrp ?? null,
+      sellingPrice: a.sellingPrice ?? null,
     });
     setIsDialogOpen(true);
   }
@@ -300,6 +304,35 @@ export default function AdminActivities() {
                   </span>
                 </label>
               </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/20">
+              <div>
+                <p className="text-sm font-semibold">Pricing (optional)</p>
+                <p className="text-xs text-muted-foreground mt-0.5">When both MRP and Selling Price are set, a discount badge is shown on the public page.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">MRP (₹)</label>
+                  <Input type="number" min={0} {...form.register("mrp")} placeholder="e.g. 2000" className="mt-1" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Selling Price (₹)</label>
+                  <Input type="number" min={0} {...form.register("sellingPrice")} placeholder="e.g. 1500" className="mt-1" />
+                </div>
+              </div>
+              {(() => {
+                const mrpVal = form.watch("mrp");
+                const spVal = form.watch("sellingPrice");
+                const mrp = Number(mrpVal);
+                const sp = Number(spVal);
+                if (mrp > 0 && sp > 0 && mrp > sp) {
+                  const pct = Math.round(((mrp - sp) / mrp) * 100);
+                  return <p className="text-xs text-green-600 font-semibold">Discount badge will show: {pct}% OFF</p>;
+                }
+                return null;
+              })()}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

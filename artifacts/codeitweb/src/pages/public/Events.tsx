@@ -25,6 +25,8 @@ interface BoatEvent {
   minHours: number;
   isActive: boolean;
   sortOrder: number;
+  mrp?: number | null;
+  sellingPrice?: number | null;
 }
 
 const EVENT_IMAGES: Record<string, string> = {
@@ -136,6 +138,11 @@ export default function Events() {
                 : [];
               const isOpen = expanded === event.id;
 
+              const mrp = event.mrp ?? null;
+              const sp = event.sellingPrice ?? null;
+              const hasDiscount = mrp && sp && mrp > sp;
+              const discountPct = hasDiscount ? Math.round(((mrp - sp) / mrp) * 100) : 0;
+
               return (
                 <motion.div
                   key={event.id}
@@ -143,8 +150,15 @@ export default function Events() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.07 }}
-                  className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
+                  className="relative bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
                 >
+                  {/* Discount badge */}
+                  {hasDiscount && (
+                    <div className="absolute top-4 right-4 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                      {discountPct}% OFF
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
                     {/* Image */}
                     {event.image && (
@@ -162,9 +176,18 @@ export default function Events() {
                       <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div>
                           <h3 className="text-2xl font-display font-bold text-primary mb-1">{event.name}</h3>
-                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                            <Clock className="w-3.5 h-3.5 shrink-0" />
-                            <span>Minimum {event.minHours} hour{event.minHours !== 1 ? "s" : ""}</span>
+                          <div className="flex items-center gap-2 flex-wrap mt-1">
+                            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                              <Clock className="w-3.5 h-3.5 shrink-0" />
+                              <span>Minimum {event.minHours} hour{event.minHours !== 1 ? "s" : ""}</span>
+                            </div>
+                            {/* Pricing */}
+                            {sp && (
+                              <div className="flex items-baseline gap-1.5">
+                                <span className="text-base font-bold text-primary">₹{sp.toLocaleString()}</span>
+                                {hasDiscount && <span className="text-sm text-muted-foreground line-through">₹{mrp!.toLocaleString()}</span>}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

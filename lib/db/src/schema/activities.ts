@@ -10,6 +10,8 @@ export const activitiesTable = pgTable("activities", {
   image: text("image"),
   isActive: boolean("is_active").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
+  mrp: integer("mrp"),
+  sellingPrice: integer("selling_price"),
 });
 
 export const insertActivitySchema = createInsertSchema(activitiesTable).omit({ id: true });

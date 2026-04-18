@@ -121,6 +121,8 @@ export const ListActivitiesResponseItem = zod.object({
   image: zod.string().nullable(),
   isActive: zod.boolean(),
   sortOrder: zod.number(),
+  mrp: zod.number().nullable(),
+  sellingPrice: zod.number().nullable(),
 });
 export const ListActivitiesResponse = zod.array(ListActivitiesResponseItem);
 
@@ -133,6 +135,8 @@ export const CreateActivityBody = zod.object({
   icon: zod.string(),
   image: zod.string().optional(),
   sortOrder: zod.number().optional(),
+  mrp: zod.number().nullable().optional(),
+  sellingPrice: zod.number().nullable().optional(),
 });
 
 /**
@@ -149,6 +153,8 @@ export const UpdateActivityBody = zod.object({
   image: zod.string().optional(),
   isActive: zod.boolean().optional(),
   sortOrder: zod.number().optional(),
+  mrp: zod.number().nullable().optional(),
+  sellingPrice: zod.number().nullable().optional(),
 });
 
 export const UpdateActivityResponse = zod.object({
@@ -159,6 +165,8 @@ export const UpdateActivityResponse = zod.object({
   image: zod.string().nullable(),
   isActive: zod.boolean(),
   sortOrder: zod.number(),
+  mrp: zod.number().nullable(),
+  sellingPrice: zod.number().nullable(),
 });
 
 /**
