@@ -13,11 +13,11 @@ import { ChatWidget } from "@/components/ChatWidget";
 const ALL_NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Packages", href: "/packages" },
-  { name: "Events", href: "/events" },
   { name: "Activities", href: "/activities" },
-  { name: "Contact", href: "/contact" },
+  { name: "Events", href: "/events" },
   { name: "Gallery", href: "/gallery" },
   { name: "Blog", href: "/blog" },
+  { name: "Contact", href: "/contact" },
   { name: "About", href: "/about" },
 ];
 
