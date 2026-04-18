@@ -400,18 +400,18 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Footer */}
       <footer
-        className={cn("text-primary-foreground py-16 mt-auto", !themeFooterBg && "bg-primary")}
+        className={cn("text-primary-foreground py-8 mt-auto", !themeFooterBg && "bg-primary")}
         style={themeFooterBg ? { backgroundColor: themeFooterBg } : undefined}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="mb-6">
-              <p className="font-display font-bold text-4xl md:text-5xl text-white leading-none tracking-tight drop-shadow-sm">
+            <div className="mb-2">
+              <p className="font-display font-bold text-3xl md:text-4xl text-white leading-none tracking-tight drop-shadow-sm">
                 {settings?.siteName || "Mhadeinest"}
               </p>
             </div>
-            <p className="text-primary-foreground/70 mb-6">
+            <p className="text-primary-foreground/70 mb-3 text-sm">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}
             </p>
             <div className="flex gap-4 justify-center md:justify-start">
@@ -435,8 +435,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
           {/* Quick Links column */}
           <div className="text-center md:text-left">
-            <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Quick Links</h4>
-            <ul className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-2 md:flex-col md:gap-0 md:space-y-3">
+            <h4 className="text-base font-display font-semibold mb-3 text-secondary">Quick Links</h4>
+            <ul className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-1.5 md:flex-col md:gap-0 md:space-y-2 text-sm">
               {NAV_LINKS.filter(l => l.name !== "Gallery" && l.name !== "Blog").map(link => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-primary-foreground/80 hover:text-white transition-colors">
@@ -446,7 +446,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
               ))}
               {NAV_LINKS.some(l => l.name === "Gallery" || l.name === "Blog") && (
                 <>
-                  <li className="md:mt-4 mt-1">
+                  <li className="md:mt-3 mt-1">
                     <span className="text-[10px] font-semibold uppercase tracking-widest text-primary-foreground/40">Resources</span>
                   </li>
                   {NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog").map(link => (
@@ -463,11 +463,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
           {/* Contact column */}
           <div className="text-center md:text-left">
-            <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Contact Us</h4>
-            <div className="space-y-4 text-primary-foreground/80">
+            <h4 className="text-base font-display font-semibold mb-3 text-secondary">Contact Us</h4>
+            <div className="space-y-2 text-sm text-primary-foreground/80">
               <p>Email: {settings?.inquiryEmail || "bookings@mhadeinest.com"}</p>
               <p>Phone: {settings?.whatsappNumber || "+91 98765 43210"}</p>
-              <Link href="/admin/login" className="inline-block mt-8 text-sm opacity-50 hover:opacity-100 transition-opacity">
+              <Link href="/admin/login" className="inline-block mt-4 text-sm opacity-50 hover:opacity-100 transition-opacity">
                 Admin Login
               </Link>
             </div>
@@ -475,14 +475,14 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
         {/* Awards Recognition Strip */}
         {activeAwards.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-primary-foreground/10">
-            <div className="flex flex-col items-center gap-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 pt-5 border-t border-primary-foreground/10">
+            <div className="flex flex-col items-center gap-3">
               <div className="flex items-center gap-2 text-primary-foreground/60">
                 <Trophy className="w-4 h-4" />
                 <span className="text-xs font-semibold uppercase tracking-widest">Awards & Recognition</span>
                 <Trophy className="w-4 h-4" />
               </div>
-              <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+              <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                 {activeAwards.map(award => (
                   <div key={award.id} className="flex flex-col items-center gap-2 group">
                     {award.link ? (
@@ -529,7 +529,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 pt-4 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
           © {new Date().getFullYear()} {settings?.siteName || "Mhadeinest"}. All rights reserved.
         </div>
       </footer>
