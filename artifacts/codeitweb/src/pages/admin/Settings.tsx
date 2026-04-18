@@ -153,6 +153,14 @@ export default function AdminSettings() {
   const [logoSaving, setLogoSaving] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
+  // ── Hero images state ───────────────────────────────────────────────────
+  const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [heroImagesSaving, setHeroImagesSaving] = useState(false);
+  const [heroImagesChanged, setHeroImagesChanged] = useState(false);
+  const [heroImageUploading, setHeroImageUploading] = useState(false);
+  const [heroUrlInput, setHeroUrlInput] = useState("");
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
+
   // ── Nav menu state ──────────────────────────────────────────────────────
   const [hiddenItems, setHiddenItems] = useState<string[]>([]);
   const [navSaving, setNavSaving] = useState(false);
@@ -239,6 +247,8 @@ export default function AdminSettings() {
         bannerVideoUrl: (settings as any).bannerVideoUrl || "",
       });
       setLogoPreview((settings as any).siteLogo || "");
+      setHeroImages((settings as any).heroImages || []);
+      setHeroImagesChanged(false);
       setHiddenItems((settings as any).navHiddenItems || []);
       setShowChatWidget((settings as any).showChatWidget !== "false");
       setChatWidgetColor((settings as any).chatWidgetColor || "#10b981");
@@ -307,6 +317,59 @@ export default function AdminSettings() {
       toast({ title: "Error", description: "Failed to save logo.", variant: "destructive" });
     } finally {
       setLogoSaving(false);
+    }
+  };
+
+  // ── Hero images handlers ────────────────────────────────────────────────
+  const addHeroImageByUrl = () => {
+    const url = heroUrlInput.trim();
+    if (!url || heroImages.length >= 5) return;
+    setHeroImages(prev => [...prev, url]);
+    setHeroUrlInput("");
+    setHeroImagesChanged(true);
+  };
+
+  const removeHeroImage = (idx: number) => {
+    setHeroImages(prev => prev.filter((_, i) => i !== idx));
+    setHeroImagesChanged(true);
+  };
+
+  const handleHeroImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || heroImages.length >= 5) return;
+    e.target.value = "";
+    setHeroImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${API}/upload`, { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      setHeroImages(prev => [...prev, url]);
+      setHeroImagesChanged(true);
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload image.", variant: "destructive" });
+    } finally {
+      setHeroImageUploading(false);
+    }
+  };
+
+  const saveHeroImages = async () => {
+    setHeroImagesSaving(true);
+    try {
+      const res = await fetch(`${API}/settings`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ heroImages }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+      setHeroImagesChanged(false);
+      toast({ title: "Hero images saved", description: `${heroImages.length} image(s) saved for the hero slideshow.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to save hero images.", variant: "destructive" });
+    } finally {
+      setHeroImagesSaving(false);
     }
   };
 
@@ -716,11 +779,96 @@ export default function AdminSettings() {
                       <Input {...siteForm.register("heroLocationTag")} placeholder="Mandovi River, Goa" />
                       <p className="text-xs text-muted-foreground mt-1">Small badge shown over the hero image (e.g. "Mandovi River, Goa")</p>
                     </Field>
-                    <Field label="Hero Image URL">
+                    <Field label="Hero Image URL (fallback)" className="md:col-span-2">
                       <Input {...siteForm.register("heroImage")} placeholder="https://... or /images/hero.png" />
-                      <p className="text-xs text-muted-foreground mt-1">Full-screen background image for the hero section</p>
+                      <p className="text-xs text-muted-foreground mt-1">Used as the hero background when no slideshow images are set below</p>
                     </Field>
                   </div>
+                </div>
+
+                {/* ── HERO SLIDESHOW IMAGES ─────────────────────────── */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-5">
+                  <div className="flex items-center justify-between border-b border-border pb-3">
+                    <h3 className="font-bold text-base">Hero Slideshow Images</h3>
+                    <span className="text-xs text-muted-foreground">{heroImages.length}/5 images</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Add up to 5 photos that auto-rotate in the hero background. Upload a file or paste a URL. Leave empty to use the fallback URL above.</p>
+
+                  {/* Current images */}
+                  {heroImages.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                      {heroImages.map((url, idx) => (
+                        <div key={idx} className="relative group rounded-lg overflow-hidden border border-border aspect-video bg-muted">
+                          <img
+                            src={url}
+                            alt={`Hero ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => removeHeroImage(idx)}
+                              className="bg-destructive text-white rounded-full p-1 hover:scale-110 transition-transform"
+                              title="Remove"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1 rounded">{idx + 1}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add new image */}
+                  {heroImages.length < 5 && (
+                    <div className="flex gap-2">
+                      <Input
+                        value={heroUrlInput}
+                        onChange={e => setHeroUrlInput(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addHeroImageByUrl())}
+                        placeholder="https://... or /images/hero.png"
+                        className="flex-1"
+                      />
+                      <Button type="button" variant="outline" size="sm" onClick={addHeroImageByUrl} disabled={!heroUrlInput.trim()}>
+                        Add URL
+                      </Button>
+                      <input
+                        ref={heroImageInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleHeroImageUpload}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => heroImageInputRef.current?.click()}
+                        disabled={heroImageUploading}
+                      >
+                        {heroImageUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        Upload
+                      </Button>
+                    </div>
+                  )}
+
+                  {heroImagesChanged && (
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="gap-2"
+                        onClick={saveHeroImages}
+                        disabled={heroImagesSaving}
+                      >
+                        {heroImagesSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {heroImagesSaving ? "Saving…" : "Save Slideshow Images"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* ── EXPLORE SECTION ───────────────────────────────── */}

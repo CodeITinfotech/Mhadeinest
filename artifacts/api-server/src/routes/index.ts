@@ -14,9 +14,11 @@ import faqsRouter from "./faqs";
 import eventsRouter from "./events";
 import exportSqlRouter from "./export-sql";
 import dbInfoRouter from "./db-info";
+import uploadRouter from "./upload";
 
 const router: IRouter = Router();
 
+router.use(uploadRouter);
 router.use(healthRouter);
 router.use(packagesRouter);
 router.use(activitiesRouter);

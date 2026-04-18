@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import fs from "fs";
 import http from "http";
+import { fileURLToPath } from "url";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -35,6 +36,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api", router);
+
+// Always serve the uploads directory directly (works in both dev and prod)
+const uploadsDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../../artifacts/codeitweb/public/images/uploads"
+);
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use("/images/uploads", express.static(uploadsDir));
 
 if (process.env.NODE_ENV === "production") {
   const staticDir = path.join(process.cwd(), "artifacts/codeitweb/dist/public");

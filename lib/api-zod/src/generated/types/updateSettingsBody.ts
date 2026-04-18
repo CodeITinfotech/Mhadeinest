@@ -12,6 +12,7 @@ export interface UpdateSettingsBody {
   heroTitle?: string;
   heroSubtitle?: string;
   heroImage?: string;
+  heroImages?: string[];
   whatsappNumber?: string;
   inquiryEmail?: string;
   socialInstagram?: string;

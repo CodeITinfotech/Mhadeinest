@@ -9,6 +9,7 @@ export const settingsTable = pgTable("settings", {
   heroTitle: text("hero_title").notNull().default("Experience Goa From The Water"),
   heroSubtitle: text("hero_subtitle").notNull().default("Luxury houseboat stay with 3 private bedrooms, rooftop dining, and thrilling water activities"),
   heroImage: text("hero_image").notNull().default(""),
+  heroImages: text("hero_images").array().notNull().default([]),
   heroLocationTag: text("hero_location_tag").notNull().default("Mandovi River, Goa"),
   whatsappNumber: text("whatsapp_number").notNull().default("919876543210"),
   inquiryEmail: text("inquiry_email").notNull().default("booking@goahouseboat.com"),

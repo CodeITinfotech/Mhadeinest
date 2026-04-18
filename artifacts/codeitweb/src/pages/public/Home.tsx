@@ -78,7 +78,22 @@ export default function Home() {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .slice(0, 4);
 
-  const heroImage = settings?.heroImage || `${BASE}images/hero.png`;
+  const heroSlideImages: string[] = (() => {
+    const imgs = (settings as any)?.heroImages as string[] | undefined;
+    if (imgs && imgs.length > 0) return imgs;
+    const fallback = settings?.heroImage || `${BASE}images/hero.png`;
+    return [fallback];
+  })();
+
+  const [heroSlide, setHeroSlide] = useState(0);
+
+  useEffect(() => {
+    if (heroSlideImages.length <= 1) return;
+    const timer = setInterval(() => {
+      setHeroSlide(prev => (prev + 1) % heroSlideImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroSlideImages.length]);
 
   useEffect(() => {
     if (window.location.hash === "#check-availability") {
@@ -101,14 +116,34 @@ export default function Home() {
       {/* ─── HERO ─── */}
       <section className="relative h-screen min-h-[600px] overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src={heroImage}
-            alt="Mhadeinest — luxury river resort on the Goa backwaters"
-            className="w-full h-full object-cover object-center"
-          />
+          <AnimatePresence initial={false}>
+            <motion.img
+              key={heroSlideImages[heroSlide]}
+              src={heroSlideImages[heroSlide]}
+              alt="Hero background"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
+            />
+          </AnimatePresence>
           {/* Lighter, more natural gradient — image earns its place */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-black/68" />
         </div>
+        {/* Slide indicator dots */}
+        {heroSlideImages.length > 1 && (
+          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+            {heroSlideImages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setHeroSlide(i)}
+                className={`w-2 h-2 rounded-full transition-all ${i === heroSlide ? "bg-white scale-125" : "bg-white/40 hover:bg-white/70"}`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Location tag */}
         <motion.div

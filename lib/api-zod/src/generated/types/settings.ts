@@ -13,6 +13,7 @@ export interface Settings {
   heroTitle: string;
   heroSubtitle: string;
   heroImage: string;
+  heroImages: string[];
   whatsappNumber: string;
   inquiryEmail: string;
   /** @nullable */
