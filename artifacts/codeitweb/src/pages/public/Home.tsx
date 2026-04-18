@@ -108,16 +108,13 @@ export default function Home() {
 
   const activePackages = packages.filter(p => p.isActive).slice(0, 3);
 
-  // Build explore category images from real data
-  const pkgsWithImage = packages.filter(p => p.isActive && p.image).sort((a, b) => a.sortOrder - b.sortOrder);
-  const actsWithImage = activities.filter(a => a.isActive && a.image).sort((a, b) => a.sortOrder - b.sortOrder);
-  const settingsAny = settings as any;
+  // Build explore cards from real packages + activities (first 2 of each, up to 4 total)
+  const sortedPackages = packages.filter(p => p.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
+  const sortedActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const exploreCategories = [
-    { label: "Luxury Rooms",    image: pkgsWithImage[0]?.image || null,  href: "/packages" },
-    { label: "Dining & Cuisine",image: pkgsWithImage[1]?.image || settingsAny?.bannerImage || null, href: "/packages" },
-    { label: "Water Activities", image: actsWithImage[0]?.image || null, href: "/activities" },
-    { label: "The Resort",      image: settingsAny?.welcomeImage || actsWithImage[1]?.image || pkgsWithImage[2]?.image || null, href: "/about" },
-  ];
+    ...sortedPackages.slice(0, 2).map(p => ({ label: p.name, image: p.image || null, href: "/packages" })),
+    ...sortedActivities.slice(0, 2).map(a => ({ label: a.name, image: a.image || null, href: "/activities" })),
+  ].slice(0, 4);
 
   return (
     <div className="flex flex-col">
