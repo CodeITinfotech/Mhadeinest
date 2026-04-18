@@ -43,10 +43,10 @@ export default function Contact() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/inquiries`, {
+      const res = await fetch(`${API_BASE}/api/inquiry`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, message: form.message || "Contact page inquiry" }),
+        body: JSON.stringify({ ...form, whatsapp: form.phone, message: form.message || "Contact page inquiry" }),
       });
       if (!res.ok) throw new Error("Failed");
       setSuccess(true);
