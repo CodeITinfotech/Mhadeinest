@@ -152,61 +152,71 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex flex-1 items-center justify-center gap-7">
-            {NAV_LINKS.filter(l => l.name !== "Gallery" && l.name !== "Blog").map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={cn(
-                  "text-sm font-medium transition-colors relative py-1 group",
-                  location === link.href
-                    ? "text-secondary"
-                    : "text-foreground/80 hover:text-primary"
-                )}
-              >
-                {link.name}
-                <span className={cn(
-                  "absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all duration-200 bg-secondary",
-                  location === link.href ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100"
-                )} />
-              </Link>
-            ))}
-            {/* Resources dropdown (Gallery + Blog) */}
-            {NAV_LINKS.some(l => l.name === "Gallery" || l.name === "Blog") && (
-              <div className="relative group">
-                <button className={cn(
-                  "flex items-center gap-1 text-sm font-medium transition-colors relative py-1",
-                  (location === "/gallery" || location === "/blog")
-                    ? "text-secondary"
-                    : "text-foreground/80 hover:text-primary"
-                )}>
-                  Resources
-                  <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
-                  <span className={cn(
-                    "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-secondary transition-all duration-200",
-                    (location === "/gallery" || location === "/blog") ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
-                  )} />
-                </button>
-                {/* Dropdown panel */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50">
-                  <div className="bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-[130px]">
-                    {NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog").map(link => (
-                      <Link
-                        key={link.name}
-                        href={link.href}
-                        className={cn(
-                          "flex items-center px-4 py-2.5 text-sm font-medium transition-colors",
-                          location === link.href
-                            ? "text-secondary bg-primary/5"
-                            : "text-foreground/80 hover:text-primary hover:bg-muted"
-                        )}
-                      >
-                        {link.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+            {(() => {
+              const resourceLinks = NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog");
+              const hasResources = resourceLinks.length > 0;
+              let resourcesRendered = false;
+              return NAV_LINKS.map((link) => {
+                if (link.name === "Gallery" || link.name === "Blog") {
+                  if (resourcesRendered) return null;
+                  resourcesRendered = true;
+                  if (!hasResources) return null;
+                  return (
+                    <div key="resources" className="relative group">
+                      <button className={cn(
+                        "flex items-center gap-1 text-sm font-medium transition-colors relative py-1",
+                        (location === "/gallery" || location === "/blog")
+                          ? "text-secondary"
+                          : "text-foreground/80 hover:text-primary"
+                      )}>
+                        Resources
+                        <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                        <span className={cn(
+                          "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-secondary transition-all duration-200",
+                          (location === "/gallery" || location === "/blog") ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+                        )} />
+                      </button>
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50">
+                        <div className="bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-[130px]">
+                          {resourceLinks.map(rl => (
+                            <Link
+                              key={rl.name}
+                              href={rl.href}
+                              className={cn(
+                                "flex items-center px-4 py-2.5 text-sm font-medium transition-colors",
+                                location === rl.href
+                                  ? "text-secondary bg-primary/5"
+                                  : "text-foreground/80 hover:text-primary hover:bg-muted"
+                              )}
+                            >
+                              {rl.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={cn(
+                      "text-sm font-medium transition-colors relative py-1 group",
+                      location === link.href
+                        ? "text-secondary"
+                        : "text-foreground/80 hover:text-primary"
+                    )}
+                  >
+                    {link.name}
+                    <span className={cn(
+                      "absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all duration-200 bg-secondary",
+                      location === link.href ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100"
+                    )} />
+                  </Link>
+                );
+              });
+            })()}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
