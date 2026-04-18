@@ -477,6 +477,8 @@ export const GetSettingsResponse = zod.object({
   themeFooterBg: zod.string(),
   themeButtonColor: zod.string(),
   themeTextColor: zod.string(),
+  developerName: zod.string(),
+  developerUrl: zod.string(),
   updatedAt: zod.string(),
 });
 
@@ -541,6 +543,8 @@ export const UpdateSettingsBody = zod.object({
   themeFooterBg: zod.string().optional(),
   themeButtonColor: zod.string().optional(),
   themeTextColor: zod.string().optional(),
+  developerName: zod.string().optional(),
+  developerUrl: zod.string().optional(),
 });
 
 export const UpdateSettingsResponse = zod.object({
@@ -602,6 +606,8 @@ export const UpdateSettingsResponse = zod.object({
   themeFooterBg: zod.string(),
   themeButtonColor: zod.string(),
   themeTextColor: zod.string(),
+  developerName: zod.string(),
+  developerUrl: zod.string(),
   updatedAt: zod.string(),
 });
 

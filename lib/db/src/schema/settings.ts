@@ -61,6 +61,8 @@ export const settingsTable = pgTable("settings", {
   themeFooterBg: text("theme_footer_bg").notNull().default(""),
   themeButtonColor: text("theme_button_color").notNull().default(""),
   themeTextColor: text("theme_text_color").notNull().default(""),
+  developerName: text("developer_name").notNull().default(""),
+  developerUrl: text("developer_url").notNull().default(""),
   dbType: text("db_type").notNull().default("postgresql"),
   dbHost: text("db_host").notNull().default(""),
   dbPort: text("db_port").notNull().default("3306"),

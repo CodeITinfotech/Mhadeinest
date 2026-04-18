@@ -78,6 +78,8 @@ const siteSchema = z.object({
   themeFooterBg: z.string(),
   themeButtonColor: z.string(),
   themeTextColor: z.string(),
+  developerName: z.string(),
+  developerUrl: z.string(),
 });
 
 const profileSchema = z.object({
@@ -241,6 +243,8 @@ export default function AdminSettings() {
         themeFooterBg: (settings as any).themeFooterBg || "",
         themeButtonColor: (settings as any).themeButtonColor || "",
         themeTextColor: (settings as any).themeTextColor || "",
+        developerName: (settings as any).developerName || "",
+        developerUrl: (settings as any).developerUrl || "",
       });
       setLogoPreview((settings as any).siteLogo || "");
       setHeroImages((settings as any).heroImages || []);
@@ -956,6 +960,21 @@ export default function AdminSettings() {
                     <Field label="Instagram URL"><Input {...siteForm.register("socialInstagram")} /></Field>
                     <Field label="Facebook URL"><Input {...siteForm.register("socialFacebook")} /></Field>
                     <Field label="YouTube URL"><Input {...siteForm.register("socialYoutube")} /></Field>
+                  </div>
+
+                  <div className="border-t border-border pt-5 space-y-4">
+                    <div>
+                      <p className="text-sm font-semibold">Footer Credit</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Shown in the footer as "Designed &amp; developed by [Company]". Leave blank to hide.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <Field label="Company Name">
+                        <Input {...siteForm.register("developerName")} placeholder="e.g. Codeit Studio" />
+                      </Field>
+                      <Field label="Company Website URL">
+                        <Input {...siteForm.register("developerUrl")} placeholder="https://codeitstudio.in" />
+                      </Field>
+                    </div>
                   </div>
                 </div>
 

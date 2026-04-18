@@ -529,8 +529,25 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 pt-4 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50">
-          © {new Date().getFullYear()} {settings?.siteName || "Mhadeinest"}. All rights reserved.
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5 pt-4 border-t border-primary-foreground/10 text-center text-sm text-primary-foreground/50 space-y-1">
+          <p>© {new Date().getFullYear()} {settings?.siteName || "Mhadeinest"}. All rights reserved.</p>
+          {(settings as any)?.developerName && (
+            <p>
+              Designed &amp; developed by{" "}
+              {(settings as any)?.developerUrl ? (
+                <a
+                  href={(settings as any).developerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary-foreground/80 transition-colors underline underline-offset-2"
+                >
+                  {(settings as any).developerName}
+                </a>
+              ) : (
+                <span>{(settings as any).developerName}</span>
+              )}
+            </p>
+          )}
         </div>
       </footer>
 
