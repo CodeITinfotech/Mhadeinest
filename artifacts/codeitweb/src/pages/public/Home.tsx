@@ -88,13 +88,15 @@ export default function Home() {
 
   const [heroSlide, setHeroSlide] = useState(0);
 
+  const slideIntervalMs = ((settings as any)?.heroSlideInterval ?? 5) * 1000;
+
   useEffect(() => {
     if (heroSlideImages.length <= 1) return;
     const timer = setInterval(() => {
       setHeroSlide(prev => (prev + 1) % heroSlideImages.length);
-    }, 5000);
+    }, slideIntervalMs);
     return () => clearInterval(timer);
-  }, [heroSlideImages.length]);
+  }, [heroSlideImages.length, slideIntervalMs]);
 
   useEffect(() => {
     if (window.location.hash === "#check-availability") {

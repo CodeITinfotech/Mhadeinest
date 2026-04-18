@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -10,6 +10,7 @@ export const settingsTable = pgTable("settings", {
   heroSubtitle: text("hero_subtitle").notNull().default("Luxury houseboat stay with 3 private bedrooms, rooftop dining, and thrilling water activities"),
   heroImage: text("hero_image").notNull().default(""),
   heroImages: text("hero_images").array().notNull().default([]),
+  heroSlideInterval: integer("hero_slide_interval").notNull().default(5),
   heroLocationTag: text("hero_location_tag").notNull().default("Mandovi River, Goa"),
   whatsappNumber: text("whatsapp_number").notNull().default("919876543210"),
   inquiryEmail: text("inquiry_email").notNull().default("booking@goahouseboat.com"),

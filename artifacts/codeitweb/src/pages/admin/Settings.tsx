@@ -55,6 +55,7 @@ const siteSchema = z.object({
   heroTitle: z.string(),
   heroSubtitle: z.string(),
   heroImage: z.string(),
+  heroSlideInterval: z.coerce.number().min(2).max(30).default(5),
   heroLocationTag: z.string(),
   whatsappNumber: z.string(),
   inquiryEmail: z.string().email(),
@@ -213,6 +214,7 @@ export default function AdminSettings() {
         heroTitle: settings.heroTitle,
         heroSubtitle: settings.heroSubtitle,
         heroImage: settings.heroImage,
+        heroSlideInterval: (settings as any).heroSlideInterval ?? 5,
         heroLocationTag: (settings as any).heroLocationTag || "Mandovi River, Goa",
         whatsappNumber: settings.whatsappNumber,
         inquiryEmail: settings.inquiryEmail,
@@ -794,6 +796,27 @@ export default function AdminSettings() {
                     <span className="text-xs text-muted-foreground">{heroImages.length}/5 images</span>
                   </div>
                   <p className="text-xs text-muted-foreground">Add up to 5 photos that auto-rotate in the hero background. Upload a file or paste a URL. Leave empty to use the fallback URL above.</p>
+
+                  {/* Slide interval */}
+                  <div className="flex items-center gap-4 py-2 border-b border-border">
+                    <div className="flex-1">
+                      <label className="text-sm font-medium text-foreground">Slide Interval</label>
+                      <p className="text-xs text-muted-foreground mt-0.5">How many seconds each image is shown before switching</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min={2}
+                        max={30}
+                        step={1}
+                        {...siteForm.register("heroSlideInterval")}
+                        className="w-28 accent-secondary"
+                      />
+                      <span className="text-sm font-semibold tabular-nums w-12 text-center">
+                        {siteForm.watch("heroSlideInterval") ?? 5}s
+                      </span>
+                    </div>
+                  </div>
 
                   {/* Current images */}
                   {heroImages.length > 0 && (
