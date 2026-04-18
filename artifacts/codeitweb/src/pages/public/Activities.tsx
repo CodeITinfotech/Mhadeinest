@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useListActivities } from "@workspace/api-client-react";
 import * as LucideIcons from "lucide-react";
+import { Link } from "wouter";
+import { ArrowRight } from "lucide-react";
 
 export default function Activities() {
   const { data: activities = [], isLoading } = useListActivities();
@@ -39,27 +41,31 @@ export default function Activities() {
           {activeActivities.map((activity, idx) => {
             const IconComponent = (LucideIcons as any)[activity.icon] || LucideIcons.Activity;
             return (
-              <motion.div 
-                key={activity.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-secondary/50 transition-all group"
-              >
-                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 group-hover:bg-secondary/20 group-hover:text-secondary transition-all">
-                  <IconComponent className="w-7 h-7" />
-                </div>
-                <h3 className="text-2xl font-display font-bold text-primary mb-4">{activity.name}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {activity.description}
-                </p>
-                {activity.image && (
-                  <div className="mt-6 rounded-xl overflow-hidden aspect-video">
-                    <img src={activity.image} alt={activity.name} className="w-full h-full object-cover" />
+              <Link key={activity.id} href={`/activities/${activity.id}`}>
+                <motion.div 
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl hover:border-secondary/50 transition-all group cursor-pointer h-full flex flex-col"
+                >
+                  <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 group-hover:bg-secondary/20 group-hover:text-secondary transition-all">
+                    <IconComponent className="w-7 h-7" />
                   </div>
-                )}
-              </motion.div>
+                  <h3 className="text-2xl font-display font-bold text-primary mb-4 group-hover:text-secondary transition-colors">{activity.name}</h3>
+                  <p className="text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                    {activity.description}
+                  </p>
+                  {activity.image && (
+                    <div className="mt-6 rounded-xl overflow-hidden aspect-video">
+                      <img src={activity.image} alt={activity.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    </div>
+                  )}
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-secondary text-sm font-semibold">
+                    Read more <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </motion.div>
+              </Link>
             );
           })}
         </div>

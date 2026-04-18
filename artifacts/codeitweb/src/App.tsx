@@ -19,6 +19,7 @@ import BlogDetail from "@/pages/public/blog/BlogDetail";
 import BlogSubmit from "@/pages/public/blog/BlogSubmit";
 import About from "@/pages/public/About";
 import Contact from "@/pages/public/Contact";
+import ActivityDetail from "@/pages/public/ActivityDetail";
 
 // Admin Pages
 import AdminLogin from "@/pages/admin/Login";
@@ -89,6 +90,7 @@ function Router() {
             <Route path="/packages" component={Packages} />
             <Route path="/events" component={Events} />
             <Route path="/activities" component={Activities} />
+            <Route path="/activities/:id" component={ActivityDetail} />
             <Route path="/gallery" component={Gallery} />
             <Route path="/blog" component={BlogList} />
             <Route path="/blog/submit" component={BlogSubmit} />
