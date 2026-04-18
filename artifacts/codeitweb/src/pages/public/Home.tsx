@@ -109,11 +109,25 @@ export default function Home() {
   const activePackages = packages.filter(p => p.isActive).slice(0, 3);
 
   // Build explore cards from real packages + activities (first 2 of each, up to 4 total)
+  // For images: use the item's own image, then cycle through gallery/hero images as fallback
   const sortedPackages = packages.filter(p => p.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const sortedActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
+  const imagePool: string[] = [
+    ...activeGalleryImages,
+    ...((settings as any)?.heroImages as string[] | undefined || []),
+    ...(settings?.heroImage ? [settings.heroImage] : []),
+  ].filter(Boolean);
+  let poolIdx = 0;
+  const pickImage = (own: string | null | undefined): string | null => {
+    if (own) return own;
+    if (imagePool.length === 0) return null;
+    const img = imagePool[poolIdx % imagePool.length];
+    poolIdx++;
+    return img;
+  };
   const exploreCategories = [
-    ...sortedPackages.slice(0, 2).map(p => ({ label: p.name, image: p.image || null, href: "/packages" })),
-    ...sortedActivities.slice(0, 2).map(a => ({ label: a.name, image: a.image || null, href: "/activities" })),
+    ...sortedPackages.slice(0, 2).map(p => ({ label: p.name, image: pickImage(p.image), href: "/packages" })),
+    ...sortedActivities.slice(0, 2).map(a => ({ label: a.name, image: pickImage(a.image), href: "/activities" })),
   ].slice(0, 4);
 
   return (
