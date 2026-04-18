@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useGetSettings } from "@workspace/api-client-react";
 import { useQuery } from "@tanstack/react-query";
-import { Phone, Menu, X, Instagram, Facebook, Youtube, MessageCircle, Trophy } from "lucide-react";
+import { Phone, Menu, X, Instagram, Facebook, Youtube, MessageCircle, Trophy, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -151,7 +151,7 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex flex-1 items-center justify-center gap-7">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS.filter(l => l.name !== "Gallery" && l.name !== "Blog").map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
@@ -163,13 +163,49 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
                 )}
               >
                 {link.name}
-                {/* Active underline indicator */}
                 <span className={cn(
                   "absolute bottom-0 left-0 right-0 h-0.5 rounded-full transition-all duration-200 bg-secondary",
                   location === link.href ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 group-hover:opacity-60 group-hover:scale-x-100"
                 )} />
               </Link>
             ))}
+            {/* Resources dropdown (Gallery + Blog) */}
+            {NAV_LINKS.some(l => l.name === "Gallery" || l.name === "Blog") && (
+              <div className="relative group">
+                <button className={cn(
+                  "flex items-center gap-1 text-sm font-medium transition-colors relative py-1",
+                  (location === "/gallery" || location === "/blog")
+                    ? "text-secondary"
+                    : "text-foreground/80 hover:text-primary"
+                )}>
+                  Resources
+                  <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180" />
+                  <span className={cn(
+                    "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-secondary transition-all duration-200",
+                    (location === "/gallery" || location === "/blog") ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
+                  )} />
+                </button>
+                {/* Dropdown panel */}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50">
+                  <div className="bg-background border border-border rounded-xl shadow-lg py-1.5 min-w-[130px]">
+                    {NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog").map(link => (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        className={cn(
+                          "flex items-center px-4 py-2.5 text-sm font-medium transition-colors",
+                          location === link.href
+                            ? "text-secondary bg-primary/5"
+                            : "text-foreground/80 hover:text-primary hover:bg-muted"
+                        )}
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
@@ -228,8 +264,8 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
               className="fixed left-0 right-0 z-40 bg-background/97 backdrop-blur-md border-b border-border shadow-2xl md:hidden overflow-y-auto"
             >
               <div className="px-5 py-4 space-y-1">
-                {/* Nav links */}
-                {NAV_LINKS.map((link) => (
+                {/* Main nav links (excluding Gallery & Blog) */}
+                {NAV_LINKS.filter(l => l.name !== "Gallery" && l.name !== "Blog").map((link) => (
                   <Link
                     key={link.name}
                     href={link.href}
@@ -247,6 +283,30 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
                     {link.name}
                   </Link>
                 ))}
+                {/* Resources group (Gallery + Blog) */}
+                {NAV_LINKS.some(l => l.name === "Gallery" || l.name === "Blog") && (
+                  <div className="pt-1">
+                    <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Resources</p>
+                    {NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog").map((link) => (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 pl-6 pr-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                          location === link.href
+                            ? "bg-primary/8 text-secondary font-semibold"
+                            : "text-foreground/80 hover:bg-muted"
+                        )}
+                      >
+                        {location === link.href && (
+                          <span className="w-1 h-1 rounded-full bg-secondary shrink-0" />
+                        )}
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
                 {/* Divider */}
                 <div className="h-px bg-border my-2" />
@@ -323,13 +383,27 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
           <div className="text-center md:text-left">
             <h4 className="text-lg font-display font-semibold mb-6 text-secondary">Quick Links</h4>
             <ul className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-2 md:flex-col md:gap-0 md:space-y-3">
-              {NAV_LINKS.slice(0, 5).map(link => (
+              {NAV_LINKS.filter(l => l.name !== "Gallery" && l.name !== "Blog").map(link => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-primary-foreground/80 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
               ))}
+              {NAV_LINKS.some(l => l.name === "Gallery" || l.name === "Blog") && (
+                <>
+                  <li className="md:mt-4 mt-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-primary-foreground/40">Resources</span>
+                  </li>
+                  {NAV_LINKS.filter(l => l.name === "Gallery" || l.name === "Blog").map(link => (
+                    <li key={link.name}>
+                      <Link href={link.href} className="text-primary-foreground/70 hover:text-white transition-colors">
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              )}
             </ul>
           </div>
 
