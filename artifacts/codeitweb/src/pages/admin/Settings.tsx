@@ -20,7 +20,7 @@ import { processImage } from "@/lib/imageUtils";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
 
-type Tab = "site" | "email" | "profile" | "deployment";
+type Tab = "site" | "theme" | "email" | "profile" | "deployment";
 
 const ALL_NAV_ITEMS = [
   { key: "Home",       href: "/" },
@@ -74,6 +74,10 @@ const siteSchema = z.object({
   bannerDescription: z.string(),
   bannerImage: z.string(),
   bannerVideoUrl: z.string(),
+  themeNavBg: z.string(),
+  themeFooterBg: z.string(),
+  themeButtonColor: z.string(),
+  themeTextColor: z.string(),
 });
 
 const profileSchema = z.object({
@@ -233,6 +237,10 @@ export default function AdminSettings() {
         bannerDescription: (settings as any).bannerDescription || "Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds.",
         bannerImage: (settings as any).bannerImage || "",
         bannerVideoUrl: (settings as any).bannerVideoUrl || "",
+        themeNavBg: (settings as any).themeNavBg || "",
+        themeFooterBg: (settings as any).themeFooterBg || "",
+        themeButtonColor: (settings as any).themeButtonColor || "",
+        themeTextColor: (settings as any).themeTextColor || "",
       });
       setLogoPreview((settings as any).siteLogo || "");
       setHeroImages((settings as any).heroImages || []);
@@ -644,6 +652,7 @@ export default function AdminSettings() {
 
   const tabs = [
     { key: "site" as Tab, label: "Site Settings", icon: Globe },
+    { key: "theme" as Tab, label: "Theme", icon: LayoutGrid },
     { key: "email" as Tab, label: "Email Settings", icon: Mail },
     { key: "profile" as Tab, label: "Admin Profile", icon: User },
     { key: "deployment" as Tab, label: "Deployment", icon: Server },
@@ -1154,6 +1163,110 @@ export default function AdminSettings() {
             </div>
           )}
         </>
+      )}
+
+      {/* ── THEME TAB ─────────────────────────────────────────────────── */}
+      {activeTab === "theme" && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">Website Theme</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">Customise colours for key areas of your website. Leave blank to use the default theme.</p>
+            </div>
+            <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2">
+              {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {updateMutation.isPending ? "Saving…" : "Save Theme"}
+            </Button>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
+            {([
+              { label: "Header / Nav background", field: "themeNavBg", hint: "The top navigation bar background colour" },
+              { label: "Footer background",        field: "themeFooterBg", hint: "The footer section background colour" },
+              { label: "Button / Accent colour",   field: "themeButtonColor", hint: "CTA buttons, active links, and highlight accents" },
+              { label: "Body text colour",          field: "themeTextColor", hint: "Main paragraph and UI text across the site" },
+            ] as { label: string; field: "themeNavBg" | "themeFooterBg" | "themeButtonColor" | "themeTextColor"; hint: string }[]).map(({ label, field, hint }) => {
+              const val: string = siteForm.watch(field) || "";
+              const isValid = /^#[0-9a-fA-F]{6}$/.test(val);
+              return (
+                <div key={field} className="flex flex-col sm:flex-row sm:items-center gap-4 pb-6 border-b border-border last:border-0 last:pb-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div
+                      className="w-10 h-10 rounded-lg border-2 border-border shrink-0 cursor-pointer overflow-hidden"
+                      style={{ backgroundColor: isValid ? val : "transparent" }}
+                      title="Click to open colour picker"
+                    >
+                      <input
+                        type="color"
+                        value={isValid ? val : "#ffffff"}
+                        onChange={e => siteForm.setValue(field, e.target.value)}
+                        className="w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
+                    <Input
+                      {...siteForm.register(field)}
+                      placeholder="#rrggbb or blank for default"
+                      className="w-48 font-mono text-sm"
+                      maxLength={7}
+                    />
+                    {val && (
+                      <button
+                        type="button"
+                        onClick={() => siteForm.setValue(field, "")}
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors whitespace-nowrap"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Live preview strip */}
+          {(() => {
+            const navBg = siteForm.watch("themeNavBg") || "";
+            const footerBg = siteForm.watch("themeFooterBg") || "";
+            const btnColor = siteForm.watch("themeButtonColor") || "";
+            const textColor = siteForm.watch("themeTextColor") || "";
+            const defaultNav = "hsl(43 32% 97%)";
+            const defaultFooter = "hsl(162 42% 22%)";
+            const defaultBtn = "hsl(33 76% 52%)";
+            const defaultText = "hsl(160 18% 16%)";
+            return (
+              <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-3">
+                <p className="text-sm font-semibold text-foreground flex items-center gap-2"><Eye className="w-4 h-4 text-muted-foreground" /> Live Preview</p>
+                <div className="rounded-lg overflow-hidden border border-border text-sm">
+                  <div className="px-4 py-2.5 flex items-center justify-between" style={{ backgroundColor: /^#[0-9a-fA-F]{6}$/.test(navBg) ? navBg : defaultNav }}>
+                    <span className="font-bold text-xs" style={{ color: /^#[0-9a-fA-F]{6}$/.test(textColor) ? textColor : defaultText }}>Site Name</span>
+                    <div className="flex gap-3 text-xs" style={{ color: /^#[0-9a-fA-F]{6}$/.test(textColor) ? textColor : defaultText }}>
+                      <span>Home</span><span>Packages</span><span>Contact</span>
+                    </div>
+                  </div>
+                  <div className="px-4 py-4 bg-background flex items-center gap-3">
+                    <span className="text-xs" style={{ color: /^#[0-9a-fA-F]{6}$/.test(textColor) ? textColor : defaultText }}>Your page content appears here.</span>
+                    <span className="text-xs px-3 py-1 rounded-full font-semibold" style={{ backgroundColor: /^#[0-9a-fA-F]{6}$/.test(btnColor) ? btnColor : defaultBtn, color: "#fff" }}>Book Now</span>
+                  </div>
+                  <div className="px-4 py-2.5 text-xs text-white/80" style={{ backgroundColor: /^#[0-9a-fA-F]{6}$/.test(footerBg) ? footerBg : defaultFooter }}>
+                    © {new Date().getFullYear()} Site Name · All rights reserved.
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          <div className="flex justify-end pt-2">
+            <Button onClick={siteForm.handleSubmit(onSiteSubmit)} disabled={updateMutation.isPending} className="gap-2 px-8">
+              {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {updateMutation.isPending ? "Saving…" : "Save Theme"}
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* ── EMAIL SETTINGS TAB ────────────────────────────────────────── */}

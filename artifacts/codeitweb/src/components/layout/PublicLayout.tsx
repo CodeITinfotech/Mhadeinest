@@ -54,6 +54,25 @@ function CurrencySwitcher({ scrolled, onHome }: { scrolled: boolean; onHome: boo
 
 const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+function hexToHsl(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
 interface Award {
   id: number;
   title: string;
@@ -110,6 +129,25 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const themeNavBg: string = (settings as any)?.themeNavBg || "";
+  const themeFooterBg: string = (settings as any)?.themeFooterBg || "";
+  const themeButtonColor: string = (settings as any)?.themeButtonColor || "";
+  const themeTextColor: string = (settings as any)?.themeTextColor || "";
+
+  useEffect(() => {
+    const parts: string[] = [];
+    const isHex = (v: string) => /^#[0-9a-fA-F]{6}$/.test(v);
+    if (isHex(themeButtonColor)) parts.push(`--secondary: ${hexToHsl(themeButtonColor)};`);
+    if (isHex(themeTextColor)) parts.push(`--foreground: ${hexToHsl(themeTextColor)};`);
+    let el = document.getElementById("theme-overrides") as HTMLStyleElement | null;
+    if (!el) {
+      el = document.createElement("style");
+      el.id = "theme-overrides";
+      document.head.appendChild(el);
+    }
+    el.textContent = parts.length ? `:root { ${parts.join(" ")} }` : "";
+  }, [themeButtonColor, themeTextColor]);
+
   const whatsappLink = settings?.whatsappNumber 
     ? `https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}?text=Hello!%20I%20would%20like%20to%20inquire%20about%20Mhadeinest.`
     : "#";
@@ -119,9 +157,11 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Header — always visible, scroll deepens the shadow */}
       <header
         className={cn(
-          "fixed top-0 w-full z-50 transition-all duration-300 bg-background/97 backdrop-blur-md border-b border-border",
-          isScrolled ? "shadow-md py-3" : "shadow-sm py-4"
+          "fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md border-b border-border",
+          isScrolled ? "shadow-md py-3" : "shadow-sm py-4",
+          !themeNavBg && "bg-background/97"
         )}
+        style={themeNavBg ? { backgroundColor: themeNavBg } : undefined}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <a
@@ -359,7 +399,10 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-16 mt-auto">
+      <footer
+        className={cn("text-primary-foreground py-16 mt-auto", !themeFooterBg && "bg-primary")}
+        style={themeFooterBg ? { backgroundColor: themeFooterBg } : undefined}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
