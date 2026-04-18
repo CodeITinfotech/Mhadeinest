@@ -49,7 +49,7 @@ export default function ActivityDetail() {
     <div className="flex flex-col min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="relative h-[55vh] min-h-[360px] overflow-hidden">
+      <section className="relative h-[55vh] min-h-[400px] overflow-hidden">
         {activity.image ? (
           <img
             src={activity.image}
@@ -71,13 +71,13 @@ export default function ActivityDetail() {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="absolute top-6 left-6 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5"
+            className="absolute top-28 left-6 z-20 flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5"
           >
             <ArrowLeft className="w-4 h-4" /> All Activities
           </motion.button>
         </Link>
 
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 pt-24">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}

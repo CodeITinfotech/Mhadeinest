@@ -19,7 +19,7 @@ export default function Gallery() {
   const sortedImages = [...filteredImages].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
-    <div className="pt-24 pb-24 bg-background min-h-screen">
+    <div className="pt-28 pb-24 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-3xl md:text-5xl font-display font-bold text-primary mb-6">Photo Gallery</h1>

@@ -15,7 +15,7 @@ export default function BlogList() {
   const posts = data?.posts || [];
 
   return (
-    <div className="pt-24 pb-24 bg-background min-h-screen">
+    <div className="pt-28 pb-24 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="max-w-2xl">

@@ -68,7 +68,7 @@ export default function Events() {
   ];
 
   return (
-    <div className="pt-24 pb-24 bg-background">
+    <div className="pt-28 pb-24 bg-background">
       <div className="max-w-7xl mx-auto px-4">
 
         {/* Hero header */}

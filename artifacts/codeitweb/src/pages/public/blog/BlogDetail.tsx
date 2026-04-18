@@ -30,7 +30,7 @@ export default function BlogDetail() {
   }
 
   return (
-    <div className="bg-background min-h-screen pb-24">
+    <div className="bg-background min-h-screen pb-24 pt-28">
       {/* Header Image */}
       {post.images && post.images.length > 0 && (
         <div className="w-full h-[50vh] md:h-[60vh] relative">

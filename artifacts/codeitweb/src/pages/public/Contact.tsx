@@ -62,14 +62,14 @@ export default function Contact() {
     <div className="flex flex-col min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="relative h-[52vh] min-h-[340px] overflow-hidden">
+      <section className="relative h-[52vh] min-h-[380px] overflow-hidden">
         <img
           src={heroImage}
           alt={siteName}
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/65" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 pt-24">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

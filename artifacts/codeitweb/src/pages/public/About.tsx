@@ -50,7 +50,7 @@ export default function About() {
   const trailVideoUrl = settings?.trailVideoUrl || "";
 
   return (
-    <div className="pt-24 pb-24 bg-background">
+    <div className="pt-28 pb-24 bg-background">
       <div className="max-w-7xl mx-auto px-4">
         {/* Page Header */}
         <div className="text-center mb-16">
