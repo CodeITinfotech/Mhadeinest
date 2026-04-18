@@ -292,18 +292,10 @@ function PublicLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="flex items-center gap-3 mb-6">
-              {hasCustomLogo ? (
-                <img
-                  src={logo}
-                  alt={settings?.siteName || "Mhadeinest"}
-                  className="h-14 w-auto object-contain drop-shadow-lg"
-                />
-              ) : (
-                <p className="font-display font-bold text-2xl text-white leading-tight">
-                  {settings?.siteName || "Mhadeinest"}
-                </p>
-              )}
+            <div className="mb-6">
+              <p className="font-display font-bold text-4xl md:text-5xl text-white leading-none tracking-tight drop-shadow-sm">
+                {settings?.siteName || "Mhadeinest"}
+              </p>
             </div>
             <p className="text-primary-foreground/70 mb-6">
               {settings?.tagline || "Experience the ultimate luxury on the beautiful waters of Goa."}
