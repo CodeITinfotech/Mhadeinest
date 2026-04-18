@@ -32,32 +32,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
 function CurrencySwitcher({ scrolled, onHome }: { scrolled: boolean; onHome: boolean }) {
   const { currency, setCurrency } = useCurrency();
-  const currencies: Currency[] = ["INR", "GBP", "USD"];
   const isLight = scrolled || !onHome;
   return (
-    <div className={cn(
-      "flex items-center rounded-full p-0.5 gap-0.5",
-      isLight ? "bg-muted" : "bg-white/15 backdrop-blur-sm"
-    )}>
-      {currencies.map(c => (
-        <button
-          key={c}
-          onClick={() => setCurrency(c)}
-          className={cn(
-            "px-2.5 py-1 rounded-full text-[11px] font-bold transition-all leading-none",
-            currency === c
-              ? isLight
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-white text-primary shadow-sm"
-              : isLight
-                ? "text-muted-foreground hover:text-foreground"
-                : "text-white/70 hover:text-white"
-          )}
-        >
-          {c}
-        </button>
-      ))}
-    </div>
+    <select
+      value={currency}
+      onChange={e => setCurrency(e.target.value as Currency)}
+      className={cn(
+        "text-[11px] font-bold rounded-full px-2.5 py-1 border cursor-pointer outline-none transition-colors",
+        isLight
+          ? "bg-muted border-border text-foreground hover:bg-muted/80"
+          : "bg-white/15 backdrop-blur-sm border-white/20 text-white hover:bg-white/25"
+      )}
+    >
+      <option value="INR">INR ₹</option>
+      <option value="GBP">GBP £</option>
+      <option value="USD">USD $</option>
+    </select>
   );
 }
 
