@@ -13,13 +13,14 @@ router.get("/events", async (_req, res): Promise<void> => {
 });
 
 router.post("/events", async (req, res): Promise<void> => {
-  const { name, description, image, amenities, chargeables, minHours, sortOrder, isActive } = req.body;
+  const { name, category, description, image, amenities, chargeables, minHours, sortOrder, isActive, mrp, sellingPrice } = req.body;
   if (!name) {
     res.status(400).json({ error: "Name is required" });
     return;
   }
   const [event] = await db.insert(eventsTable).values({
     name,
+    category: category || "",
     description: description || "",
     image: image || null,
     amenities: amenities || "",
@@ -27,6 +28,8 @@ router.post("/events", async (req, res): Promise<void> => {
     minHours: minHours ?? 2,
     sortOrder: sortOrder ?? 0,
     isActive: isActive ?? true,
+    mrp: mrp ?? null,
+    sellingPrice: sellingPrice ?? null,
   }).returning();
   res.status(201).json(event);
 });
@@ -37,11 +40,12 @@ router.patch("/events/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Invalid id" });
     return;
   }
-  const { name, description, image, amenities, chargeables, minHours, sortOrder, isActive } = req.body;
+  const { name, category, description, image, amenities, chargeables, minHours, sortOrder, isActive, mrp, sellingPrice } = req.body;
   const [event] = await db
     .update(eventsTable)
     .set({
       ...(name !== undefined && { name }),
+      ...(category !== undefined && { category }),
       ...(description !== undefined && { description }),
       ...(image !== undefined && { image }),
       ...(amenities !== undefined && { amenities }),
@@ -49,6 +53,8 @@ router.patch("/events/:id", async (req, res): Promise<void> => {
       ...(minHours !== undefined && { minHours }),
       ...(sortOrder !== undefined && { sortOrder }),
       ...(isActive !== undefined && { isActive }),
+      ...(mrp !== undefined && { mrp: mrp ?? null }),
+      ...(sellingPrice !== undefined && { sellingPrice: sellingPrice ?? null }),
     })
     .where(eq(eventsTable.id, id))
     .returning();
