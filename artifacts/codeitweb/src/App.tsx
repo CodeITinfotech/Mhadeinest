@@ -18,6 +18,7 @@ import BlogList from "@/pages/public/blog/BlogList";
 import BlogDetail from "@/pages/public/blog/BlogDetail";
 import BlogSubmit from "@/pages/public/blog/BlogSubmit";
 import About from "@/pages/public/About";
+import Contact from "@/pages/public/Contact";
 
 // Admin Pages
 import AdminLogin from "@/pages/admin/Login";
@@ -92,6 +93,7 @@ function Router() {
             <Route path="/blog" component={BlogList} />
             <Route path="/blog/submit" component={BlogSubmit} />
             <Route path="/blog/:slug" component={BlogDetail} />
+            <Route path="/contact" component={Contact} />
             <Route path="/about" component={About} />
             <Route component={NotFound} />
           </Switch>

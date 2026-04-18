@@ -17,6 +17,7 @@ const ALL_NAV_LINKS = [
   { name: "Activities", href: "/activities" },
   { name: "Gallery", href: "/gallery" },
   { name: "Blog", href: "/blog" },
+  { name: "Contact", href: "/contact" },
   { name: "About", href: "/about" },
 ];
 

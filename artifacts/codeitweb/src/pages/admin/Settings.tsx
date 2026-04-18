@@ -28,6 +28,7 @@ const ALL_NAV_ITEMS = [
   { key: "Activities", href: "/activities" },
   { key: "Gallery",    href: "/gallery" },
   { key: "Blog",       href: "/blog" },
+  { key: "Contact",    href: "/contact" },
   { key: "About",      href: "/about" },
 ];
 
