@@ -41,7 +41,7 @@ const FALLBACK_GALLERY = [
 interface GalleryItem { id: number; imageUrl: string; isActive: boolean; sortOrder: number; }
 
 export default function Home() {
-  const { data: settings } = useGetSettings();
+  const { data: settings, isLoading: settingsLoading } = useGetSettings();
   const { data: packages = [] } = useListPackages();
   const { data: activities = [] } = useListActivities();
   const { fmt } = useCurrency();
@@ -79,6 +79,7 @@ export default function Home() {
     .slice(0, 4);
 
   const heroSlideImages: string[] = (() => {
+    if (settingsLoading) return [];
     const imgs = (settings as any)?.heroImages as string[] | undefined;
     if (imgs && imgs.length > 0) return imgs;
     const fallback = settings?.heroImage || `${BASE}images/hero.png`;
