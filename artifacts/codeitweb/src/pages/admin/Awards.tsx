@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, Trophy, Link as LinkIcon, GripVertical } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { processImage } from "@/lib/imageUtils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
@@ -72,18 +73,20 @@ export default function AdminAwards() {
     setImageChanged(false);
   }
 
-  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setImagePreview(ev.target?.result as string);
-      setImageChanged(true);
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    setUploading(true);
+    try {
+      const dataUrl = await processImage(file, 1200, 900, 0.82);
+      setImagePreview(dataUrl);
+      setImageChanged(true);
+    } catch {
+      // ignore
+    } finally {
+      setUploading(false);
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

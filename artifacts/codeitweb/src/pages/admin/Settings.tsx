@@ -15,6 +15,7 @@ import {
   Database, FolderOpen, FolderTree, ChevronRight, Download, Archive, Copy, Check, Wifi,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { processImage } from "@/lib/imageUtils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
@@ -31,22 +32,6 @@ const ALL_NAV_ITEMS = [
   { key: "Contact",    href: "/contact" },
   { key: "About",      href: "/about" },
 ];
-
-// ─── helpers ───────────────────────────────────────────────────────────────
-function scaleDown(dataUrl: string, maxPx = 800): Promise<string> {
-  return new Promise((res) => {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width * scale);
-      c.height = Math.round(img.height * scale);
-      c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-      res(c.toDataURL("image/png"));
-    };
-    img.src = dataUrl;
-  });
-}
 
 // ─── schemas ───────────────────────────────────────────────────────────────
 const siteSchema = z.object({
@@ -285,18 +270,15 @@ export default function AdminSettings() {
   };
 
   // ── Logo handlers ───────────────────────────────────────────────────────
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const raw = ev.target?.result as string;
-      const scaled = await scaleDown(raw, 800);
-      setLogoPreview(scaled);
-      setLogoChanged(true);
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    try {
+      const dataUrl = await processImage(file, 800, 800, 0.88);
+      setLogoPreview(dataUrl);
+      setLogoChanged(true);
+    } catch { /* ignore */ }
   };
 
   const removeLogo = () => {

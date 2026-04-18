@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit2, Trash2, Eye, EyeOff, Loader2, PartyPopper, X, GripVertical } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { processImage } from "@/lib/imageUtils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
@@ -119,13 +120,15 @@ export default function AdminEvents() {
 
   const handleImageFile = async (file: File) => {
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = e => {
-      setImagePreview(e.target?.result as string);
+    try {
+      const dataUrl = await processImage(file, 1200, 900, 0.82);
+      setImagePreview(dataUrl);
       setImageChanged(true);
+    } catch {
+      // ignore
+    } finally {
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const uploadImageToServer = async (dataUrl: string): Promise<string | null> => {

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { processImage } from "@/lib/imageUtils";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const API = `${BASE}/api`;
@@ -101,17 +102,17 @@ function ImageEditor({ index, onResult, onRemove, initialSrc }: ImageEditorProps
     if (originalSrc) loadImage(originalSrc);
   }, [originalSrc]);
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const src = ev.target?.result as string;
-      setOriginalSrc(src);
+    try {
+      const dataUrl = await processImage(file, 1600, 1200, 0.88);
+      setOriginalSrc(dataUrl);
       setMode("view");
       setCrop(null);
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      // ignore
+    }
   }
 
   // Display dimensions capped for the preview pane

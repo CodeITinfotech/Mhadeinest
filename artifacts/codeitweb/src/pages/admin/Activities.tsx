@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit2, Trash2, GripVertical, Eye, EyeOff, Loader2, Activity as ActivityIcon } from "lucide-react";
+import { processImage } from "@/lib/imageUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import * as LucideIcons from "lucide-react";
 
@@ -106,18 +107,20 @@ export default function AdminActivities() {
     setImageChanged(false);
   }
 
-  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setImagePreview(ev.target?.result as string);
-      setImageChanged(true);
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    setUploading(true);
+    try {
+      const dataUrl = await processImage(file, 1200, 900, 0.82);
+      setImagePreview(dataUrl);
+      setImageChanged(true);
+    } catch {
+      // ignore
+    } finally {
+      setUploading(false);
+    }
   }
 
   const onSubmit = (data: ActivityForm) => {

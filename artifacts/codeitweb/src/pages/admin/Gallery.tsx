@@ -27,6 +27,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { processImage } from "@/lib/imageUtils";
 
 // ─── shared image-editor types ─────────────────────────────────────────────
 
@@ -291,17 +292,14 @@ export default function AdminGallery() {
 
   const currentHero = settings?.heroImage || `${import.meta.env.BASE_URL}images/hero.png`;
 
-  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const raw = ev.target?.result as string;
-      const scaled = await scaleDown(raw, 1600);
-      setBannerEditor({ dataUrl: scaled, originalDataUrl: scaled, format: "image/jpeg" });
-    };
-    reader.readAsDataURL(file);
     e.target.value = "";
+    try {
+      const dataUrl = await processImage(file, 1600, 900, 0.85);
+      setBannerEditor({ dataUrl, originalDataUrl: dataUrl, format: "image/jpeg" });
+    } catch { /* ignore */ }
   };
 
   const saveBanner = async () => {
@@ -334,25 +332,22 @@ export default function AdminGallery() {
   const [savingGallery, setSavingGallery] = useState(false);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const raw = ev.target?.result as string;
-        const scaled = await scaleDown(raw, 1400);
+    e.target.value = "";
+    await Promise.all(files.map(async (file) => {
+      try {
+        const dataUrl = await processImage(file, 1400, 1050, 0.82);
         setNewPhotos((prev) => [
           ...prev,
           {
-            editor: { dataUrl: scaled, originalDataUrl: scaled, format: "image/jpeg" },
+            editor: { dataUrl, originalDataUrl: dataUrl, format: "image/jpeg" },
             caption: "",
             category: "general",
           },
         ]);
-      };
-      reader.readAsDataURL(file);
-    });
-    e.target.value = "";
+      } catch { /* ignore */ }
+    }));
   };
 
   const updateNewPhoto = (idx: number, patch: Partial<NewPhoto>) => {
