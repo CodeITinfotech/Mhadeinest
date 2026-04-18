@@ -22,12 +22,7 @@ const FALLBACK_FEATURES = [
   { icon: Coffee, title: "Rooftop Dining", desc: "Live Goan cuisine prepared fresh, right on the water." },
 ];
 
-const EXPLORE_CATEGORIES = [
-  { label: "Luxury Rooms", image: `${BASE}images/room-luxury.jpg`, href: "/packages" },
-  { label: "Dining & Cuisine", image: `${BASE}images/dining.png`, href: "/packages" },
-  { label: "Water Activities", image: `${BASE}images/boating.jpg`, href: "/activities" },
-  { label: "The Resort", image: `${BASE}images/resort2.jpg`, href: "/about" },
-];
+// Explore categories are built dynamically from real data inside the component
 
 const FALLBACK_GALLERY = [
   `${BASE}images/gallery-1.jpg`,
@@ -112,6 +107,17 @@ export default function Home() {
   }, []);
 
   const activePackages = packages.filter(p => p.isActive).slice(0, 3);
+
+  // Build explore category images from real data
+  const pkgsWithImage = packages.filter(p => p.isActive && p.image).sort((a, b) => a.sortOrder - b.sortOrder);
+  const actsWithImage = activities.filter(a => a.isActive && a.image).sort((a, b) => a.sortOrder - b.sortOrder);
+  const settingsAny = settings as any;
+  const exploreCategories = [
+    { label: "Luxury Rooms",    image: pkgsWithImage[0]?.image || null,  href: "/packages" },
+    { label: "Dining & Cuisine",image: pkgsWithImage[1]?.image || settingsAny?.bannerImage || null, href: "/packages" },
+    { label: "Water Activities", image: actsWithImage[0]?.image || null, href: "/activities" },
+    { label: "The Resort",      image: settingsAny?.welcomeImage || actsWithImage[1]?.image || pkgsWithImage[2]?.image || null, href: "/about" },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -252,7 +258,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {EXPLORE_CATEGORIES.map((cat, idx) => (
+            {exploreCategories.map((cat, idx) => (
               <motion.a
                 key={cat.label}
                 href={cat.href}
@@ -260,16 +266,17 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="relative group overflow-hidden rounded-lg aspect-[3/4] block cursor-pointer"
+                className="relative group overflow-hidden rounded-lg aspect-[3/4] block cursor-pointer bg-muted border border-border"
               >
-                <img
-                  src={cat.image}
-                  alt={cat.label}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-106"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = `${BASE}images/hero.png`;
-                  }}
-                />
+                {cat.image ? (
+                  <img
+                    src={cat.image}
+                    alt={cat.label}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/10" />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="text-white font-display font-semibold text-base leading-tight">{cat.label}</p>
