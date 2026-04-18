@@ -22,6 +22,7 @@ interface EventChargeable {
 interface BoatEvent {
   id: number;
   name: string;
+  category: string;
   description: string;
   image: string | null;
   amenities: string;
@@ -38,6 +39,7 @@ const chargeableSchema = z.object({
 
 const eventSchema = z.object({
   name: z.string().min(1, "Event name is required"),
+  category: z.string().default(""),
   description: z.string().default(""),
   amenities: z.string().default(""),
   chargeables: z.array(chargeableSchema).default([]),
@@ -48,8 +50,22 @@ const eventSchema = z.object({
 
 type EventForm = z.infer<typeof eventSchema>;
 
+const CATEGORY_PRESETS = [
+  "Birthday Party",
+  "Anniversary",
+  "Bachelorette",
+  "Engagement Ceremony",
+  "Special Shoot",
+  "Family Get Together",
+  "Corporate Event",
+  "Baby Shower",
+  "Farewell Party",
+  "Other",
+];
+
 const EMPTY_FORM: EventForm = {
   name: "",
+  category: "",
   description: "",
   amenities: "",
   chargeables: [],
@@ -100,6 +116,7 @@ export default function AdminEvents() {
     setImageChanged(false);
     form.reset({
       name: event.name,
+      category: event.category || "",
       description: event.description || "",
       amenities: event.amenities || "",
       chargeables: event.chargeables || [],
@@ -239,6 +256,11 @@ export default function AdminEvents() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-semibold truncate">{event.name}</p>
+                  {event.category && (
+                    <span className="text-xs text-secondary border border-secondary/30 bg-secondary/5 px-2 py-0.5 rounded-full">
+                      {event.category}
+                    </span>
+                  )}
                   <span className="text-xs text-muted-foreground border border-border px-2 py-0.5 rounded-full">
                     Min {event.minHours}h
                   </span>
@@ -302,6 +324,20 @@ export default function AdminEvents() {
                 <label className="text-sm font-medium">Minimum Duration (hours)</label>
                 <Input type="number" min={1} {...form.register("minHours")} placeholder="2" />
               </div>
+            </div>
+
+            {/* Category */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">Event Category</label>
+              <Input
+                {...form.register("category")}
+                list="category-presets"
+                placeholder="e.g. Birthday Party, Anniversary…"
+              />
+              <datalist id="category-presets">
+                {CATEGORY_PRESETS.map(c => <option key={c} value={c} />)}
+              </datalist>
+              <p className="text-xs text-muted-foreground">Used to group events on the public page. Type custom or pick from suggestions.</p>
             </div>
 
             {/* Description */}

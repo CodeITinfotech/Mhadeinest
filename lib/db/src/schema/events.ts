@@ -10,6 +10,7 @@ export interface EventChargeable {
 export const eventsTable = pgTable("events", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  category: text("category").notNull().default(""),
   description: text("description").notNull().default(""),
   image: text("image"),
   amenities: text("amenities").notNull().default(""),

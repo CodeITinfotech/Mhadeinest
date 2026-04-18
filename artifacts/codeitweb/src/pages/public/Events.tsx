@@ -17,6 +17,7 @@ interface EventChargeable {
 interface BoatEvent {
   id: number;
   name: string;
+  category: string;
   description: string;
   image: string | null;
   amenities: string;
@@ -58,14 +59,25 @@ export default function Events() {
 
   const whatsappNumber = (settings as any)?.whatsappNumber || "";
 
-  const EVENT_TYPES = [
-    { label: "Birthday Party", emoji: "🎂" },
-    { label: "Anniversary", emoji: "💍" },
-    { label: "Bachelorette", emoji: "🥂" },
-    { label: "Engagement Ceremony", emoji: "💑" },
-    { label: "Special Shoot", emoji: "📸" },
-    { label: "Family Get Together", emoji: "👨‍👩‍👧‍👦" },
-  ];
+  const CATEGORY_EMOJIS: Record<string, string> = {
+    "Birthday Party": "🎂",
+    "Anniversary": "💍",
+    "Bachelorette": "🥂",
+    "Engagement Ceremony": "💑",
+    "Special Shoot": "📸",
+    "Family Get Together": "👨‍👩‍👧‍👦",
+    "Corporate Event": "💼",
+    "Baby Shower": "🍼",
+    "Farewell Party": "🎉",
+    "Other": "✨",
+  };
+
+  const eventCategories = Array.from(
+    new Set(activeEvents.map(e => e.category).filter(Boolean))
+  ).map(cat => ({
+    label: cat,
+    emoji: CATEGORY_EMOJIS[cat] || "🎉",
+  }));
 
   return (
     <div className="pt-28 pb-24 bg-background">
@@ -80,15 +92,17 @@ export default function Events() {
           </p>
         </div>
 
-        {/* Event type chips */}
-        <div className="flex flex-wrap justify-center gap-3 mb-16">
-          {EVENT_TYPES.map(t => (
-            <span key={t.label} className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-sm font-medium text-primary">
-              <span>{t.emoji}</span>
-              {t.label}
-            </span>
-          ))}
-        </div>
+        {/* Event category chips — derived from active events */}
+        {eventCategories.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-3 mb-16">
+            {eventCategories.map(t => (
+              <span key={t.label} className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-sm font-medium text-primary">
+                <span>{t.emoji}</span>
+                {t.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Hero banner */}
         <motion.div
