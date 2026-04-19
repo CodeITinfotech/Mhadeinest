@@ -31,7 +31,7 @@ jobs:
 
       # 📥 Install all workspace dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       # 🏗️ Build frontend
       - name: Build frontend
@@ -75,6 +75,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
+          security: loose          # add this line
           local-dir: ./artifacts/codeitweb/dist/public/
           server-dir: /
           dangerous-clean-slate: true
