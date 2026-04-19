@@ -30,7 +30,16 @@ app.use(
     },
   }),
 );
-app.use(cors({ credentials: true, origin: true }));
+// app.use(cors({ credentials: true, origin: true }));
+app.use(cors({
+  credentials: true,
+  origin: [
+    "https://mhadeinestgoa.com",
+    "https://www.mhadeinestgoa.com",
+    "http://localhost:5173",
+    "http://localhost:8080",
+  ]
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
