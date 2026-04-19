@@ -1,0 +1,81 @@
+name: Deploy Frontend to cPanel
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      LOCAL_DIR: ./artifacts/codeitweb/dist/public/
+      SERVER_DIR: /
+      FTP_PORT: 21
+
+    steps:
+      # 📦 Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 🟢 Setup Node.js 24
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # 📥 Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # 📥 Install all workspace dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # 🏗️ Build frontend
+      - name: Build frontend
+        working-directory: ./artifacts/codeitweb
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: pnpm run build
+
+      # ✅ Verify build output exists
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          if [ ! -d "artifacts/codeitweb/dist/public" ]; then
+            echo "❌ dist/public does not exist"
+            exit 1
+          fi
+          if [ -z "$(ls -A artifacts/codeitweb/dist/public)" ]; then
+            echo "❌ dist/public is empty"
+            exit 1
+          fi
+          echo "✅ dist/public exists and has files"
+          ls -la artifacts/codeitweb/dist/public
+
+      # 🔍 Print deploy values (safe)
+      - name: Print deploy values
+        run: |
+          echo "---- DEPLOY DEBUG ----"
+          echo "LOCAL_DIR  = $LOCAL_DIR"
+          echo "SERVER_DIR = $SERVER_DIR"
+          echo "FTP_PORT   = $FTP_PORT"
+          echo "FTP_SERVER set?    -> ${{ secrets.FTP_SERVER != '' }}"
+          echo "FTP_USERNAME set?  -> ${{ secrets.FTP_USERNAME != '' }}"
+          echo "FTP_PASSWORD set?  -> ${{ secrets.FTP_PASSWORD != '' }}"
+          echo "VITE_API_URL set?  -> ${{ secrets.VITE_API_URL != '' }}"
+
+      # 🚀 Deploy to cPanel via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          local-dir: ./artifacts/codeitweb/dist/public/
+          server-dir: /
+          dangerous-clean-slate: true
+          log-level: verbose
