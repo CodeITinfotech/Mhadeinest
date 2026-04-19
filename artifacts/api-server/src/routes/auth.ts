@@ -47,7 +47,8 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   res.cookie("admin_session", JSON.stringify({ id: user.id, username: user.username, role: user.role }), {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: "lax",
+    sameSite: "none",
+    secure: true,
   });
 
   res.json(AdminLoginResponse.parse({
@@ -114,7 +115,7 @@ router.put("/auth/profile", async (req, res): Promise<void> => {
 
     // Refresh cookie with new username if changed
     const newSession = { id: updated.id, username: updated.username, role: updated.role };
-    res.cookie("admin_session", JSON.stringify(newSession), { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "lax" });
+    res.cookie("admin_session", JSON.stringify(newSession), { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: "none", secure: true });
 
     res.json({ success: true, user: { id: updated.id, username: updated.username, role: updated.role, displayName: updated.displayName, email: updated.email, phone: updated.phone } });
   } catch (err) {
