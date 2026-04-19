@@ -41,9 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
 # Replit
 .cache/
 .local/
@@ -52,3 +49,28 @@ Thumbs.db
 .replitignore
 replit.md
 artifact.toml
+
+# Environment variables - never commit these
+.env
+.env.local
+.env.*.local
+
+# pnpm
+.pnpm-store/
+
+# Build artifacts
+artifacts/api-server/dist/
+artifacts/codeitweb/dist/
+
+# Uploaded user content (added via admin panel at runtime)
+artifacts/codeitweb/public/images/uploads/
+
+# Logs
+*.log
+logs/
+
+lib\db\.env
+.env
+
+lib\api-client-react\node_modules
+artifacts\api-server\.env

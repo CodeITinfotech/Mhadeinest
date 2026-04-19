@@ -33,6 +33,16 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      // "/images": {
+      //   target: "http://localhost:8080",
+      //   changeOrigin: true,
+      // },
+    },
     // When running behind the Replit proxy, direct HMR WebSocket through the public domain
     ...(replitDomain
       ? {

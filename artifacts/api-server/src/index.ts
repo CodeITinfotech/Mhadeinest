@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import http from "http";
 import net from "net";
 import app from "./app";

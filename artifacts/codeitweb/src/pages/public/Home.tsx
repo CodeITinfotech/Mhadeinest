@@ -36,9 +36,15 @@ const FALLBACK_GALLERY = [
 interface GalleryItem { id: number; imageUrl: string; isActive: boolean; sortOrder: number; }
 
 export default function Home() {
-  const { data: settings, isLoading: settingsLoading } = useGetSettings();
-  const { data: packages = [] } = useListPackages();
-  const { data: activities = [] } = useListActivities();
+  const { data: _settingsRaw, isLoading: settingsLoading } = useGetSettings();
+  const settings = Array.isArray(_settingsRaw) ? _settingsRaw[0] : (_settingsRaw as any)?.data ?? _settingsRaw;
+
+  const { data: _packagesRaw } = useListPackages();
+  const packages = Array.isArray(_packagesRaw) ? _packagesRaw : (_packagesRaw as any)?.data ?? [];
+
+  const { data: _activitiesRaw } = useListActivities();
+  const activities = Array.isArray(_activitiesRaw) ? _activitiesRaw : (_activitiesRaw as any)?.data ?? [];
+  
   const { fmt } = useCurrency();
   const { open: openInquiry } = useInquiryModal();
   const [openFaqId, setOpenFaqId] = useState<number | null>(null);
