@@ -10,7 +10,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useInquiryModal } from "@/context/InquiryModalContext";
 import { useState, useEffect } from "react";
 
-const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const API_BASE = import.meta.env.VITE_API_URL || import.meta.env.BASE_URL.replace(/\/$/, "");
 const BASE = import.meta.env.BASE_URL;
 
 interface Faq { id: number; question: string; answer: string; isActive: boolean; sortOrder: number; }
@@ -21,8 +21,6 @@ const FALLBACK_FEATURES = [
   { icon: Sun, title: "Golden Hour Views", desc: "Watch Goa's sky turn amber from your private rooftop." },
   { icon: Coffee, title: "Rooftop Dining", desc: "Live Goan cuisine prepared fresh, right on the water." },
 ];
-
-// Explore categories are built dynamically from real data inside the component
 
 const FALLBACK_GALLERY = [
   `${BASE}images/gallery-1.jpg`,
@@ -36,6 +34,7 @@ const FALLBACK_GALLERY = [
 interface GalleryItem { id: number; imageUrl: string; isActive: boolean; sortOrder: number; }
 
 export default function Home() {
+  // Fix 1: handle response shape from API client
   const { data: _settingsRaw, isLoading: settingsLoading } = useGetSettings();
   const settings = Array.isArray(_settingsRaw) ? _settingsRaw[0] : (_settingsRaw as any)?.data ?? _settingsRaw;
 
@@ -44,7 +43,7 @@ export default function Home() {
 
   const { data: _activitiesRaw } = useListActivities();
   const activities = Array.isArray(_activitiesRaw) ? _activitiesRaw : (_activitiesRaw as any)?.data ?? [];
-  
+
   const { fmt } = useCurrency();
   const { open: openInquiry } = useInquiryModal();
   const [openFaqId, setOpenFaqId] = useState<number | null>(null);
@@ -114,8 +113,6 @@ export default function Home() {
 
   const activePackages = packages.filter(p => p.isActive).slice(0, 3);
 
-  // Build explore cards from real packages + activities (first 2 of each, up to 4 total)
-  // For images: use the item's own image, then cycle through gallery/hero images as fallback
   const sortedPackages = packages.filter(p => p.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const sortedActivities = activities.filter(a => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   const imagePool: string[] = [
@@ -139,8 +136,9 @@ export default function Home() {
   return (
     <div className="flex flex-col">
 
-      {/* ─── HERO ─── */}
-      <section className="relative h-screen min-h-[600px] overflow-hidden">
+      {/* ─── HERO ─── Fix 2: use flex column so AvailabilitySearch never overlaps on mobile */}
+      <section className="relative min-h-screen flex flex-col overflow-hidden">
+        {/* Background */}
         <div className="absolute inset-0 z-0">
           <AnimatePresence initial={false}>
             <motion.img
@@ -154,57 +152,50 @@ export default function Home() {
               transition={{ duration: 1.2, ease: "easeInOut" }}
             />
           </AnimatePresence>
-          {/* Lighter, more natural gradient — image earns its place */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-black/68" />
         </div>
-        {/* Slide indicator dots */}
-        {heroSlideImages.length > 1 && (
-          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-            {heroSlideImages.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroSlide(i)}
-                className={`w-2 h-2 rounded-full transition-all ${i === heroSlide ? "bg-white scale-125" : "bg-white/40 hover:bg-white/70"}`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
 
-        {/* Location tag */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="absolute top-[30%] left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
-        >
-          <MapPin className="w-3.5 h-3.5 text-secondary" />
-          <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">{(settings as any)?.heroLocationTag || "Mandovi River, Goa"}</span>
-        </motion.div>
+        {/* Content column — grows to fill space, centres content */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-4 pt-28 pb-6">
+          {/* Location tag */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="flex items-center gap-2 mb-4"
+          >
+            <MapPin className="w-3.5 h-3.5 text-secondary" />
+            <span className="text-white/80 text-xs font-medium tracking-[0.14em] uppercase">
+              {(settings as any)?.heroLocationTag || "Mandovi River, Goa"}
+            </span>
+          </motion.div>
 
-        {/* Hero headline block */}
-        <div className="absolute top-[36%] left-0 right-0 z-10 text-center px-4">
+          {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-4xl md:text-5xl lg:text-[3.75rem] font-display font-bold text-white mb-4 leading-[1.1] drop-shadow-md"
+            className="text-4xl md:text-5xl lg:text-[3.75rem] font-display font-bold text-white mb-4 leading-[1.1] drop-shadow-md max-w-2xl"
           >
-            {settings?.heroTitle || "Experience Goa\nFrom the Water"}
+            {settings?.heroTitle || "Experience Goa From The Water"}
           </motion.h1>
+
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.18 }}
-            className="text-base md:text-lg text-white/78 mb-7 font-light drop-shadow max-w-lg mx-auto leading-relaxed"
+            className="text-base md:text-lg text-white/80 mb-7 font-light drop-shadow max-w-lg leading-relaxed"
           >
             {settings?.heroSubtitle || "A luxury river resort on Goa's backwaters — three private bedrooms, rooftop dining, and the river all to yourself."}
           </motion.p>
+
+          {/* CTA buttons */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.32 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3"
+            className="flex flex-row items-center justify-center gap-3 flex-wrap"
           >
             <Link href="/packages">
               <Button size="default" className="px-8 py-2.5 rounded-sm bg-secondary hover:bg-secondary/90 text-white font-semibold tracking-wide shadow-lg">
@@ -220,18 +211,32 @@ export default function Home() {
               Discover More
             </Button>
           </motion.div>
+
+          {/* Slide dots — inline, not absolute */}
+          {heroSlideImages.length > 1 && (
+            <div className="flex gap-2 mt-6">
+              {heroSlideImages.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setHeroSlide(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${i === heroSlide ? "bg-white scale-125" : "bg-white/40 hover:bg-white/70"}`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Availability widget — anchored to bottom */}
-        <div id="check-availability" className="absolute bottom-6 md:bottom-10 left-0 right-0 z-20 px-4">
+        {/* Availability widget — in normal flow, never overlaps content */}
+        <div id="check-availability" className="relative z-20 px-4 pb-6 md:pb-10">
           <AvailabilitySearch />
         </div>
       </section>
 
-      {/* ─── FEATURES STRIP ─── */}
+      {/* ─── FEATURES STRIP ─── Fix 3: proper mobile grid with borders */}
       <section className="bg-white py-14 border-b border-border">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-border">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-0 md:divide-x md:divide-border">
             {(activeActivities.length > 0 ? activeActivities : FALLBACK_FEATURES).map((item, idx) => {
               const Icon = activeActivities.length > 0
                 ? ((LucideIcons as any)[(item as any).icon] || Waves)
@@ -245,13 +250,13 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.08, duration: 0.5 }}
-                  className="flex flex-col items-center text-center px-6 py-8 group"
+                  className="flex flex-col items-center text-center px-4 md:px-6 py-7 group rounded-xl md:rounded-none border border-border md:border-0 bg-white"
                 >
-                  <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-full bg-primary/8 group-hover:bg-primary/14 transition-colors">
-                    <Icon className="w-6 h-6 text-primary" />
+                  <div className="w-11 h-11 mb-3 flex items-center justify-center rounded-full bg-primary/8 group-hover:bg-primary/14 transition-colors">
+                    <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-semibold text-base text-foreground mb-1.5">{title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+                  <h3 className="font-display font-semibold text-sm text-foreground mb-1.5">{title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-4">{desc}</p>
                 </motion.div>
               );
             })}
@@ -286,11 +291,7 @@ export default function Home() {
                 className="relative group overflow-hidden rounded-lg aspect-[3/4] block cursor-pointer bg-muted border border-border"
               >
                 {cat.image ? (
-                  <img
-                    src={cat.image}
-                    alt={cat.label}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                  <img src={cat.image} alt={cat.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/10" />
                 )}
@@ -325,7 +326,6 @@ export default function Home() {
                 ? settings.aboutText.substring(0, 260) + "..."
                 : "Immerse yourself in the tranquility of Goa's backwaters with Mhadeinest. We offer an unparalleled blend of traditional charm and modern luxury — three exquisitely designed bedrooms, a rooftop restaurant, and thrilling water activities await."}
             </p>
-            {/* Star rating */}
             <div className="flex items-center gap-2 mb-7">
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-secondary text-secondary" />)}
@@ -353,7 +353,6 @@ export default function Home() {
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
-            {/* Floating review card */}
             <div className="absolute -bottom-6 -left-6 bg-white p-5 rounded-lg shadow-lg max-w-[220px] hidden md:block border border-border/60">
               <p className="font-display text-sm font-semibold text-foreground leading-snug mb-2">
                 "{(settings as any)?.welcomeReviewText || "An unforgettable experience on the water."}"
@@ -385,7 +384,6 @@ export default function Home() {
                 transition={{ delay: idx * 0.15 }}
                 className="bg-card rounded-lg overflow-hidden border border-border group hover:shadow-lg transition-all duration-300 flex flex-col"
               >
-                {/* Clickable image area → navigates to the package detail */}
                 <Link href={`/packages#package-${pkg.id}`} className="block">
                   <div className="aspect-[16/10] relative overflow-hidden">
                     <img
@@ -396,16 +394,13 @@ export default function Home() {
                     <div className="absolute top-3 left-3 bg-primary/90 text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-sm tracking-wide uppercase">
                       Up to {pkg.capacity} guests
                     </div>
-                    {/* Hover overlay — "View Details" prompt */}
                     <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/30 transition-all duration-300 flex items-center justify-center">
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-primary text-xs font-bold px-4 py-2 rounded-sm tracking-wide uppercase flex items-center gap-2">
-                        <ArrowRight className="w-3.5 h-3.5" />
-                        View Details
+                        <ArrowRight className="w-3.5 h-3.5" /> View Details
                       </span>
                     </div>
                   </div>
                 </Link>
-
                 <div className="p-6 flex flex-col flex-1">
                   <Link href={`/packages#package-${pkg.id}`} className="block mb-1.5">
                     <h3 className="font-display font-bold text-lg text-foreground group-hover:text-primary transition-colors">{pkg.name}</h3>
@@ -420,11 +415,7 @@ export default function Home() {
                     </div>
                     <div className="flex gap-2">
                       <Link href={`/packages#package-${pkg.id}`}>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="rounded-sm border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-semibold px-4"
-                        >
+                        <Button size="sm" variant="outline" className="rounded-sm border-primary/40 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-semibold px-4">
                           Details
                         </Button>
                       </Link>
@@ -440,7 +431,6 @@ export default function Home() {
                 </div>
               </motion.div>
             )) : (
-              /* Skeleton placeholder while packages load */
               [0,1,2].map(i => (
                 <div key={i} className="bg-card rounded-lg overflow-hidden border border-border animate-pulse">
                   <div className="aspect-[16/10] bg-muted" />
@@ -502,27 +492,13 @@ export default function Home() {
       {/* ─── IMMERSIVE EXPERIENCE BANNER ─── */}
       <section className="relative py-0 overflow-hidden">
         <div className="relative h-[480px] md:h-[520px]">
-          {/* Video background — shown when a video URL is configured */}
           {(settings as any)?.bannerVideoUrl ? (
             <>
-              <video
-                key={(settings as any).bannerVideoUrl}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              >
+              <video key={(settings as any).bannerVideoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover object-center">
                 <source src={(settings as any).bannerVideoUrl} type="video/mp4" />
               </video>
-              {/* Fallback poster image while video loads */}
               {(settings as any)?.bannerImage && (
-                <img
-                  src={(settings as any).bannerImage}
-                  alt=""
-                  aria-hidden
-                  className="absolute inset-0 w-full h-full object-cover object-center -z-10"
-                />
+                <img src={(settings as any).bannerImage} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center -z-10" />
               )}
             </>
           ) : (
@@ -534,49 +510,20 @@ export default function Home() {
           )}
           <div className="absolute inset-0 bg-primary/82" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-secondary text-xs font-semibold uppercase tracking-[0.18em] mb-4"
-            >
+            <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-secondary text-xs font-semibold uppercase tracking-[0.18em] mb-4">
               {(settings as any)?.bannerLabel || "The Mhadeinest Way"}
             </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-5xl font-display font-bold text-white leading-tight max-w-2xl mb-5"
-            >
+            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-3xl md:text-5xl font-display font-bold text-white leading-tight max-w-2xl mb-5">
               {(settings as any)?.bannerTitle || "Experience Goa Like You Never Have Before"}
             </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-white/68 text-base max-w-lg mb-8 leading-relaxed"
-            >
+            <motion.p initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.15 }} className="text-white/68 text-base max-w-lg mb-8 leading-relaxed">
               {(settings as any)?.bannerDescription || "Wake up on the river. Kayak at sunrise. Dine under the stars. Mhadeinest is your private floating retreat, away from the crowds."}
             </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.28 }}
-              className="flex gap-4 flex-wrap justify-center"
-            >
+            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.28 }} className="flex gap-4 flex-wrap justify-center">
               <Link href="/packages">
-                <Button className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-8 font-semibold tracking-wide shadow-lg">
-                  Explore Packages
-                </Button>
+                <Button className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-8 font-semibold tracking-wide shadow-lg">Explore Packages</Button>
               </Link>
-              <Button
-                variant="ghost"
-                className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-8 font-medium"
-                onClick={() => openInquiry()}
-              >
+              <Button variant="ghost" className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-8 font-medium" onClick={() => openInquiry()}>
                 Plan My Stay
               </Button>
             </motion.div>
@@ -584,34 +531,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── ACTIVITIES ─── */}
+      {/* ─── ACTIVITIES ─── Fix 4: horizontal layout on mobile */}
       {activeActivities.length > 0 && (
         <section className="py-20 bg-muted/40">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-12">
               <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">What To Do</p>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-                On-Board Activities & Experiences
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">On-Board Activities & Experiences</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
               {activeActivities.map((activity, idx) => {
                 const Icon = (LucideIcons as any)[activity.icon] || Waves;
                 return (
-                  <motion.div
-                    key={activity.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-lg p-6 text-center border border-border hover:shadow-md transition-shadow group"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-primary/8 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/15 transition-colors">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-display font-semibold text-base text-foreground mb-2">{activity.name}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{activity.description}</p>
-                  </motion.div>
+                  <Link key={activity.id} href={`/activities/${activity.id}`}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="bg-white rounded-xl border border-border hover:shadow-md hover:border-secondary/40 transition-all cursor-pointer group flex flex-row md:flex-col items-center md:items-center gap-4 md:gap-0 p-4 md:p-6 md:text-center"
+                    >
+                      <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-full bg-primary/8 flex items-center justify-center md:mx-auto md:mb-4 group-hover:bg-primary/15 transition-colors">
+                        <Icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display font-semibold text-sm md:text-base text-foreground mb-1 md:mb-2 group-hover:text-secondary transition-colors">{activity.name}</h3>
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 md:line-clamp-none">{activity.description}</p>
+                      </div>
+                    </motion.div>
+                  </Link>
                 );
               })}
             </div>
@@ -630,29 +578,15 @@ export default function Home() {
       {activeFaqs.length > 0 && (
         <section className="py-20 bg-background">
           <div className="max-w-3xl mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
               <p className="text-secondary font-semibold text-xs uppercase tracking-[0.16em] mb-3">Got Questions?</p>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-                Frequently Asked Questions
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Frequently Asked Questions</h2>
             </motion.div>
-
             <div className="divide-y divide-border border border-border rounded-lg bg-card overflow-hidden">
               {activeFaqs.map((faq, idx) => {
                 const isOpen = openFaqId === faq.id;
                 return (
-                  <motion.div
-                    key={faq.id}
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.05 }}
-                  >
+                  <motion.div key={faq.id} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: idx * 0.05 }}>
                     <button
                       onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
                       className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-muted/50 transition-colors"
@@ -662,14 +596,7 @@ export default function Home() {
                     </button>
                     <AnimatePresence initial={false}>
                       {isOpen && (
-                        <motion.div
-                          key="answer"
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden"
-                        >
+                        <motion.div key="answer" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: "easeInOut" }} className="overflow-hidden">
                           <div className="px-6 pb-6 pt-1">
                             <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">{faq.answer}</p>
                           </div>
@@ -684,26 +611,17 @@ export default function Home() {
         </section>
       )}
 
-      {/* ─── KEEP IN TOUCH / CTA STRIP ─── */}
+      {/* ─── CTA STRIP ─── */}
       <section className="py-16 bg-primary">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">
-            Ready to Experience Mhadeinest?
-          </h2>
-          <p className="text-primary-foreground/65 mb-7 text-[15px]">
-            Reach out to plan your stay — our team responds within a few hours.
-          </p>
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">Ready to Experience Mhadeinest?</h2>
+          <p className="text-primary-foreground/65 mb-7 text-[15px]">Reach out to plan your stay — our team responds within a few hours.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-10 font-semibold tracking-wide shadow-lg"
-              onClick={() => openInquiry()}
-            >
+            <Button className="rounded-sm bg-secondary hover:bg-secondary/90 text-white px-10 font-semibold tracking-wide shadow-lg" onClick={() => openInquiry()}>
               Send an Inquiry
             </Button>
             <Link href="/packages">
-              <Button variant="ghost" className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-10 font-medium">
-                Browse Packages
-              </Button>
+              <Button variant="ghost" className="rounded-sm text-white border border-white/30 hover:bg-white/12 px-10 font-medium">Browse Packages</Button>
             </Link>
           </div>
         </div>
